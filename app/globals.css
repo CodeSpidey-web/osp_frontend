@@ -1,0 +1,307 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+.animation-fade-in {
+  animation: fade-in 0.5s ease forwards;
+}
+
+.rbt-bg-color-primary .mainmenu > li > a.active,
+.rbt-bg-color-primary .mainmenu > li > a:hover {
+    color: #ffffff !important;
+}
+.rbt-bg-color-primary .mainmenu > li > a.active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 30px !important;
+}
+.rbt-header-content .mainmenu > li > a.active,
+.mainmenu > li > a.active {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 30px !important;
+    color: var(--color-primary) !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0 15px !important;
+}
+
+/* Fix collision between Bootstrap .collapse and Tailwind .collapse */
+.collapse.show {
+    visibility: visible !important;
+}
+
+/* Replace primary blue with forest green and orange with yellow/gold from the logo */
+:root {
+  --color-primary: #136c39 !important;
+  --color-secondary: #fed000 !important;
+}
+
+/* Bigger logo */
+.logo a img,
+.rbt-header .logo a img,
+.rbt-footer .rbt-footer-top .logo a img {
+  max-height: 140px !important;
+  max-width: 400px !important;
+  width: auto !important;
+}
+
+.rbt-header {
+  padding-top: 0.75rem;
+}
+
+/* Modern nav link styles */
+.nav-link-custom {
+  position: relative;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  padding: 0.5rem 1rem;
+  color: #374151;
+  transition: color 0.2s ease;
+}
+
+.nav-link-custom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 70%;
+  height: 2px;
+  background: var(--color-primary, #136c39);
+  border-radius: 1px;
+  transition: transform 0.25s ease;
+}
+
+.nav-link-custom:hover {
+  color: var(--color-primary, #136c39);
+}
+
+.nav-link-custom:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.nav-link-custom.active {
+  color: var(--color-primary, #136c39);
+  font-weight: 600;
+}
+
+.nav-link-custom.active::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.mainmenu > li > a.nav-link-custom.active {
+  background: transparent !important;
+  border-radius: 0 !important;
+  height: auto !important;
+  line-height: inherit !important;
+  display: inline !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.mainmenu > li > a.nav-link-custom {
+  height: auto !important;
+  line-height: inherit !important;
+  display: inline !important;
+}
+
+.mainmenu > li {
+  margin: 0;
+}
+
+.hero-enhanced .rbt-product-banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(19,108,57,0.06) 0%, rgba(254,208,0,0.04) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-enhanced .rbt-banner-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-subtitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-primary, #136c39);
+  margin-bottom: 0.75rem;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a1a2e;
+  margin-bottom: 0.75rem;
+}
+
+.hero-desc {
+  font-size: 1.05rem;
+  color: #6b7280;
+  max-width: 480px;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.hero-cta.rbt-btn {
+  background: var(--color-primary, #136c39);
+  border: none;
+  color: #fff;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.25s ease;
+}
+
+.hero-cta.rbt-btn:hover {
+  background: #0f5a2f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(19,108,57,0.25);
+}
+
+.trust-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
+}
+
+.trust-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+}
+
+.trust-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--color-primary, #136c39);
+  background: rgba(19,108,57,0.08);
+  margin: 0 auto 1rem;
+}
+
+.trust-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #1a1a2e;
+}
+
+.trust-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.newsletter-section {
+  background: linear-gradient(135deg, #0c331a 0%, #136c39 50%, #1a8c4e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter-section::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(254,208,0,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  pointer-events: none;
+}
+
+.newsletter-section::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+  pointer-events: none;
+}
+
+.newsletter-section .form-control:focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
