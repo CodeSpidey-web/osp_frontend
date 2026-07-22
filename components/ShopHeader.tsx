@@ -139,11 +139,11 @@ export default function ShopHeader() {
                             <a href="#" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
                                 <div className="rbt-round-btn rbt-bg-static-gray">
                                     <i className="fa-regular fa-bag-shopping"></i>
-                                    <span className="access-box-count rbt-shiny">12</span>
+                                    <span className="access-box-count rbt-shiny">{cartCount}</span>
                                 </div>
                                 <div className="content p-0">
                                     <p>Total Cart</p>
-                                    <span>Total ₹0</span>
+                                    <span>Total {formatPrice(cartTotal, currencyCode)}</span>
                                 </div>
                             </a>
                         </li>
