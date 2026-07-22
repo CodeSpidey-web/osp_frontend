@@ -114,8 +114,8 @@ body {
   .logo a img,
   .rbt-header .logo a img,
   .rbt-footer .rbt-footer-top .logo a img {
-    max-height: 75px !important;
-    max-width: 260px !important;
+    max-height: 100px !important;
+    max-width: 320px !important;
     width: auto !important;
   }
 }
