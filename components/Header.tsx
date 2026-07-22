@@ -89,7 +89,7 @@ export default function Header() {
                             <div className="header-info p-0  d-none d-xl-block">
                                 <div className="logo">
                                     <a href="/">
-                                        <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                                     </a>
                                 </div>
                             </div>
@@ -131,7 +131,7 @@ export default function Header() {
                         <div className="header-info p-0  d-block d-xl-none">
                             <div className="logo">
                                 <a href="/">
-                                    <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                    <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                                 </a>
                             </div>
                         </div>
@@ -195,7 +195,7 @@ export default function Header() {
                             <div className="header-info d-xl-block d-none">
                                 <div className="logo rbt-logo-height-sm">
                                     <a href="/">
-                                        <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                                     </a>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@ export default function Header() {
                     <div className="header-info d-xl-none d-block">
                         <div className="logo">
                             <a href="/">
-                                <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                             </a>
                         </div>
                     </div>

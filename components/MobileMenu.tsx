@@ -15,7 +15,7 @@ export default function MobileMenu() {
                             <div className="content">
                                 <div className="logo">
                                     <a href="/">
-                                        <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                                     </a>
                                 </div>
                                 <div className="rbt-btn-close">

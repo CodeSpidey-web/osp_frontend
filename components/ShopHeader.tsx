@@ -52,7 +52,7 @@ export default function ShopHeader() {
                         <div className="header-info">
                             <div className="logo">
                                 <a href="index-2.html">
-                                    <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                    <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                                 </a>
                             </div>
                         </div>
@@ -204,7 +204,7 @@ export default function ShopHeader() {
                     <div className="header-info d-xl-block d-none">
                         <div className="logo rbt-logo-height-sm">
                             <a href="index-2.html">
-                                <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                                <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                             </a>
                         </div>
                     </div>
@@ -223,7 +223,7 @@ export default function ShopHeader() {
             <div className="header-info d-xl-none d-block">
                 <div className="logo">
                     <a href="index-2.html">
-                        <img src="/assets/images/logo/fixed_logo.webp" alt="Ocean Student Projects Logo" />
+                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
                     </a>
                 </div>
             </div>
