@@ -16,7 +16,7 @@ export default function ShopBannerAndCategories() {
                 <a className="rbt-cat-box rbt-cat-box-1 text-center" href={`/shop${cat.handle ? `?category_id=${cat.id}` : ''}`}>
                   <div className="inner">
                     <div className="rbt-image-portion">
-                      <img src={`/assets/images/catagory-img/cat-img-0${(i % 6) + 1}.webp`} alt={cat.name} />
+                      <img src={`/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} alt={cat.name} />
                     </div>
                     <div className="content">
                       <p className="title">{cat.name}</p>

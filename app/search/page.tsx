@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 
 import ShopHeader from '@/components/ShopHeader';
 import Footer from '@/components/Footer';
-import { useProducts } from '@/lib/hooks';
+import { useProducts, useCategories } from '@/lib/hooks';
 
 const MobileMenu = dynamic(() => import("@/components/MobileMenu"), { ssr: false });
 const SideNavs = dynamic(() => import("@/components/SideNavs"), { ssr: false });
@@ -13,6 +13,7 @@ const Modals = dynamic(() => import("@/components/Modals"), { ssr: false });
 const SearchPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const { products, count, loading } = useProducts({ q: searchQuery || undefined, limit: 12 });
+    const { categories } = useCategories();
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -68,117 +69,28 @@ const SearchPage = () => {
                     </div>
                 </div>
 
-                <div className="rbt-component-area rbt-catagories-area pt--0 pt_sm--16 pt_md--16 rbt-bg-color-white">
-                    <div className="container">
-                        <div className="row row--12 align-items-end rbt-tablet-row rbt-mobile-row">
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-1"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-01.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Apple Phone</p>
-                                        </div>
+                {categories && categories.length > 0 && (
+                    <div className="rbt-component-area rbt-catagories-area pt--0 pt_sm--16 pt_md--16 rbt-bg-color-white">
+                        <div className="container">
+                            <div className="row row--12 align-items-end rbt-tablet-row rbt-mobile-row">
+                                {categories.slice(0, 8).map((cat, i) => (
+                                    <div key={cat.id} className="col-lg-1-8 col-md-2 col-sm-3 col-3">
+                                        <a className="rbt-cat-box rbt-cat-box-1 text-center" href={`/shop${cat.handle ? `?category_id=${cat.id}` : ''}`}>
+                                            <div className="inner">
+                                                <div className="rbt-image-portion">
+                                                    <img src={`/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} alt={cat.name} />
+                                                </div>
+                                                <div className="content">
+                                                    <p className="title">{cat.name}</p>
+                                                </div>
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-2"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-02.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Jacket &amp; Polo</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-3"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-03.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Printer &amp; Ink</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-4"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-04.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Doll Panda</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-5"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img className="rbt-sm-max-height" src="assets/images/catagory-img/cat-img-05.webp"
-                                                alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">VIP Chair</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-6"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-06.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Stylish Bags</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-7"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-03.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Printer &amp; Ink</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div className="col-lg-1-8 col-md-2 col-sm-3 col-3">
-                                <a className="rbt-cat-box rbt-cat-box-1 text-center rbt-scroll-trigger fade_in animation-order-8"
-                                    href="/shop">
-                                    <div className="inner">
-                                        <div className="rbt-image-portion">
-                                            <img src="assets/images/catagory-img/cat-img-04.webp" alt="Catagory Product Images" />
-                                        </div>
-                                        <div className="content">
-                                            <p className="title">Doll Panda</p>
-                                        </div>
-                                    </div>
-                                </a>
+                                ))}
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 <div className="rbt-component-area ptb--32 ptb_sm--12 ptb_md--20">
                     <div className="container">
