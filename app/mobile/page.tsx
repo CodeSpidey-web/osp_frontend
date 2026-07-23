@@ -1,15 +1,49 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const devices = {
-  iphone: { name: 'iPhone 14', width: '390px', height: '844px', border: '32px', notch: true },
-  galaxy: { name: 'Galaxy S22', width: '360px', height: '800px', border: '24px', notch: false },
-  ipad: { name: 'iPad Mini', width: '768px', height: '1024px', border: '16px', notch: false }
+  iphone: { name: 'iPhone 14', width: 390, height: 844, border: '32px', notch: true, defaultScale: 0.8 },
+  galaxy: { name: 'Galaxy S22', width: 360, height: 800, border: '24px', notch: false, defaultScale: 0.8 },
+  ipad: { name: 'iPad Mini', width: 768, height: 1024, border: '16px', notch: false, defaultScale: 0.55 }
 };
 
 export default function MobilePreviewPage() {
   const [device, setDevice] = useState(devices.iphone);
   const [currentPath, setCurrentPath] = useState('/');
+  const [zoom, setZoom] = useState(0.8);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Sync default scale when device changes
+  useEffect(() => {
+    setZoom(device.defaultScale);
+  }, [device]);
+
+  // Inject CSS inside iframe on load to hide the vertical scrollbar track
+  const handleIframeLoad = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (iframe) {
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (doc) {
+          const style = doc.createElement('style');
+          style.innerHTML = `
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            ::-webkit-scrollbar {
+              display: none !important;
+            }
+            /* Hide scrollbar for IE, Edge and Firefox */
+            html, body {
+              -ms-overflow-style: none !important;
+              scrollbar-width: none !important;
+            }
+          `;
+          doc.head.appendChild(style);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to inject scrollbar-hiding style inside iframe:', err);
+    }
+  };
 
   return (
     <div style={{
@@ -29,7 +63,8 @@ export default function MobilePreviewPage() {
         flexDirection: 'column',
         padding: '24px',
         boxSizing: 'border-box',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        zIndex: 20
       }}>
         <div>
           <h2 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '700', color: '#10b981' }}>
@@ -117,54 +152,108 @@ export default function MobilePreviewPage() {
       <div style={{
         flex: 1,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)',
-        backgroundSize: '20px 20px',
-        position: 'relative'
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Top Control Bar for Zoom */}
         <div style={{
-          backgroundColor: '#000',
-          borderRadius: '40px',
-          padding: '12px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 4px #475569',
-          position: 'relative',
-          transition: 'all 0.3s ease'
+          height: '60px',
+          borderBottom: '1px solid #334155',
+          backgroundColor: '#1e293b',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: '0 24px',
+          gap: '16px',
+          zIndex: 10
         }}>
-          {/* Mock Camera Notch */}
-          {device.notch && (
-            <div style={{
-              position: 'absolute',
-              top: '22px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '110px',
-              height: '24px',
-              backgroundColor: '#000',
-              borderRadius: '12px',
-              zIndex: 10
-            }} />
-          )}
+          <span style={{ fontSize: '13px', color: '#94a3b8' }}>Zoom: {Math.round(zoom * 100)}%</span>
+          <button 
+            onClick={() => setZoom(prev => Math.max(0.4, prev - 0.05))}
+            style={{ padding: '4px 10px', background: '#334155', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer' }}
+          >-</button>
+          <input 
+            type="range" 
+            min="0.4" 
+            max="1.2" 
+            step="0.05"
+            value={zoom} 
+            onChange={(e) => setZoom(parseFloat(e.target.value))} 
+            style={{ width: '120px', cursor: 'pointer', accentColor: '#10b981' }}
+          />
+          <button 
+            onClick={() => setZoom(prev => Math.min(1.2, prev + 0.05))}
+            style={{ padding: '4px 10px', background: '#334155', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer' }}
+          >+</button>
+          <button 
+            onClick={() => setZoom(device.defaultScale)}
+            style={{ padding: '4px 10px', background: '#10b981', border: 'none', borderRadius: '4px', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer' }}
+          >Reset</button>
+        </div>
 
-          {/* Interactive Iframe Screen */}
+        {/* Workspace canvas */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+          overflow: 'auto',
+          padding: '40px',
+          boxSizing: 'border-box'
+        }}>
           <div style={{
-            width: device.width,
-            height: device.height,
-            borderRadius: device.border,
-            overflow: 'hidden',
-            backgroundColor: '#fff',
-            position: 'relative',
-            transition: 'all 0.3s ease'
+            transform: `scale(${zoom})`,
+            transformOrigin: 'center center',
+            transition: 'transform 0.2s ease-out',
+            flexShrink: 0
           }}>
-            <iframe
-              src={currentPath}
-              style={{
-                border: 'none',
-                width: '100%',
-                height: '100%',
-                display: 'block'
-              }}
-            />
+            <div style={{
+              backgroundColor: '#000',
+              borderRadius: '40px',
+              padding: '12px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 4px #475569',
+              position: 'relative'
+            }}>
+              {/* Mock Camera Notch */}
+              {device.notch && (
+                <div style={{
+                  position: 'absolute',
+                  top: '22px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '110px',
+                  height: '24px',
+                  backgroundColor: '#000',
+                  borderRadius: '12px',
+                  zIndex: 10
+                }} />
+              )}
+
+              {/* Interactive Iframe Screen */}
+              <div style={{
+                width: `${device.width}px`,
+                height: `${device.height}px`,
+                borderRadius: device.border,
+                overflow: 'hidden',
+                backgroundColor: '#fff',
+                position: 'relative'
+              }}>
+                <iframe
+                  ref={iframeRef}
+                  src={currentPath}
+                  onLoad={handleIframeLoad}
+                  style={{
+                    border: 'none',
+                    width: '100%',
+                    height: '100%',
+                    display: 'block'
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
