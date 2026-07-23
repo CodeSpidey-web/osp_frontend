@@ -111,7 +111,7 @@ const Footer = () => {
                 <div className="container p--0">
                     <div className="row row--0">
                         <div className="col-md-12">
-                            <ul className="rbt-quick-access onepagenav justify-content-around">
+                            <ul className="rbt-quick-access justify-content-around">
                                 <li className="rbt-access-box">
                                     <a className="rbt-round-btn has-rbt-md-fsize" href="/">
                                         <i className="fa-regular fa-house"></i>
