@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const devices = {
-  iphone: { name: 'iPhone 14', width: 390, height: 844, border: '32px', notch: true },
-  galaxy: { name: 'Galaxy S22', width: 360, height: 800, border: '24px', notch: false },
-  ipad: { name: 'iPad Mini', width: 768, height: 1024, border: '16px', notch: false }
+  iphone: { name: 'iPhone 14', width: 390, height: 844, border: '32px', notch: true, defaultScale: 0.75 },
+  galaxy: { name: 'Galaxy S22', width: 360, height: 800, border: '24px', notch: false, defaultScale: 0.75 },
+  ipad: { name: 'iPad Mini', width: 768, height: 1024, border: '16px', notch: false, defaultScale: 0.60 }
 };
 
 export default function MobilePreviewPage() {
@@ -12,11 +12,13 @@ export default function MobilePreviewPage() {
   const [currentPath, setCurrentPath] = useState('/');
   const [zoom, setZoom] = useState(0.75);
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isSpinning, setIsSpinning] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Sync zoom to 75% when device changes
+  // Sync zoom to device default scale
   useEffect(() => {
-    setZoom(0.75);
+    setZoom(device.defaultScale);
+    setIsLandscape(false);
   }, [device]);
 
   // Inject CSS inside iframe on load to hide the vertical scrollbar track
@@ -46,6 +48,14 @@ export default function MobilePreviewPage() {
     }
   };
 
+  const handleRotate = () => {
+    setIsSpinning(true);
+    setIsLandscape(!isLandscape);
+    setTimeout(() => {
+      setIsSpinning(false);
+    }, 600); // matches the animation duration
+  };
+
   const finalWidth = isLandscape ? device.height : device.width;
   const finalHeight = isLandscape ? device.width : device.height;
 
@@ -58,6 +68,25 @@ export default function MobilePreviewPage() {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       overflow: 'hidden'
     }}>
+      {/* Dynamic Keyframes for smooth scaling & physical rotation */}
+      <style>{`
+        @keyframes physical-spin {
+          0% {
+            transform: scale(${zoom}) rotate(0deg);
+          }
+          50% {
+            transform: scale(${zoom * 0.7}) rotate(180deg);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+          }
+          100% {
+            transform: scale(${zoom}) rotate(360deg);
+          }
+        }
+        .spin-active {
+          animation: physical-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      `}</style>
+
       {/* Control Panel Sidebar */}
       <div style={{
         width: '280px',
@@ -111,7 +140,8 @@ export default function MobilePreviewPage() {
 
             {/* Rotation Control */}
             <button
-              onClick={() => setIsLandscape(!isLandscape)}
+              onClick={handleRotate}
+              disabled={isSpinning}
               style={{
                 width: '100%',
                 backgroundColor: isLandscape ? '#10b981' : '#475569',
@@ -119,7 +149,7 @@ export default function MobilePreviewPage() {
                 border: 'none',
                 padding: '10px',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                cursor: isSpinning ? 'not-allowed' : 'pointer',
                 fontSize: '13px',
                 fontWeight: '600',
                 display: 'flex',
@@ -214,7 +244,7 @@ export default function MobilePreviewPage() {
             style={{ padding: '4px 10px', background: '#334155', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer' }}
           >+</button>
           <button 
-            onClick={() => setZoom(0.75)}
+            onClick={() => setZoom(device.defaultScale)}
             style={{ padding: '4px 10px', background: '#10b981', border: 'none', borderRadius: '4px', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer' }}
           >Reset</button>
         </div>
@@ -231,19 +261,23 @@ export default function MobilePreviewPage() {
           padding: '40px',
           boxSizing: 'border-box'
         }}>
-          <div style={{
-            transform: `scale(${zoom})`,
-            transformOrigin: 'center center',
-            transition: 'transform 0.2s ease-out, width 0.3s ease, height 0.3s ease',
-            flexShrink: 0
-          }}>
+          {/* Animated wrapper container */}
+          <div 
+            className={isSpinning ? 'spin-active' : ''}
+            style={{
+              transform: isSpinning ? undefined : `scale(${zoom})`,
+              transformOrigin: 'center center',
+              transition: isSpinning ? undefined : 'transform 0.2s ease-out',
+              flexShrink: 0
+            }}
+          >
             <div style={{
               backgroundColor: '#000',
               borderRadius: '40px',
               padding: '12px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 4px #475569',
               position: 'relative',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
               {/* Mock Camera Notch (Only in portrait view) */}
               {device.notch && !isLandscape && (
@@ -268,7 +302,7 @@ export default function MobilePreviewPage() {
                 overflow: 'hidden',
                 backgroundColor: '#fff',
                 position: 'relative',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
               }}>
                 <iframe
                   ref={iframeRef}
