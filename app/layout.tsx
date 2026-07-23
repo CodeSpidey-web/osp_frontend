@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { CartProvider } from "@/lib/CartContext";
+import DebugToolbar from "@/components/DebugToolbar";
 
 export default function RootLayout({
   children,
@@ -46,6 +47,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col rbt-header-sticky" suppressHydrationWarning>
         <CartProvider>
           {children}
+          <DebugToolbar />
         </CartProvider>
         
         {/* Modernizer JS */}
