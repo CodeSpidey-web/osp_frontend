@@ -29,7 +29,7 @@ export default function ShopHeader() {
   }, []);
   return (
     <>
-<header className="rbt-header rbt-header-2">
+<header className="rbt-header-2">
 
     <div className="rbt-header-wrapper rbt-header-sticky-activation rbt-header-wrapper-one header-space-between rbt-bg-color-white header-not-transparent header-sticky plr--0 position-relative z-5">
     <div className="rbt-separator-mid">
@@ -52,7 +52,7 @@ export default function ShopHeader() {
                         <div className="header-info">
                             <div className="logo">
                                 <a href="index-2.html">
-                                    <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
+                                    <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                                 </a>
                             </div>
                         </div>
@@ -204,7 +204,7 @@ export default function ShopHeader() {
                     <div className="header-info d-xl-block d-none">
                         <div className="logo rbt-logo-height-sm">
                             <a href="index-2.html">
-                                <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
+                                <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                             </a>
                         </div>
                     </div>
@@ -223,7 +223,7 @@ export default function ShopHeader() {
             <div className="header-info d-xl-none d-block">
                 <div className="logo">
                     <a href="index-2.html">
-                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
+                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                     </a>
                 </div>
             </div>

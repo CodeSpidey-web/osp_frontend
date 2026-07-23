@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getProducts, getCategories, MedusaProduct, MedusaCategory } from "@/lib/medusa";
+import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
@@ -18,6 +18,7 @@ export default function MainContent() {
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [selectedBuildTopic, setSelectedBuildTopic] = useState<string | null>(null);
+  const [popularTab, setPopularTab] = useState<'week' | 'month' | 'year' | 'all'>('week');
 
   useEffect(() => {
     async function fetchData() {
@@ -38,6 +39,20 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
+    const handleReveal = () => {
+      document.querySelectorAll(".reveal").forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 200) {
+          el.classList.add("visible");
+        }
+      });
+    };
+
+    handleReveal();
+    const timeout = setTimeout(handleReveal, 100);
+    window.addEventListener("scroll", handleReveal);
+    window.addEventListener("resize", handleReveal);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -47,11 +62,18 @@ export default function MainContent() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.01, rootMargin: "200px" }
     );
+
     document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [loading]);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("scroll", handleReveal);
+      window.removeEventListener("resize", handleReveal);
+      observer.disconnect();
+    };
+  }, [loading, categories, products]);
 
   const handleAddToCart = async (variantId: string, productId: string) => {
     setAddingId(productId);
@@ -187,6 +209,39 @@ export default function MainContent() {
         .rbt-product-card:hover .product-grid-image {
           transform: scale(1.08);
         }
+        .rbt-cat-box-5 .rbt-btn,
+        .rbt-cat-box-5 .rbt-btn-md,
+        .rbt-cat-box-5 .inner > .rbt-btn {
+          font-size: 0.7125rem !important;
+          font-weight: 600 !important;
+          padding: 6px 12px !important;
+          white-space: nowrap !important;
+          max-width: 90% !important;
+          word-break: normal !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+        .rbt-cat-box-5.wider-coloumn .content .title {
+          font-size: 1.1rem !important;
+          font-weight: 500 !important;
+        }
+        .rbt-product-nav-grp li button.rbt-product-nav {
+          border: none !important;
+          background: transparent;
+          cursor: pointer;
+          padding: 6px 16px !important;
+          border-radius: 50px !important;
+          transition: all 0.2s ease !important;
+        }
+        .rbt-product-nav-section .rbt-product-nav-grp li button.rbt-product-nav.active,
+        .rbt-product-nav-grp li .rbt-product-nav.active {
+          background: #ffffff !important;
+          color: #111111 !important;
+          font-weight: 600 !important;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+          position: relative;
+          z-index: 2;
+        }
       `}</style>
 
       {/* Hero Section */}
@@ -270,41 +325,170 @@ export default function MainContent() {
                 </div>
               </div>
             </div>
-            <div className="row row--12 mt_dec--24 justify-content-center">
-              {categories.map((cat, i) => (
-                <div key={cat.id} className={`col-lg-3 col-md-4 col-sm-6 col-12 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
-                  <div className="rbt-cat-box rbt-cat-box-5 card-hover-effect text-center bg-white p-4 rbt-rounded--16">
-                    <div className="inner">
-                      <div className="rbt-image-portion mb--16 overflow-hidden rbt-rounded--12">
-                        <a href={`/shop?category_id=${cat.id}`}>
-                          <img src={`/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} alt={cat.name} className="product-grid-image w-100" />
+            <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
+              {categories.slice(0, 8).map((cat, i) => {
+
+                if (i === 3) {
+                  return (
+                    <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
+                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
+                        <div className="inner">
+                          <div className="rbt-image-portion">
+                            <a href={`/shop?category_id=${cat.id}`}>
+                              <img src="/assets/images/catagory-img/cat-bg-electro-c-lg-01.webp" alt={cat.name} />
+                            </a>
+                          </div>
+                          <div className="content">
+                            <div className="top-content">
+                              <span className="rbt-badge rbt-badge-small">EXCLUSIVE</span>
+                              <p className="subtitle">NEW ARRIVALS</p>
+                              <h2 className="title h5"><span className="rbt-bold--text">{cat.name}</span></h2>
+                            </div>
+                            <div className="bottom-content">
+                              <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
+                                See Collection
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rbt-right-corner-portion">
+                          <div className="rbt-corner-portion-wrapper">
+                            <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
+                              <i className="fa-solid fa-arrow-up-right"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (i === 5) {
+                  return (
+                    <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
+                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
+                        <div className="inner">
+                          <div className="rbt-image-portion">
+                            <a href={`/shop?category_id=${cat.id}`}>
+                              <img src="/assets/images/catagory-img/cat-bg-electro-c-lg-02.webp" alt={cat.name} />
+                            </a>
+                          </div>
+                          <div className="content">
+                            <div className="top-content">
+                              <span className="rbt-badge rbt-badge-small">TRENDING</span>
+                              <p className="subtitle">ONLINE EXCLUSIVE</p>
+                              <h2 className="title h5"><span className="rbt-bold--text">{cat.name}</span></h2>
+                            </div>
+                            <div className="bottom-content">
+                              <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-marquee-btn marquee-auto rbt-btn-white rbt-btn-md">
+                                <span data-text="View All The Trending Collection">
+                                  View All The Trending Collection
+                                </span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rbt-right-corner-portion">
+                          <div className="rbt-corner-portion-wrapper">
+                            <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
+                              <i className="fa-solid fa-arrow-up-right"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
+                    <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated text-center">
+                      <div className="inner">
+                        <div className="rbt-image-portion">
+                          <a href={`/shop?category_id=${cat.id}`}>
+                            <img src={`/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} alt={cat.name} />
+                          </a>
+                        </div>
+                        <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
+                          {cat.name}
                         </a>
                       </div>
-                      <h4 className="h6 font-bold" style={{marginBottom: '40px'}}>{cat.name}</h4>
-                      <a href={`/shop?category_id=${cat.id}`} className="rbt-btn btn-premium rbt-btn-sm w-100">
-                        Explore
-                      </a>
+                      <div className="rbt-right-corner-portion">
+                        <div className="rbt-corner-portion-wrapper">
+                          <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
+                            <i className="fa-solid fa-arrow-up-right"></i>
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+
           </div>
         </div>
       )}
 
-      {/* Dynamic Products Grid */}
-      <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gap reveal">
+      {/* Popular Products Area */}
+      <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gapTop reveal">
         <div className="container">
           <div className="row">
-            <div className="col-lg-12 mb--40">
-              <div className="rbt-component-section-title text-center border-0 p-0">
-                <span className="subtitle text-primary font-bold">OUR COMPONENTS INVENTORY</span>
-                <h2 className="rbt-title mt--8">
-                  Highly Requested <span className="rbt-bold--text">Project Essentials</span>
+            <div className="col-lg-12 d-flex justify-content-between flex-row align-items-center flex-wrap rbt-gap--16 mb--32">
+              <div className="rbt-component-section-title rbt-gap--4 p-0 mb--0 border-0">
+                <h2 className="rbt-title rbt-scroll-trigger fade_in animation-order-1">
+                  <span className="rbt-bold--text">Popular products</span>
                 </h2>
-                <p className="b2 text-muted mt--8">All products are actively stocked and shipped with technical documentation reference guides.</p>
               </div>
+
+              <div className="mobile-horizontal-scroll-section">
+                <div className="rbt-product-nav-section rbt-nav-effect-activation rbt-scroll-trigger fade_in animation-order-2 justify-content-center">
+                  <ul className="rbt-product-nav-grp">
+                    <li>
+                      <button
+                        type="button"
+                        className={`rbt-product-nav ${popularTab === 'week' ? 'active' : ''}`}
+                        onClick={() => setPopularTab('week')}
+                      >
+                        This Week
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`rbt-product-nav ${popularTab === 'month' ? 'active' : ''}`}
+                        onClick={() => setPopularTab('month')}
+                      >
+                        This Month
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`rbt-product-nav ${popularTab === 'year' ? 'active' : ''}`}
+                        onClick={() => setPopularTab('year')}
+                      >
+                        This Year
+                      </button>
+                    </li>
+                  </ul>
+                  <ul className="rbt-product-nav-grp">
+                    <li>
+                      <button
+                        type="button"
+                        className={`rbt-product-nav ${popularTab === 'all' ? 'active' : ''}`}
+                        onClick={() => setPopularTab('all')}
+                      >
+                        All Time
+                      </button>
+                    </li>
+                  </ul>
+                  <span className="rbt-bg-highlight"></span>
+                </div>
+              </div>
+
+
+
             </div>
           </div>
 
@@ -316,67 +500,238 @@ export default function MainContent() {
               <p className="mt--16">Synchronizing with live inventory...</p>
             </div>
           ) : (
-            <div className="row row--12">
-              {products.map((product, pi) => {
-                const variant = product.variants?.[0];
-                const price = variant?.prices?.[0];
-                const calculated = variant?.calculated_price;
-                const displayPrice = calculated ? calculated.calculated_amount : price?.amount;
-                const originalPrice = calculated?.original_amount;
+            <>
+              {(() => {
+                const getFilteredPopularProducts = () => {
+                  if (!products || products.length === 0) return [];
+                  const list = [...products];
+                  if (popularTab === 'month') {
+                    return list.reverse();
+                  } else if (popularTab === 'year') {
+                    return list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                  } else if (popularTab === 'all') {
+                    return list;
+                  }
+                  return list;
+                };
+
+                const displayProducts = getFilteredPopularProducts();
 
                 return (
-                  <div key={product.id} className={`col-lg-3 col-md-4 col-6 mt--24 reveal reveal-delay-${(pi % 4) + 1}`}>
-                    <div className="rbt-card rbt-product-card card-hover-effect h-100 bg-white rbt-rounded--16 overflow-hidden d-flex flex-column">
-                      <div className="rbt-card-img position-relative overflow-hidden">
-                        <a href={`/product/${product.handle || product.id}`}>
-                          <img
-                            src={product.thumbnail || product.images?.[0]?.url || "/assets/images/product-img/electronics/electro-c-01.webp"}
-                            alt={product.title}
-                            className="product-grid-image w-100"
-                          />
-                        </a>
-                      </div>
-                      <div className="rbt-card-body p-4 d-flex flex-column flex-grow-1 justify-content-between">
-                        <div>
-                          {product.collection && (
-                            <span className="rbt-card-subtitle rbt-card-catagories-text text-primary text-uppercase font-semibold tracking-wider d-block mb--8" style={{ fontSize: '0.75rem' }}>
-                              {product.collection.title}
-                            </span>
-                          )}
-                          <h3 className="rbt-card-title h6 font-bold mb--12">
-                            <a href={`/product/${product.handle || product.id}`} className="text-dark hover-text-primary">
-                              {product.title}
-                            </a>
-                          </h3>
-                        </div>
-                        <div>
-                          <div className="pricing-part mb--16 d-flex align-items-center gap-2">
-                            {originalPrice && originalPrice !== displayPrice && (
-                              <del className="text-muted" style={{ fontSize: '0.875rem' }}>{formatPrice(originalPrice)}</del>
-                            )}
-                            <span className="price-text text-success font-bold" style={{ fontSize: '1.125rem' }}>{formatPrice(displayPrice || 0)}</span>
+                  <>
+                    <div className="row row--12 mt_dec--24">
+                      <div className="col-lg-6 col-12 mt--24">
+                        <div className="row">
+                          <div className="col-md-12">
+                            <div className="rbt-product-banner rbt-product-banner-style-two h-100 rbt-bg-color-gray-150 border-0">
+                              <div className="rbt-banner-inner">
+                                <div className="rbt-product-banner-img rbt-full-width-img">
+                                  <img
+                                    src="/assets/images/product-banner/product-banner-electro-c-01.webp"
+                                    alt="Ecommerce Product Banner Image"
+                                  />
+                                </div>
+                                <div className="rbt-product-banner-content w-100">
+                                  <div className="rbt-content-section">
+                                    <p className="rbt-banner-subtitle mb-0">SALE UPTO 70%</p>
+                                    <h2 className="title mb--16">
+                                      <span className="rbt-bold--text">Automatic Water Pump Controller <br /> Module XHM203</span>
+                                    </h2>
+                                  </div>
+                                  <div className="rbt-banner-btn mt--16">
+                                    <a className="rbt-btn rbt-btn-md border-0" href="/shop">SHOP NOW</a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          {variant && (
-                            <button
-                              className="rbt-btn btn-premium rbt-btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
-                              onClick={() => handleAddToCart(variant.id, product.id)}
-                              disabled={addingId === product.id}
-                              style={{ border: 'none', cursor: 'pointer' }}
-                            >
-                              <i className="fa-regular fa-cart-shopping"></i>
-                              {addingId === product.id ? "Adding..." : "Add To Cart"}
-                            </button>
-                          )}
+                        </div>
+                      </div>
+
+                      <div className="col-lg-6 col-12 mt--24">
+                        <div className="row row--12 mt_dec--24 h-100">
+                          {displayProducts.slice(0, 2).map((product, pi) => {
+                            const variant = product.variants?.[0];
+                            const price = variant?.prices?.[0];
+                            const calculated = variant?.calculated_price;
+                            const displayPrice = calculated ? calculated.calculated_amount : price?.amount;
+                            const originalPrice = calculated?.original_amount;
+                            const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${(pi % 6) + 1}.webp`;
+
+                            return (
+                              <div key={product.id} className="col-lg-6 col-6 mt--24 d-flex">
+                                <div className="rbt-card rbt-product-card rbt-scroll-trigger fade_in w-100 h-100 d-flex flex-column justify-content-between">
+                                  <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in flex-grow-1 d-flex align-items-center justify-content-center" style={{ minHeight: '320px', background: '#ffffff' }}>
+                                    <a href={`/product/${product.handle || product.id}`} className="w-100 h-100 d-flex align-items-center justify-content-center">
+                                      <img
+                                        src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
+                                        alt={product.title}
+                                        style={{ maxHeight: '280px', objectFit: 'contain' }}
+                                        onError={(e) => {
+                                          e.currentTarget.onerror = null;
+                                          e.currentTarget.src = fallbackImg;
+                                        }}
+                                      />
+                                    </a>
+                                    <div className="rbt-product-badge rbt-product-badge-bg-primary rbt-badge-top-left--position">
+                                      SALE
+                                    </div>
+                                    <button
+                                      className="rbt-wishlisted-btn rbt-round-btn bg-light-one rbt-top-right--position tooltips"
+                                      type="button"
+                                      data-tooltip="Add to wishlist"
+                                      data-tooltip-position="left"
+                                    >
+                                      <i className="fa-regular fa-heart"></i>
+                                    </button>
+                                    {variant && (
+                                      <button
+                                        className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
+                                        onClick={() => handleAddToCart(variant.id, product.id)}
+                                        disabled={addingId === product.id}
+                                        style={{
+                                          border: "none",
+                                          left: "16px",
+                                          right: "16px",
+                                          width: "calc(100% - 32px)",
+                                          borderRadius: "50px",
+                                          cursor: "pointer",
+                                          margin: "0 auto",
+                                        }}
+                                      >
+                                        <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="rbt-card-body rbt-card-body-center-align">
+                                    <a href="/categories" className="rbt-card-subtitle rbt-card-catagories-text">
+                                      {product.collection?.title || "Electronic Components"}
+                                    </a>
+                                    <h2 className="rbt-card-title">
+                                      <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
+                                    </h2>
+                                    <div className="rbt-card-rating">
+                                      <ul className="rbt-rating-icon-list">
+                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                      </ul>
+                                      <p className="rating-digit">(25)</p>
+                                      <span className="icon"><i className="fa-sharp fa-solid fa-truck-fast"></i></span>
+                                    </div>
+                                    <div className="pricing-part">
+                                      {originalPrice && originalPrice !== displayPrice && (
+                                        <del className="price-text">{formatPrice(originalPrice)}</del>
+                                      )}
+                                      <span className="price-text">{formatPrice(displayPrice || 0)}</span>
+                                      <span className="rbt-offer-badge">-30%</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
-                  </div>
+
+                    {displayProducts.length > 2 && (
+                      <div className="row row--12 mt--24">
+                        {displayProducts.slice(2).map((product, pi) => {
+                          const variant = product.variants?.[0];
+                          const price = variant?.prices?.[0];
+                          const calculated = variant?.calculated_price;
+                          const displayPrice = calculated ? calculated.calculated_amount : price?.amount;
+                          const originalPrice = calculated?.original_amount;
+                          const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${((pi + 2) % 6) + 1}.webp`;
+
+                          return (
+                            <div key={product.id} className="col-lg-3 col-6 mt--24">
+                              <div className="rbt-card rbt-product-card rbt-scroll-trigger fade_in">
+                                <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in">
+                                  <a href={`/product/${product.handle || product.id}`}>
+                                    <img
+                                      src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
+                                      alt={product.title}
+                                      onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = fallbackImg;
+                                      }}
+                                    />
+                                  </a>
+                                  <div className="rbt-product-badge rbt-product-badge-bg-primary rbt-badge-top-left--position">
+                                    SALE
+                                  </div>
+                                  <button
+                                    className="rbt-wishlisted-btn rbt-round-btn bg-light-one rbt-top-right--position tooltips"
+                                    type="button"
+                                    data-tooltip="Add to wishlist"
+                                    data-tooltip-position="left"
+                                  >
+                                    <i className="fa-regular fa-heart"></i>
+                                  </button>
+                                  {variant && (
+                                    <button
+                                      className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
+                                      onClick={() => handleAddToCart(variant.id, product.id)}
+                                      disabled={addingId === product.id}
+                                      style={{
+                                        border: "none",
+                                        left: "16px",
+                                        right: "16px",
+                                        width: "calc(100% - 32px)",
+                                        borderRadius: "50px",
+                                        cursor: "pointer",
+                                        margin: "0 auto",
+                                      }}
+                                    >
+                                      <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
+                                    </button>
+                                  )}
+                                </div>
+                                <div className="rbt-card-body rbt-card-body-center-align">
+                                  <a href="/categories" className="rbt-card-subtitle rbt-card-catagories-text">
+                                    {product.collection?.title || "Electronic Components"}
+                                  </a>
+                                  <h2 className="rbt-card-title">
+                                    <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
+                                  </h2>
+                                  <div className="rbt-card-rating">
+                                    <ul className="rbt-rating-icon-list">
+                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
+                                    </ul>
+                                    <p className="rating-digit">(25)</p>
+                                    <span className="icon"><i className="fa-sharp fa-solid fa-truck-fast"></i></span>
+                                  </div>
+                                  <div className="pricing-part">
+                                    {originalPrice && originalPrice !== displayPrice && (
+                                      <del className="price-text">{formatPrice(originalPrice)}</del>
+                                    )}
+                                    <span className="price-text">{formatPrice(displayPrice || 0)}</span>
+                                    <span className="rbt-offer-badge">-30%</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+
+                  </>
                 );
-              })}
-            </div>
+              })()}
+            </>
           )}
 
-          <div className="text-center mt--48">
+          <div className="text-center mt--30 mb--36">
             <a className="rbt-btn btn-premium rbt-btn-md px-5" href="/shop">View Full Catalog</a>
           </div>
         </div>

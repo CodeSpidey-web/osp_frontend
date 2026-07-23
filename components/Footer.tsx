@@ -12,7 +12,7 @@ const Footer = () => {
                                 <div className="footer-widget">
                                     <div className="logo d-flex justify-content-center justify-content-md-start">
                                         <a href="/">
-                                            <img alt="Ocean Student Projects Logo" src="/assets/images/logo/transperent_logo.webp" style={{ maxHeight: '80px' }} />
+                                            <img alt="Ocean Student Projects Logo" src="/assets/images/logo/logo.webp" style={{ maxHeight: '80px' }} />
                                         </a>
                                     </div>
                                     <p className="description mt--16">
