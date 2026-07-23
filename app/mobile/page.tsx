@@ -2,20 +2,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const devices = {
-  iphone: { name: 'iPhone 14', width: 390, height: 844, border: '32px', notch: true, defaultScale: 0.8 },
-  galaxy: { name: 'Galaxy S22', width: 360, height: 800, border: '24px', notch: false, defaultScale: 0.8 },
-  ipad: { name: 'iPad Mini', width: 768, height: 1024, border: '16px', notch: false, defaultScale: 0.55 }
+  iphone: { name: 'iPhone 14', width: 390, height: 844, border: '32px', notch: true },
+  galaxy: { name: 'Galaxy S22', width: 360, height: 800, border: '24px', notch: false },
+  ipad: { name: 'iPad Mini', width: 768, height: 1024, border: '16px', notch: false }
 };
 
 export default function MobilePreviewPage() {
   const [device, setDevice] = useState(devices.iphone);
   const [currentPath, setCurrentPath] = useState('/');
-  const [zoom, setZoom] = useState(0.8);
+  const [zoom, setZoom] = useState(0.75);
+  const [isLandscape, setIsLandscape] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Sync default scale when device changes
+  // Sync zoom to 75% when device changes
   useEffect(() => {
-    setZoom(device.defaultScale);
+    setZoom(0.75);
   }, [device]);
 
   // Inject CSS inside iframe on load to hide the vertical scrollbar track
@@ -44,6 +45,9 @@ export default function MobilePreviewPage() {
       console.error('Failed to inject scrollbar-hiding style inside iframe:', err);
     }
   };
+
+  const finalWidth = isLandscape ? device.height : device.width;
+  const finalHeight = isLandscape ? device.width : device.height;
 
   return (
     <div style={{
@@ -79,7 +83,7 @@ export default function MobilePreviewPage() {
             <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b', margin: '0 0 12px 0' }}>
               Select Device
             </h3>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               {Object.keys(devices).map((key) => {
                 const dev = devices[key as keyof typeof devices];
                 return (
@@ -104,6 +108,29 @@ export default function MobilePreviewPage() {
                 );
               })}
             </div>
+
+            {/* Rotation Control */}
+            <button
+              onClick={() => setIsLandscape(!isLandscape)}
+              style={{
+                width: '100%',
+                backgroundColor: isLandscape ? '#10b981' : '#475569',
+                color: isLandscape ? '#0f172a' : '#f8fafc',
+                border: 'none',
+                padding: '10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              🔄 Rotate to {isLandscape ? 'Portrait' : 'Landscape'}
+            </button>
           </div>
 
           {/* Quick Navigation Links */}
@@ -187,7 +214,7 @@ export default function MobilePreviewPage() {
             style={{ padding: '4px 10px', background: '#334155', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer' }}
           >+</button>
           <button 
-            onClick={() => setZoom(device.defaultScale)}
+            onClick={() => setZoom(0.75)}
             style={{ padding: '4px 10px', background: '#10b981', border: 'none', borderRadius: '4px', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer' }}
           >Reset</button>
         </div>
@@ -207,7 +234,7 @@ export default function MobilePreviewPage() {
           <div style={{
             transform: `scale(${zoom})`,
             transformOrigin: 'center center',
-            transition: 'transform 0.2s ease-out',
+            transition: 'transform 0.2s ease-out, width 0.3s ease, height 0.3s ease',
             flexShrink: 0
           }}>
             <div style={{
@@ -215,10 +242,11 @@ export default function MobilePreviewPage() {
               borderRadius: '40px',
               padding: '12px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 4px #475569',
-              position: 'relative'
+              position: 'relative',
+              transition: 'all 0.3s ease'
             }}>
-              {/* Mock Camera Notch */}
-              {device.notch && (
+              {/* Mock Camera Notch (Only in portrait view) */}
+              {device.notch && !isLandscape && (
                 <div style={{
                   position: 'absolute',
                   top: '22px',
@@ -234,12 +262,13 @@ export default function MobilePreviewPage() {
 
               {/* Interactive Iframe Screen */}
               <div style={{
-                width: `${device.width}px`,
-                height: `${device.height}px`,
+                width: `${finalWidth}px`,
+                height: `${finalHeight}px`,
                 borderRadius: device.border,
                 overflow: 'hidden',
                 backgroundColor: '#fff',
-                position: 'relative'
+                position: 'relative',
+                transition: 'all 0.3s ease'
               }}>
                 <iframe
                   ref={iframeRef}
