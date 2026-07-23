@@ -12,13 +12,20 @@ export default function MobilePreviewPage() {
   const [currentPath, setCurrentPath] = useState('/');
   const [zoom, setZoom] = useState(0.75);
   const [isLandscape, setIsLandscape] = useState(false);
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
+  const [rotateTilt, setRotateTilt] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Sync zoom to device default scale
+  // Sync zoom when device changes (with subtle scale down)
   useEffect(() => {
-    setZoom(device.defaultScale);
-    setIsLandscape(false);
+    setIsChanging(true);
+    const timer = setTimeout(() => {
+      setZoom(device.defaultScale);
+      setIsLandscape(false);
+      setRotateTilt(0);
+      setIsChanging(false);
+    }, 200);
+    return () => clearTimeout(timer);
   }, [device]);
 
   // Inject CSS inside iframe on load to hide the vertical scrollbar track
@@ -49,11 +56,23 @@ export default function MobilePreviewPage() {
   };
 
   const handleRotate = () => {
-    setIsSpinning(true);
-    setIsLandscape(!isLandscape);
+    if (isChanging) return;
+    setIsChanging(true);
+    
+    // Tilt the device physically to the left (-90deg) or right (+90deg)
+    const targetTilt = isLandscape ? 90 : -90;
+    setRotateTilt(targetTilt);
+    
+    // Halfway through the rotation, swap the size orientation and reset the rotation angle
     setTimeout(() => {
-      setIsSpinning(false);
-    }, 600); // matches the animation duration
+      setIsLandscape(!isLandscape);
+      setRotateTilt(0);
+    }, 200);
+
+    // End transition
+    setTimeout(() => {
+      setIsChanging(false);
+    }, 450);
   };
 
   const finalWidth = isLandscape ? device.height : device.width;
@@ -68,25 +87,6 @@ export default function MobilePreviewPage() {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       overflow: 'hidden'
     }}>
-      {/* Dynamic Keyframes for smooth scaling & physical rotation */}
-      <style>{`
-        @keyframes physical-spin {
-          0% {
-            transform: scale(${zoom}) rotate(0deg);
-          }
-          50% {
-            transform: scale(${zoom * 0.7}) rotate(180deg);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
-          }
-          100% {
-            transform: scale(${zoom}) rotate(360deg);
-          }
-        }
-        .spin-active {
-          animation: physical-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-      `}</style>
-
       {/* Control Panel Sidebar */}
       <div style={{
         width: '280px',
@@ -141,7 +141,7 @@ export default function MobilePreviewPage() {
             {/* Rotation Control */}
             <button
               onClick={handleRotate}
-              disabled={isSpinning}
+              disabled={isChanging}
               style={{
                 width: '100%',
                 backgroundColor: isLandscape ? '#10b981' : '#475569',
@@ -149,7 +149,7 @@ export default function MobilePreviewPage() {
                 border: 'none',
                 padding: '10px',
                 borderRadius: '8px',
-                cursor: isSpinning ? 'not-allowed' : 'pointer',
+                cursor: isChanging ? 'not-allowed' : 'pointer',
                 fontSize: '13px',
                 fontWeight: '600',
                 display: 'flex',
@@ -263,11 +263,11 @@ export default function MobilePreviewPage() {
         }}>
           {/* Animated wrapper container */}
           <div 
-            className={isSpinning ? 'spin-active' : ''}
             style={{
-              transform: isSpinning ? undefined : `scale(${zoom})`,
+              transform: `scale(${zoom}) rotate(${rotateTilt}deg) ${isChanging ? 'scale(0.93)' : 'scale(1)'}`,
+              opacity: isChanging ? 0.35 : 1,
               transformOrigin: 'center center',
-              transition: isSpinning ? undefined : 'transform 0.2s ease-out',
+              transition: 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
               flexShrink: 0
             }}
           >
@@ -276,8 +276,7 @@ export default function MobilePreviewPage() {
               borderRadius: '40px',
               padding: '12px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 4px #475569',
-              position: 'relative',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              position: 'relative'
             }}>
               {/* Mock Camera Notch (Only in portrait view) */}
               {device.notch && !isLandscape && (
@@ -301,8 +300,7 @@ export default function MobilePreviewPage() {
                 borderRadius: device.border,
                 overflow: 'hidden',
                 backgroundColor: '#fff',
-                position: 'relative',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                position: 'relative'
               }}>
                 <iframe
                   ref={iframeRef}
