@@ -40,7 +40,7 @@ export default function SideNavs() {
                             <div className="rbt-categories-sidebar-top-content mb--24">
                                 <div className="logo">
                                     <a href="/">
-                                        <img src="/assets/images/logo/transperent_logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                                     </a>
                                 </div>
                                 <button className="rbt-sidebar-close-btn">
