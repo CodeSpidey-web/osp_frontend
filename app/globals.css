@@ -317,3 +317,90 @@ body {
   box-shadow: none !important;
   border-color: transparent !important;
 }
+
+/* Header Logo Sizing */
+.logo img,
+.header-info .logo img {
+  max-height: 50px !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 768px) {
+  .logo img,
+  .header-info .logo img {
+    max-height: 40px !important;
+  }
+}
+
+/* Feature & Trust Strip below Hero */
+.feature-trust-strip {
+  background: #136c39;
+  padding: 12px 0;
+}
+
+.feature-trust-strip .feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 4px 8px;
+}
+
+.feature-trust-strip .feature-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.feature-trust-strip .feature-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.feature-trust-strip .feature-subtitle {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0;
+}
+
+@media (max-width: 576px) {
+  .feature-trust-strip {
+    padding: 6px 0;
+  }
+  .feature-trust-strip .feature-item {
+    gap: 3px;
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .feature-trust-strip .feature-icon {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    font-size: 0.6rem;
+  }
+  .feature-trust-strip .feature-title {
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0;
+  }
+  .feature-trust-strip .feature-subtitle {
+    display: none;
+  }
+}
+
+
+
+

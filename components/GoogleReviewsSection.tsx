@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ReviewItem {
   id: string;
@@ -51,6 +51,8 @@ export default function GoogleReviewsSection() {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   useEffect(() => {
     async function fetchReviews() {
@@ -141,11 +143,22 @@ export default function GoogleReviewsSection() {
     },
   ];
 
-  const cardsPerPage = 4;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const cardsPerPage = isMobile ? 1 : 4;
   const totalPages = Math.ceil(displayReviews.length / cardsPerPage);
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? Math.max(0, displayReviews.length - cardsPerPage) : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? displayReviews.length - cardsPerPage : Math.max(0, prev - 1)));
   };
 
   const handleNext = () => {
@@ -184,7 +197,15 @@ export default function GoogleReviewsSection() {
         </div>
 
         {/* Carousel Container with Custom Compact Side Buttons */}
-        <div className="relative px-1 sm:px-4">
+        <div 
+          className="relative px-1 sm:px-4 select-none"
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchMove={(e) => { touchEndX.current = e.touches[0].clientX; }}
+          onTouchEnd={() => {
+            if (touchStartX.current - touchEndX.current > 40) handleNext();
+            if (touchEndX.current - touchStartX.current > 40) handlePrev();
+          }}
+        >
           {/* Left Arrow Button */}
           <div
             role="button"

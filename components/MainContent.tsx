@@ -228,6 +228,24 @@ export default function MainContent() {
           font-size: 1.1rem !important;
           font-weight: 500 !important;
         }
+        @media (max-width: 768px) {
+          .rbt-mobile-row {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding-bottom: 12px !important;
+            justify-content: flex-start !important;
+          }
+          .rbt-mobile-row > [class*="col-"] {
+            flex: 0 0 240px !important;
+            max-width: 240px !important;
+            scroll-snap-align: start !important;
+          }
+          .rbt-cat-box-5.wider-coloumn .content .title {
+            font-size: 0.9rem !important;
+          }
+        }
         .rbt-product-nav-grp li button.rbt-product-nav {
           border: none !important;
           background: transparent;
@@ -253,50 +271,54 @@ export default function MainContent() {
 
 
       {/* Feature & Trust Strip */}
-      <div className="w-100 py-1 border-bottom d-flex align-items-center" style={{ background: '#136c39' }}>
+      <div className="w-100 feature-trust-strip border-bottom">
         <div className="container">
-          <div className="row g-2 text-center align-items-center">
-            <div className="col-lg-3 col-6 py-1">
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+          <div className="row g-1 text-center align-items-center">
+            <div className="col-3">
+              <div className="feature-item">
+                <div className="feature-icon">
                   <i className="fa-solid fa-truck-fast"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Fast Express Shipping</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Same day dispatch before 2 PM</p>
+                  <h6 className="feature-title d-none d-sm-block">Fast Express Shipping</h6>
+                  <h6 className="feature-title d-block d-sm-none">Fast Dispatch</h6>
+                  <p className="feature-subtitle">Same day dispatch before 2 PM</p>
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-6 py-1">
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+            <div className="col-3">
+              <div className="feature-item">
+                <div className="feature-icon">
                   <i className="fa-solid fa-shield-check"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>100% Tested Components</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Verified by lab engineers</p>
+                  <h6 className="feature-title d-none d-sm-block">100% Tested Components</h6>
+                  <h6 className="feature-title d-block d-sm-none">Tested Parts</h6>
+                  <p className="feature-subtitle">Verified by lab engineers</p>
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-6 py-1">
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+            <div className="col-3">
+              <div className="feature-item">
+                <div className="feature-icon">
                   <i className="fa-solid fa-rotate-left"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Easy Returns</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Hassle-free replacement policy</p>
+                  <h6 className="feature-title d-none d-sm-block">Easy Returns</h6>
+                  <h6 className="feature-title d-block d-sm-none">Easy Returns</h6>
+                  <p className="feature-subtitle">Hassle-free replacement policy</p>
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-6 py-1">
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+            <div className="col-3">
+              <div className="feature-item">
+                <div className="feature-icon">
                   <i className="fa-solid fa-headset"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Expert Tech Support</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Live assistance for projects</p>
+                  <h6 className="feature-title d-none d-sm-block">Expert Tech Support</h6>
+                  <h6 className="feature-title d-block d-sm-none">Tech Support</h6>
+                  <p className="feature-subtitle">Live assistance for projects</p>
                 </div>
               </div>
             </div>
