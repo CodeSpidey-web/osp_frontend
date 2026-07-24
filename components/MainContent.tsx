@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
+import GoogleReviewsSection from "@/components/GoogleReviewsSection";
+import HeroSwiper from "@/components/HeroSwiper";
+
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
   if (!amount) return "₹0.00";
@@ -244,73 +247,62 @@ export default function MainContent() {
         }
       `}</style>
 
-      {/* Hero Section */}
-      <div className="premium-hero">
-        <div className="glowing-circle gc-1"></div>
-        <div className="glowing-circle gc-2"></div>
+      {/* Hero Section Swiper */}
+      <HeroSwiper />
+
+
+
+      {/* Feature & Trust Strip */}
+      <div className="w-100 py-1 border-bottom d-flex align-items-center" style={{ background: '#136c39' }}>
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-lg-6 pr--50">
-              <div className="hero-glass-card">
-                <span className="hero-badge mb--16">INDIA'S STUDENT PROJECT HUB</span>
-                <h1 className="hero-title text-gradient font-bold h2 mb--20 leading-tight">
-                  High-Quality Electronics for Innovation & Prototyping
-                </h1>
-                <p className="hero-desc text-white-50 b1 mb--32">
-                  Get premium microcontrollers, sensors, modules, development boards, and DIY kits. Super-fast shipping, fully validated inventory, and 100% responsive customer support.
-                </p>
-                <div className="rbt-banner-btn gap-3 d-flex flex-wrap">
-                  <a className="rbt-btn btn-premium rbt-btn-lg" href="/shop">Start Building</a>
-                  <a className="rbt-btn rbt-btn-border rbt-btn-lg text-white" href="#topic-finder" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>DIY Kits Finder</a>
+          <div className="row g-2 text-center align-items-center">
+            <div className="col-lg-3 col-6 py-1">
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <i className="fa-solid fa-truck-fast"></i>
+                </div>
+                <div className="text-start">
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Fast Express Shipping</h6>
+                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Same day dispatch before 2 PM</p>
                 </div>
               </div>
             </div>
-            <div className="col-lg-6 mt-5 mt-lg-0 text-center position-relative">
-              <div className="rbt-product-img bg-transparent">
-                <video autoPlay loop muted playsInline preload="metadata" style={{ maxHeight: '600px', width: '100%', borderRadius: '16px', filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.3))' }}>
-                  <source src="/assets/videos/hero-video.mp4" type="video/mp4" />
-                </video>
+            <div className="col-lg-3 col-6 py-1">
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <i className="fa-solid fa-shield-check"></i>
+                </div>
+                <div className="text-start">
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>100% Tested Components</h6>
+                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Verified by lab engineers</p>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-6 py-1">
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <i className="fa-solid fa-rotate-left"></i>
+                </div>
+                <div className="text-start">
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Easy Returns</h6>
+                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Hassle-free replacement policy</p>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-6 py-1">
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <div className="rbt-round-btn shadow-sm" style={{ width: '36px', height: '36px', minWidth: '36px', fontSize: '0.95rem', color: '#ffffff', background: 'rgba(255,255,255,0.18)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <i className="fa-solid fa-headset"></i>
+                </div>
+                <div className="text-start">
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Expert Tech Support</h6>
+                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Live assistance for projects</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Dynamic Project Finder Section */}
-      <div className="rbt-component-area rbt-section-gap rbt-bg-color-white reveal" id="topic-finder">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8 text-center">
-              <div className="rbt-component-section-title border-0 p-0 mb--32">
-                <span className="subtitle text-primary font-bold">INTERACTIVE FINDER</span>
-                <h2 className="rbt-title mt--8">What are you <span className="rbt-bold--text">building today?</span></h2>
-                <p className="b2 text-muted mt--8">Select your project focus area and we will highlight the exact component collections you need.</p>
-              </div>
-              <div className="d-flex flex-wrap justify-content-center gap-3 mt--16">
-                <button className={`interactive-tag ${selectedBuildTopic === 'boards' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('boards', 'development')}>
-                  <i className="fa-solid fa-microchip mr--8"></i> Microcontrollers & Boards
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'kits' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('kits', 'starter')}>
-                  <i className="fa-solid fa-graduation-cap mr--8"></i> IoT & DIY Starter Kits
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'sensors' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('sensors', 'sensors')}>
-                  <i className="fa-solid fa-radar mr--8"></i> Sensors & Modules
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'cables' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('cables', 'cables')}>
-                  <i className="fa-solid fa-plug mr--8"></i> Cables & Adapters
-                </button>
-              </div>
-              {selectedBuildTopic && (
-                <div className="mt--24 text-success font-semibold animation-fade-in">
-                  <span className="spinner-border spinner-border-sm mr--8" role="status"></span>
-                  Redirecting to matching products...
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Categories Grid */}
       {categories.length > 0 && (
         <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--80 reveal">
@@ -737,6 +729,41 @@ export default function MainContent() {
         </div>
       </div>
 
+      {/* Dynamic Project Finder Section */}
+      <div className="rbt-component-area rbt-section-gap rbt-bg-color-white reveal" id="topic-finder">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8 text-center">
+              <div className="rbt-component-section-title border-0 p-0 mb--32">
+                <span className="subtitle text-primary font-bold">INTERACTIVE FINDER</span>
+                <h2 className="rbt-title mt--8">What are you <span className="rbt-bold--text">building today?</span></h2>
+                <p className="b2 text-muted mt--8">Select your project focus area and we will highlight the exact component collections you need.</p>
+              </div>
+              <div className="d-flex flex-wrap justify-content-center gap-3 mt--16">
+                <button className={`interactive-tag ${selectedBuildTopic === 'boards' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('boards', 'development')}>
+                  <i className="fa-solid fa-microchip mr--8"></i> Microcontrollers & Boards
+                </button>
+                <button className={`interactive-tag ${selectedBuildTopic === 'kits' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('kits', 'starter')}>
+                  <i className="fa-solid fa-graduation-cap mr--8"></i> IoT & DIY Starter Kits
+                </button>
+                <button className={`interactive-tag ${selectedBuildTopic === 'sensors' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('sensors', 'sensors')}>
+                  <i className="fa-solid fa-radar mr--8"></i> Sensors & Modules
+                </button>
+                <button className={`interactive-tag ${selectedBuildTopic === 'cables' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('cables', 'cables')}>
+                  <i className="fa-solid fa-plug mr--8"></i> Cables & Adapters
+                </button>
+              </div>
+              {selectedBuildTopic && (
+                <div className="mt--24 text-success font-semibold animation-fade-in">
+                  <span className="spinner-border spinner-border-sm mr--8" role="status"></span>
+                  Redirecting to matching products...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Trust Badges */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-gray-light reveal">
         <div className="container">
@@ -773,8 +800,12 @@ export default function MainContent() {
         </div>
       </div>
 
+      {/* Google Reviews Section */}
+      <GoogleReviewsSection />
+
       {/* Newsletter */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-white">
+
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8">
@@ -788,30 +819,30 @@ export default function MainContent() {
                 </p>
                 <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
                   <div className="d-flex mx-auto" style={{ maxWidth: '480px', gap: '12px' }}>
-                    <input 
-                      type="email" 
-                      placeholder="Enter college/personal email" 
-                      className="form-control bg-white" 
-                      required 
-                      style={{ 
-                        height: '46px', 
-                        borderRadius: '8px', 
-                        border: '1px solid #cbd5e1', 
+                    <input
+                      type="email"
+                      placeholder="Enter college/personal email"
+                      className="form-control bg-white"
+                      required
+                      style={{
+                        height: '46px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
                         padding: '10px 16px',
                         fontSize: '0.92rem',
                         boxShadow: 'none',
                         outline: 'none',
                         background: '#ffffff'
-                      }} 
+                      }}
                     />
-                    <button 
-                      type="submit" 
-                      className="btn" 
-                      style={{ 
-                        background: '#136c39', 
-                        color: '#ffffff', 
-                        fontWeight: '600', 
-                        borderRadius: '8px', 
+                    <button
+                      type="submit"
+                      className="btn"
+                      style={{
+                        background: '#136c39',
+                        color: '#ffffff',
+                        fontWeight: '600',
+                        borderRadius: '8px',
                         padding: '0 24px',
                         height: '46px',
                         fontSize: '0.92rem',
