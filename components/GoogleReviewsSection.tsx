@@ -401,9 +401,8 @@ export default function GoogleReviewsSection() {
             </a>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    );
+  }
 
 
