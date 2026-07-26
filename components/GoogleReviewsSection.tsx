@@ -400,7 +400,8 @@ export default function GoogleReviewsSection() {
             <span>Write a Google Review</span>
           </a>
         </div>
-      </section>
+      </div>
+    </section>
     );
   }
 
