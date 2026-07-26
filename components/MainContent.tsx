@@ -4,6 +4,7 @@ import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImag
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
+import Brand from "@/components/Brand";
 
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
@@ -746,7 +747,7 @@ export default function MainContent() {
           )}
 
           <div className="text-center mt--30 mb--36">
-            <a className="rbt-btn btn-premium rbt-btn-md px-5" href="/shop">View Full Catalog</a>
+            <a className="rbt-btn btn-premium rbt-btn-md px-5 !rounded-full" href="/shop" style={{ borderRadius: "10px" }}>View Full Catalog</a>
           </div>
         </div>
       </div>
@@ -824,6 +825,9 @@ export default function MainContent() {
 
       {/* Google Reviews Section */}
       <GoogleReviewsSection />
+
+      {/* Brand Logos Marquee */}
+      <Brand />
 
       {/* Newsletter */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-white">
