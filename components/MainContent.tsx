@@ -538,24 +538,51 @@ export default function MainContent() {
                       <div className="col-lg-6 col-12 mt--24">
                         <div className="row">
                           <div className="col-md-12">
-                            <div className="rbt-product-banner rbt-product-banner-style-two h-100 rbt-bg-color-gray-150 border-0">
-                              <div className="rbt-banner-inner">
-                                <div className="rbt-product-banner-img rbt-full-width-img">
+                            <div className="rbt-product-banner h-100 border-0 rounded-[20px] overflow-hidden" style={{ minHeight: '340px', background: '#f0f2f5', borderRadius: '20px' }}>
+                              <div className="d-flex flex-column flex-md-row align-items-center justify-content-between h-100 p-4 p-md-5 gap-4">
+                                {/* Left: Image Container */}
+                                <div className="d-flex justify-content-center align-items-center flex-grow-1 flex-shrink-1" style={{ maxWidth: '100%' }}>
                                   <img
-                                    src="/assets/images/product-banner/product-banner-electro-c-01.webp"
-                                    alt="Ecommerce Product Banner Image"
+                                    src="/assets/images/product-banner/electronics-hero-c-01.webp"
+                                    alt="Power Up Deals"
+                                    style={{ maxHeight: '280px', objectFit: 'contain', width: 'auto' }}
                                   />
                                 </div>
-                                <div className="rbt-product-banner-content w-100">
-                                  <div className="rbt-content-section">
-                                    <p className="rbt-banner-subtitle mb-0">SALE UPTO 70%</p>
-                                    <h2 className="title mb--16">
-                                      <span className="rbt-bold--text">Automatic Water Pump Controller <br /> Module XHM203</span>
+                                
+                                {/* Right: Content Container */}
+                                <div className="d-flex align-items-center justify-content-between flex-grow-1 flex-shrink-0 w-100 gap-4">
+                                  <div className="d-flex flex-column text-start">
+                                    <span className="text-muted font-bold text-uppercase tracking-wider mb-1" style={{ fontSize: '12px', fontWeight: 600 }}>
+                                      Power Up Deals
+                                    </span>
+                                    <h2 className="title mb-2 text-dark font-extrabold text-uppercase leading-tight" style={{ fontSize: '24px', letterSpacing: '-0.5px', fontWeight: 800 }}>
+                                      NEW DEVICE <br className="d-none d-md-block" /> COMING SOON
                                     </h2>
+                                    <span className="text-primary italic font-medium" style={{ fontSize: '18px', fontFamily: 'Georgia, serif' }}>
+                                      Land major deals
+                                    </span>
                                   </div>
-                                  <div className="rbt-banner-btn mt--16">
-                                    <a className="rbt-btn rbt-btn-md border-0" href="/shop">SHOP NOW</a>
-                                  </div>
+                                  
+                                  <a 
+                                    href="/shop" 
+                                    className="d-flex flex-column align-items-center justify-content-center text-center font-bold text-white rounded-circle shadow-lg hover-scale transition-all"
+                                    style={{ 
+                                      width: '90px', 
+                                      height: '90px', 
+                                      minWidth: '90px',
+                                      minHeight: '90px',
+                                      backgroundColor: '#1b51e5',
+                                      textDecoration: 'none',
+                                      padding: '10px',
+                                      borderRadius: '50%'
+                                    }}
+                                  >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="mb-1 text-white">
+                                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                                      <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                    <span className="text-uppercase tracking-wider leading-none" style={{ fontSize: '10px' }}>Shop<br />Now</span>
+                                  </a>
                                 </div>
                               </div>
                             </div>
