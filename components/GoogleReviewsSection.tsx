@@ -300,9 +300,9 @@ export default function GoogleReviewsSection() {
                         )}
 
                         <div className="min-w-0 overflow-hidden">
-                          <h4 className="font-bold text-slate-800 text-sm leading-tight truncate">
+                          <h6 className="font-bold text-slate-800 text-sm leading-tight truncate">
                             {rev.author_name}
-                          </h4>
+                          </h6>
                           <span className="text-[11px] text-[#8ea0b5] font-semibold block mt-0.5 truncate">
                             Google Reviewer
                           </span>

@@ -5,6 +5,7 @@ import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
 import Brand from "@/components/Brand";
+import PromoBanner from "@/components/PromoBanner";
 
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
@@ -21,7 +22,6 @@ export default function MainContent() {
   const [categories, setCategories] = useState<MedusaCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
-  const [selectedBuildTopic, setSelectedBuildTopic] = useState<string | null>(null);
   const [popularTab, setPopularTab] = useState<'week' | 'month' | 'year' | 'all'>('week');
 
   useEffect(() => {
@@ -94,20 +94,7 @@ export default function MainContent() {
     }
   };
 
-  // Recommended Category based on project filter selection
-  const handleBuildTopicClick = (topic: string, catName: string) => {
-    setSelectedBuildTopic(topic);
-    const matchedCat = categories.find(c => c.name.toLowerCase().includes(catName.toLowerCase()));
-    if (matchedCat) {
-      setTimeout(() => {
-        window.location.href = `/shop?category_id=${matchedCat.id}`;
-      }, 800);
-    } else {
-      setTimeout(() => {
-        window.location.href = `/shop`;
-      }, 800);
-    }
-  };
+
 
   return (
     <>
@@ -538,51 +525,24 @@ export default function MainContent() {
                       <div className="col-lg-6 col-12 mt--24">
                         <div className="row">
                           <div className="col-md-12">
-                            <div className="rbt-product-banner h-100 border-0 rounded-[20px] overflow-hidden" style={{ minHeight: '340px', background: '#f0f2f5', borderRadius: '20px' }}>
-                              <div className="d-flex flex-column flex-md-row align-items-center justify-content-between h-100 p-4 p-md-5 gap-4">
-                                {/* Left: Image Container */}
-                                <div className="d-flex justify-content-center align-items-center flex-grow-1 flex-shrink-1" style={{ maxWidth: '100%' }}>
+                            <div className="rbt-product-banner rbt-product-banner-style-two h-100 rbt-bg-color-gray-150 border-0">
+                              <div className="rbt-banner-inner">
+                                <div className="rbt-product-banner-img rbt-full-width-img">
                                   <img
-                                    src="/assets/images/product-banner/electronics-hero-c-01.webp"
-                                    alt="Power Up Deals"
-                                    style={{ maxHeight: '280px', objectFit: 'contain', width: 'auto' }}
+                                    src="/assets/images/product-banner/product-banner-electro-c-01.webp"
+                                    alt="Ecommerce Product Banner Image"
                                   />
                                 </div>
-                                
-                                {/* Right: Content Container */}
-                                <div className="d-flex align-items-center justify-content-between flex-grow-1 flex-shrink-0 w-100 gap-4">
-                                  <div className="d-flex flex-column text-start">
-                                    <span className="text-muted font-bold text-uppercase tracking-wider mb-1" style={{ fontSize: '12px', fontWeight: 600 }}>
-                                      Power Up Deals
-                                    </span>
-                                    <h2 className="title mb-2 text-dark font-extrabold text-uppercase leading-tight" style={{ fontSize: '24px', letterSpacing: '-0.5px', fontWeight: 800 }}>
-                                      NEW DEVICE <br className="d-none d-md-block" /> COMING SOON
+                                <div className="rbt-product-banner-content w-100">
+                                  <div className="rbt-content-section">
+                                    <p className="rbt-banner-subtitle mb-0">SALE UPTO 70%</p>
+                                    <h2 className="title mb--16">
+                                      <span className="rbt-bold--text">Automatic Water Pump Controller <br /> Module XHM203</span>
                                     </h2>
-                                    <span className="text-primary italic font-medium" style={{ fontSize: '18px', fontFamily: 'Georgia, serif' }}>
-                                      Land major deals
-                                    </span>
                                   </div>
-                                  
-                                  <a 
-                                    href="/shop" 
-                                    className="d-flex flex-column align-items-center justify-content-center text-center font-bold text-white rounded-circle shadow-lg hover-scale transition-all"
-                                    style={{ 
-                                      width: '90px', 
-                                      height: '90px', 
-                                      minWidth: '90px',
-                                      minHeight: '90px',
-                                      backgroundColor: '#1b51e5',
-                                      textDecoration: 'none',
-                                      padding: '10px',
-                                      borderRadius: '50%'
-                                    }}
-                                  >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="mb-1 text-white">
-                                      <line x1="7" y1="17" x2="17" y2="7"></line>
-                                      <polyline points="7 7 17 7 17 17"></polyline>
-                                    </svg>
-                                    <span className="text-uppercase tracking-wider leading-none" style={{ fontSize: '10px' }}>Shop<br />Now</span>
-                                  </a>
+                                  <div className="rbt-banner-btn mt--16">
+                                    <a className="rbt-btn rbt-btn-md border-0" href="/shop">SHOP NOW</a>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -779,41 +739,6 @@ export default function MainContent() {
         </div>
       </div>
 
-      {/* Dynamic Project Finder Section */}
-      <div className="rbt-component-area rbt-section-gap rbt-bg-color-white reveal" id="topic-finder">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8 text-center">
-              <div className="rbt-component-section-title border-0 p-0 mb--32">
-                <span className="subtitle text-primary font-bold">INTERACTIVE FINDER</span>
-                <h2 className="rbt-title mt--8">What are you <span className="rbt-bold--text">building today?</span></h2>
-                <p className="b2 text-muted mt--8">Select your project focus area and we will highlight the exact component collections you need.</p>
-              </div>
-              <div className="d-flex flex-wrap justify-content-center gap-3 mt--16">
-                <button className={`interactive-tag ${selectedBuildTopic === 'boards' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('boards', 'development')}>
-                  <i className="fa-solid fa-microchip mr--8"></i> Microcontrollers & Boards
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'kits' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('kits', 'starter')}>
-                  <i className="fa-solid fa-graduation-cap mr--8"></i> IoT & DIY Starter Kits
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'sensors' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('sensors', 'sensors')}>
-                  <i className="fa-solid fa-radar mr--8"></i> Sensors & Modules
-                </button>
-                <button className={`interactive-tag ${selectedBuildTopic === 'cables' ? 'active' : ''}`} onClick={() => handleBuildTopicClick('cables', 'cables')}>
-                  <i className="fa-solid fa-plug mr--8"></i> Cables & Adapters
-                </button>
-              </div>
-              {selectedBuildTopic && (
-                <div className="mt--24 text-success font-semibold animation-fade-in">
-                  <span className="spinner-border spinner-border-sm mr--8" role="status"></span>
-                  Redirecting to matching products...
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Trust Badges */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-gray-light reveal">
         <div className="container">
@@ -850,11 +775,16 @@ export default function MainContent() {
         </div>
       </div>
 
+      {/* Electronic Accessories Banner Component */}
+      <PromoBanner />
+
       {/* Google Reviews Section */}
       <GoogleReviewsSection />
 
       {/* Brand Logos Marquee */}
       <Brand />
+
+
 
       {/* Newsletter */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-white">
