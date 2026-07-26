@@ -4,6 +4,7 @@ import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImag
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
+import Brand from "@/components/Brand";
 
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
@@ -262,8 +263,8 @@ export default function MainContent() {
                   <i className="fa-solid fa-truck-fast"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Fast Express Shipping</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Same day dispatch before 2 PM</p>
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.7125rem', lineHeight: '1.2' }}>Fast Express Shipping</h6>
+                  <p className="mb-0" style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.85)' }}>Same day dispatch before 2 PM</p>
                 </div>
               </div>
             </div>
@@ -273,8 +274,8 @@ export default function MainContent() {
                   <i className="fa-solid fa-shield-check"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>100% Tested Components</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Verified by lab engineers</p>
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.7125rem', lineHeight: '1.2' }}>100% Tested Components</h6>
+                  <p className="mb-0" style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.85)' }}>Verified by lab engineers</p>
                 </div>
               </div>
             </div>
@@ -284,8 +285,8 @@ export default function MainContent() {
                   <i className="fa-solid fa-rotate-left"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Easy Returns</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Hassle-free replacement policy</p>
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.7125rem', lineHeight: '1.2' }}>Easy Returns</h6>
+                  <p className="mb-0" style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.85)' }}>Hassle-free replacement policy</p>
                 </div>
               </div>
             </div>
@@ -295,8 +296,8 @@ export default function MainContent() {
                   <i className="fa-solid fa-headset"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.8125rem', lineHeight: '1.2' }}>Expert Tech Support</h6>
-                  <p className="mb-0" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)' }}>Live assistance for projects</p>
+                  <h6 className="mb-0 font-bold text-white" style={{ fontSize: '0.7125rem', lineHeight: '1.2' }}>Expert Tech Support</h6>
+                  <p className="mb-0" style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.85)' }}>Live assistance for projects</p>
                 </div>
               </div>
             </div>
@@ -724,7 +725,7 @@ export default function MainContent() {
           )}
 
           <div className="text-center mt--30 mb--36">
-            <a className="rbt-btn btn-premium rbt-btn-md px-5" href="/shop">View Full Catalog</a>
+            <a className="rbt-btn btn-premium rbt-btn-md px-5 !rounded-full" href="/shop" style={{ borderRadius: "10px" }}>View Full Catalog</a>
           </div>
         </div>
       </div>
@@ -802,6 +803,9 @@ export default function MainContent() {
 
       {/* Google Reviews Section */}
       <GoogleReviewsSection />
+
+      {/* Brand Logos Marquee */}
+      <Brand />
 
       {/* Newsletter */}
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-white">
