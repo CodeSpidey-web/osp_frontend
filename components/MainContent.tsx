@@ -6,6 +6,7 @@ import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
 import Brand from "@/components/Brand";
 import PromoBanner from "@/components/PromoBanner";
+import NewsletterSection from "@/components/NewsletterSection";
 
 
 function formatPrice(amount: number, currencyCode: string = "inr") {
@@ -318,11 +319,13 @@ export default function MainContent() {
         <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--80 reveal">
           <div className="container">
             <div className="row">
-              <div className="col-lg-12 mb--32">
+              <div className="col-lg-12 mb--10">
                 <div className="rbt-component-section-title text-center border-0 p-0">
-                  <span className="subtitle text-primary font-bold">POPULAR CATEGORIES</span>
-                  <h2 className="rbt-title mt--8">
-                    Browse By <span className="rbt-bold--text">Engineering Component</span>
+                  <div>
+                    <span className="osp-brand-chip">POPULAR CATEGORIES</span>
+                  </div>
+                  <h2 className="rbt-title mt--4">
+                    Browse By <span className="rbt-bold--text text-success">Engineering Component</span>
                   </h2>
                 </div>
               </div>
@@ -342,9 +345,7 @@ export default function MainContent() {
                           </div>
                           <div className="content">
                             <div className="top-content">
-                              <span className="rbt-badge rbt-badge-small">EXCLUSIVE</span>
-                              <p className="subtitle">NEW ARRIVALS</p>
-                              <h2 className="title h5"><span className="rbt-bold--text">{cat.name}</span></h2>
+                              <h2 className="title h5" style={{ maxWidth: '280px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
                             </div>
                             <div className="bottom-content">
                               <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
@@ -377,9 +378,7 @@ export default function MainContent() {
                           </div>
                           <div className="content">
                             <div className="top-content">
-                              <span className="rbt-badge rbt-badge-small">TRENDING</span>
-                              <p className="subtitle">ONLINE EXCLUSIVE</p>
-                              <h2 className="title h5"><span className="rbt-bold--text">{cat.name}</span></h2>
+                              <h2 className="title h5" style={{ maxWidth: '240px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
                             </div>
                             <div className="bottom-content">
                               <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-marquee-btn marquee-auto rbt-btn-white rbt-btn-md">
@@ -438,8 +437,11 @@ export default function MainContent() {
           <div className="row">
             <div className="col-lg-12 d-flex justify-content-between flex-row align-items-center flex-wrap rbt-gap--16 mb--32">
               <div className="rbt-component-section-title rbt-gap--4 p-0 mb--0 border-0">
+                <div>
+                  <span className="osp-brand-chip mb-1">TOP SELECTION</span>
+                </div>
                 <h2 className="rbt-title rbt-scroll-trigger fade_in animation-order-1">
-                  <span className="rbt-bold--text">Popular products</span>
+                  Popular <span className="rbt-bold--text text-success">Products</span>
                 </h2>
               </div>
 
@@ -535,7 +537,6 @@ export default function MainContent() {
                                 </div>
                                 <div className="rbt-product-banner-content w-100">
                                   <div className="rbt-content-section">
-                                    <p className="rbt-banner-subtitle mb-0">SALE UPTO 70%</p>
                                     <h2 className="title mb--16">
                                       <span className="rbt-bold--text">Automatic Water Pump Controller <br /> Module XHM203</span>
                                     </h2>
@@ -574,19 +575,7 @@ export default function MainContent() {
                                           e.currentTarget.src = fallbackImg;
                                         }}
                                       />
-                                    </a>
-                                    <div className="rbt-product-badge rbt-product-badge-bg-primary rbt-badge-top-left--position">
-                                      SALE
-                                    </div>
-                                    <button
-                                      className="rbt-wishlisted-btn rbt-round-btn bg-light-one rbt-top-right--position tooltips"
-                                      type="button"
-                                      data-tooltip="Add to wishlist"
-                                      data-tooltip-position="left"
-                                    >
-                                      <i className="fa-regular fa-heart"></i>
-                                    </button>
-                                    {variant && (
+                                    </a>                                    {variant && (
                                       <button
                                         className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
                                         onClick={() => handleAddToCart(variant.id, product.id)}
@@ -628,7 +617,7 @@ export default function MainContent() {
                                         <del className="price-text">{formatPrice(originalPrice)}</del>
                                       )}
                                       <span className="price-text">{formatPrice(displayPrice || 0)}</span>
-                                      <span className="rbt-offer-badge">-30%</span>
+
                                     </div>
                                   </div>
                                 </div>
@@ -663,17 +652,6 @@ export default function MainContent() {
                                       }}
                                     />
                                   </a>
-                                  <div className="rbt-product-badge rbt-product-badge-bg-primary rbt-badge-top-left--position">
-                                    SALE
-                                  </div>
-                                  <button
-                                    className="rbt-wishlisted-btn rbt-round-btn bg-light-one rbt-top-right--position tooltips"
-                                    type="button"
-                                    data-tooltip="Add to wishlist"
-                                    data-tooltip-position="left"
-                                  >
-                                    <i className="fa-regular fa-heart"></i>
-                                  </button>
                                   {variant && (
                                     <button
                                       className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
@@ -716,7 +694,7 @@ export default function MainContent() {
                                       <del className="price-text">{formatPrice(originalPrice)}</del>
                                     )}
                                     <span className="price-text">{formatPrice(displayPrice || 0)}</span>
-                                    <span className="rbt-offer-badge">-30%</span>
+
                                   </div>
                                 </div>
                               </div>
@@ -787,62 +765,7 @@ export default function MainContent() {
 
 
       {/* Newsletter */}
-      <div className="rbt-component-area rbt-section-gap rbt-bg-color-white">
-
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8">
-              <div className="text-center bg-white p-5" style={{ borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <span className="hero-badge mb--16">MAKER COMMUNITY</span>
-                <h3 className="rbt-title mb--12 h4">
-                  Join the Maker <span className="rbt-bold--text text-primary">Community</span>
-                </h3>
-                <p className="mb--24 text-muted b2" style={{ maxWidth: '540px', margin: '0 auto' }}>
-                  Subscribe to receive schematics, new sensor datasheets, and exclusive student project coupon codes.
-                </p>
-                <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="d-flex mx-auto" style={{ maxWidth: '480px', gap: '12px' }}>
-                    <input
-                      type="email"
-                      placeholder="Enter college/personal email"
-                      className="form-control bg-white"
-                      required
-                      style={{
-                        height: '46px',
-                        borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
-                        padding: '10px 16px',
-                        fontSize: '0.92rem',
-                        boxShadow: 'none',
-                        outline: 'none',
-                        background: '#ffffff'
-                      }}
-                    />
-                    <button
-                      type="submit"
-                      className="btn"
-                      style={{
-                        background: '#136c39',
-                        color: '#ffffff',
-                        fontWeight: '600',
-                        borderRadius: '8px',
-                        padding: '0 24px',
-                        height: '46px',
-                        fontSize: '0.92rem',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                        border: 'none'
-                      }}
-                    >
-                      Subscribe
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <NewsletterSection />
     </>
   );
 }
