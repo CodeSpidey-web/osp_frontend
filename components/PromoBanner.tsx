@@ -47,24 +47,66 @@ export default function PromoBanner() {
           }
         }
         @media (max-width: 767px) {
-          .custom-electronics-banner .content {
-            padding: 30px 24px;
-            max-width: 100%;
-          }
           .custom-electronics-banner {
-            min-height: 260px;
+            position: relative;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
             margin-left: 10px;
             margin-right: 10px;
           }
+          .custom-banner-bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+          }
+          .custom-banner-bg-image img {
+            object-fit: cover;
+            object-position: 72% center;
+          }
+          .custom-electronics-banner .content {
+            position: relative;
+            z-index: 2;
+            padding: 24px 20px;
+            max-width: 60%;
+            margin: 0;
+            border: none;
+            box-shadow: none;
+            background: linear-gradient(90deg, rgba(234, 234, 234, 0.98) 45%, rgba(234, 234, 234, 0.8) 75%, rgba(234, 234, 234, 0) 100%);
+          }
           .custom-electronics-banner .banner-title {
-            font-size: 28px !important;
+            font-size: 20px !important;
           }
           .custom-electronics-banner .banner-subtitle {
-            font-size: 24px !important;
+            font-size: 15px !important;
+            margin-bottom: 10px !important;
+          }
+          .custom-electronics-banner .subtitle {
+            font-size: 11px !important;
+            margin-bottom: 4px !important;
+          }
+          .custom-electronics-banner .starting {
+            font-size: 12px !important;
+          }
+          .custom-electronics-banner .price {
+            font-size: 20px !important;
+          }
+          .custom-electronics-banner .discount-badge {
+            font-size: 9px !important;
+            padding: 3px 6px !important;
+          }
+          .custom-electronics-banner .pricing-info {
+            margin-bottom: 14px !important;
+            gap: 6px !important;
           }
           .custom-electronics-banner .rbt-btn {
-            padding: 10px 24px !important;
-            font-size: 14px !important;
+            height: 30px !important;
+            padding: 0 16px !important;
+            font-size: 11px !important;
           }
         }
       `}</style>

@@ -641,7 +641,7 @@ export default function MainContent() {
 
                     {displayProducts.length > 2 && (
                       <div className="row row--12 mt--24">
-                        {displayProducts.slice(2).map((product, pi) => {
+                        {displayProducts.slice(2, 6).map((product, pi) => {
                           const variant = product.variants?.[0];
                           const price = variant?.prices?.[0];
                           const calculated = variant?.calculated_price;
