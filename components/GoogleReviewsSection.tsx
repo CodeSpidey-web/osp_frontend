@@ -391,7 +391,7 @@ export default function GoogleReviewsSection() {
         {/* Write a Google Review Button */}
         <div className="flex justify-center mt-4">
           <a
-            href="https://search.google.com/local/writereview?placeid=ChIJz7sXYCGRyzsRHsL9V-R9xLc"
+            href="https://search.google.com/local/writereview?placeid=ChIJG_lfnbBnUjoR-obatxOgpcE"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e5e7eb] rounded-full font-semibold text-sm text-[#374151] shadow-xs cursor-pointer no-underline"
