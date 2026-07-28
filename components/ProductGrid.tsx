@@ -6,6 +6,9 @@ import { useCart } from '@/lib/CartContext';
 interface ProductGridProps {
   products: MedusaProduct[]
   loading: boolean
+  count: number
+  offset: number
+  limit: number
 }
 
 function getPricing(product: MedusaProduct): { display: string; min: number; max: number } {
@@ -19,7 +22,7 @@ function getPricing(product: MedusaProduct): { display: string; min: number; max
   return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${(max / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
 }
 
-export default function ProductGrid({ products, loading }: ProductGridProps) {
+export default function ProductGrid({ products, loading, count, offset, limit }: ProductGridProps) {
   const { addToCart } = useCart();
   const [addingId, setAddingId] = useState<string | null>(null);
 
@@ -46,11 +49,14 @@ export default function ProductGrid({ products, loading }: ProductGridProps) {
     )
   }
 
+  const startResult = count === 0 ? 0 : offset + 1;
+  const endResult = Math.min(offset + limit, count);
+
   return (
     <>
-      <div className="rbt-shop-tool-content rbt-shop-view-var-wrapper justify-content-between">
-        <p className="rbt-shop-tools-title h6 rbt-text-color-heading">
-          Showing {products.length} {products.length === 1 ? 'product' : 'products'}
+      <div className="mb--20" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <p style={{ margin: 0, fontWeight: '600', color: 'var(--color-heading)', fontSize: '15px' }}>
+          Showing {startResult}–{endResult} of {count} {count === 1 ? 'result' : 'results'}
         </p>
       </div>
 

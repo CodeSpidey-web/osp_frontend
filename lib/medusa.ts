@@ -122,6 +122,7 @@ export async function getProducts(params?: {
   collection_id?: string[]
   offset?: number
   limit?: number
+  order?: string
 }): Promise<{ products: MedusaProduct[]; count: number }> {
   try {
     const q = new URLSearchParams()
@@ -130,6 +131,7 @@ export async function getProducts(params?: {
     if (params?.collection_id) for (const id of params.collection_id) q.append('collection_id[]', id)
     if (params?.offset) q.set('offset', String(params.offset))
     if (params?.limit) q.set('limit', String(params.limit))
+    if (params?.order) q.set('order', params.order)
     q.set('fields', '*variants.prices')
     const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(`/store/products?${q.toString()}`)
     return res

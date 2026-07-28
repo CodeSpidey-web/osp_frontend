@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { getProducts, getProduct, getCategories, MedusaProduct, MedusaCategory } from './medusa'
 
-export function useProducts(params?: { q?: string; category_id?: string[]; limit?: number }) {
+export function useProducts(params?: { q?: string; category_id?: string[]; limit?: number; offset?: number; order?: string }) {
   const [products, setProducts] = useState<MedusaProduct[]>([])
   const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -16,7 +16,7 @@ export function useProducts(params?: { q?: string; category_id?: string[]; limit
       })
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [params?.q, params?.category_id?.join(','), params?.limit])
+  }, [params?.q, params?.category_id?.join(','), params?.limit, params?.offset, params?.order])
 
   return { products, count, loading }
 }
