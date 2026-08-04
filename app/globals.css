@@ -657,3 +657,14 @@ html {
     border-color: #136c39 !important;
     transform: translateY(-1px) !important;
 }
+
+/* Align Shopping Cart link in Footer */
+.rbt-footer .ft-link li a.rbt-cart-sidenav-activation {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    background: transparent !important;
+    border: none !important;
+    height: auto !important;
+    width: auto !important;
+}

@@ -40,6 +40,7 @@ const Footer = () => {
                                         <li><a href="/about">About Us</a></li>
                                         <li><a href="/contact">Contact Us</a></li>
                                         <li><a href="#!" className="rbt-cart-sidenav-activation">Shopping Cart</a></li>
+                                        <li><a href="http://140.245.223.92.nip.io:9000/app" target="_blank" rel="noopener noreferrer">Admin Login</a></li>
                                     </ul>
                                 </div>
                             </div>
