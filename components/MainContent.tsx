@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl } from "@/lib/medusa";
+import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
@@ -17,23 +17,112 @@ function formatPrice(amount: number, currencyCode: string = "inr") {
   }).format(amount);
 }
 
+function getPricing(product: MedusaProduct): { display: string; min: number; max: number } {
+  const amounts = product.variants?.flatMap(v =>
+    v.prices?.map(p => p.amount) || []
+  ) || []
+  if (amounts.length === 0) return { display: '', min: 0, max: 0 }
+  const min = Math.min(...amounts)
+  const max = Math.max(...amounts)
+  if (min === max) return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+  return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${(max / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+}
+
+function getParentCategoryName(productCategories: any[], allCategories: MedusaCategory[]): string {
+  if (!productCategories || productCategories.length === 0) {
+    return "Electronic Components";
+  }
+
+  const findParentInTree = (
+    targetId: string, 
+    nodes: MedusaCategory[], 
+    parent: MedusaCategory | null
+  ): MedusaCategory | null => {
+    for (const node of nodes) {
+      if (node.id === targetId) {
+        return parent;
+      }
+      if (node.category_children && node.category_children.length > 0) {
+        const foundParent = findParentInTree(targetId, node.category_children, node);
+        if (foundParent) return foundParent;
+      }
+    }
+    return null;
+  };
+
+  for (const prodCat of productCategories) {
+    const parentNode = findParentInTree(prodCat.id, allCategories, null);
+    if (parentNode) {
+      return parentNode.name;
+    }
+  }
+
+  return productCategories[0]?.name || "Electronic Components";
+}
+
 export default function MainContent() {
   const { addToCart } = useCart();
   const [products, setProducts] = useState<MedusaProduct[]>([]);
   const [categories, setCategories] = useState<MedusaCategory[]>([]);
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
-  const [popularTab, setPopularTab] = useState<'week' | 'month' | 'year' | 'all'>('week');
+  const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [productsData, categoriesData] = await Promise.all([
-          getProducts({ limit: 8 }),
+          getProducts({ limit: 100 }),
           getCategories(),
         ]);
-        setProducts(productsData.products || []);
-        setCategories(categoriesData || []);
+        const allProducts = productsData.products || [];
+        const shuffled = [...allProducts];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setProducts(shuffled);
+        const cats = categoriesData || [];
+        setCategories(cats);
+
+        // Fetch first product image for parent categories
+        const parentCats = cats.filter((cat: any) => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized');
+        const categoryImageMap: Record<string, string> = {};
+        
+        await Promise.all(
+          parentCats.map(async (cat) => {
+            try {
+              const getDescendantIds = (c: any): string[] => {
+                const ids = [c.id];
+                if (c.category_children) {
+                  c.category_children.forEach((child: any) => {
+                    ids.push(child.id);
+                    const fullChild = cats.find((x: any) => x.id === child.id);
+                    if (fullChild && fullChild.category_children) {
+                      fullChild.category_children.forEach((gc: any) => {
+                        ids.push(gc.id);
+                      });
+                    }
+                  });
+                }
+                return ids;
+              };
+
+              const res = await getProducts({ category_id: getDescendantIds(cat), limit: 1 });
+              if (res.products && res.products.length > 0) {
+                const prod = res.products[0];
+                const img = getValidImageUrl(prod.thumbnail || prod.images?.[0]?.url, '', prod.handle);
+                if (img) {
+                  categoryImageMap[cat.id] = img;
+                }
+              }
+            } catch (err) {
+              console.warn(`Failed to fetch image for category ${cat.id}:`, err);
+            }
+          })
+        );
+        setCategoryImages(categoryImageMap);
       } catch (err) {
         console.error("Failed to load homepage data:", err);
       } finally {
@@ -42,6 +131,29 @@ export default function MainContent() {
     }
     fetchData();
   }, []);
+
+  // Fetch live inventory for products on home page
+  useEffect(() => {
+    if (products.length === 0) return;
+    const variantIds = products.map(p => p.variants?.[0]?.id).filter(Boolean);
+    if (variantIds.length === 0) return;
+
+    const mockVariantIds = ['variant_rpi4', 'variant_ard_kit', 'variant_uno', 'variant_sr04', 'variant_esp32', 'variant_bb'];
+
+    fetchApi<{ inventory: Record<string, number> }>(`/store/inventory?variant_ids=${variantIds.join(',')}`)
+      .then(res => {
+        const map = { ...res.inventory };
+        mockVariantIds.forEach(id => {
+          if (variantIds.includes(id)) {
+            map[id] = 10;
+          }
+        });
+        setInventoryMap(map);
+      })
+      .catch(err => {
+        console.error("Failed to load inventory for homepage:", err);
+      });
+  }, [products]);
 
   useEffect(() => {
     const handleReveal = () => {
@@ -94,8 +206,6 @@ export default function MainContent() {
       setAddingId(null);
     }
   };
-
-
 
   return (
     <>
@@ -231,8 +341,27 @@ export default function MainContent() {
             max-width: 240px !important;
             scroll-snap-align: start !important;
           }
+          .rbt-catagories-area .rbt-mobile-row > [class*="col-"] {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+          }
           .rbt-cat-box-5.wider-coloumn .content .title {
             font-size: 0.9rem !important;
+          }
+          .trust-card {
+            padding: 16px !important;
+          }
+          .trust-icon-wrapper {
+            width: 48px !important;
+            height: 48px !important;
+            font-size: 1.25rem !important;
+            margin-bottom: 12px !important;
+          }
+          .trust-title {
+            font-size: 0.875rem !important;
+          }
+          .trust-text {
+            font-size: 0.75rem !important;
           }
         }
         .rbt-product-nav-grp li button.rbt-product-nav {
@@ -256,8 +385,6 @@ export default function MainContent() {
 
       {/* Hero Section Swiper */}
       <HeroSwiper />
-
-
 
       {/* Feature & Trust Strip */}
       <div className="w-100 feature-trust-strip border-bottom">
@@ -314,45 +441,122 @@ export default function MainContent() {
           </div>
         </div>
       </div>
+      
       {/* Categories Grid */}
-      {categories.length > 0 && (
-        <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--80 reveal">
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-12 mb--10">
-                <div className="rbt-component-section-title text-center border-0 p-0">
-                  <div>
-                    <span className="osp-brand-chip">POPULAR CATEGORIES</span>
+      {(() => {
+        const parentCategories = categories.filter(
+          cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
+        );
+        return parentCategories.length > 0 && (
+          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
+            <div className="container">
+              <div className="row">
+                <div className="col-lg-12 mb--10">
+                  <div className="rbt-component-section-title text-center border-0 p-0">
+                    <div>
+                      <span className="osp-brand-chip">POPULAR CATEGORIES</span>
+                    </div>
+                    <h2 className="rbt-title mt--4">
+                      Browse By <span className="rbt-bold--text text-success">Engineering Component</span>
+                    </h2>
                   </div>
-                  <h2 className="rbt-title mt--4">
-                    Browse By <span className="rbt-bold--text text-success">Engineering Component</span>
-                  </h2>
                 </div>
               </div>
-            </div>
-            <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
-              {categories.slice(0, 8).map((cat, i) => {
+              <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
+                {parentCategories.map((cat, i) => {
 
-                if (i === 3) {
-                  return (
-                    <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
-                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
-                        <div className="inner">
-                          <div className="rbt-image-portion">
-                            <a href={`/shop?category_id=${cat.id}`}>
-                              <img src="/assets/images/catagory-img/cat-bg-electro-c-lg-01.webp" alt={cat.name} />
-                            </a>
-                          </div>
-                          <div className="content">
-                            <div className="top-content">
-                              <h2 className="title h5" style={{ maxWidth: '280px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
+                  if (i === 3) {
+                    return (
+                      <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
+                        <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
+                          <div className="inner">
+                            <div className="rbt-image-portion">
+                              <a href={`/shop?category_id=${cat.id}`}>
+                                <img 
+                                  src={categoryImages[cat.id] || "/assets/images/catagory-img/cat-bg-electro-c-lg-01.webp"} 
+                                  alt={cat.name} 
+                                  style={{ objectFit: 'contain', height: '150px', width: '100%', background: '#fff', borderRadius: '4px', padding: '10px' }} 
+                                />
+                              </a>
                             </div>
-                            <div className="bottom-content">
-                              <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
-                                See Collection
+                            <div className="content">
+                              <div className="top-content">
+                                <h2 className="title h5" style={{ maxWidth: '280px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
+                              </div>
+                              <div className="bottom-content">
+                                <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
+                                  See Collection
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="rbt-right-corner-portion">
+                            <div className="rbt-corner-portion-wrapper">
+                              <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
+                                <i className="fa-solid fa-arrow-up-right"></i>
                               </a>
                             </div>
                           </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (i === 5) {
+                    return (
+                      <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
+                        <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
+                          <div className="inner">
+                            <div className="rbt-image-portion">
+                              <a href={`/shop?category_id=${cat.id}`}>
+                                <img 
+                                  src={categoryImages[cat.id] || "/assets/images/catagory-img/cat-bg-electro-c-lg-02.webp"} 
+                                  alt={cat.name} 
+                                  style={{ objectFit: 'contain', height: '150px', width: '100%', background: '#fff', borderRadius: '4px', padding: '10px' }} 
+                                />
+                              </a>
+                            </div>
+                            <div className="content">
+                              <div className="top-content">
+                                <h2 className="title h5" style={{ maxWidth: '240px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
+                              </div>
+                              <div className="bottom-content">
+                                <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-marquee-btn marquee-auto rbt-btn-white rbt-btn-md">
+                                  <span data-text="View All The Trending Collection">
+                                    View All The Trending Collection
+                                  </span>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="rbt-right-corner-portion">
+                            <div className="rbt-corner-portion-wrapper">
+                              <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
+                                <i className="fa-solid fa-arrow-up-right"></i>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
+                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated text-center">
+                        <div className="inner">
+                          <div className="rbt-image-portion">
+                            <a href={`/shop?category_id=${cat.id}`}>
+                              <img 
+                                src={categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} 
+                                alt={cat.name} 
+                                style={{ objectFit: 'contain', height: '130px', width: '100%', background: '#fff', borderRadius: '6px', padding: '5px' }} 
+                              />
+                            </a>
+                          </div>
+                          <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
+                            {cat.name}
+                          </a>
                         </div>
                         <div className="rbt-right-corner-portion">
                           <div className="rbt-corner-portion-wrapper">
@@ -364,79 +568,20 @@ export default function MainContent() {
                       </div>
                     </div>
                   );
-                }
+                })}
+              </div>
 
-                if (i === 5) {
-                  return (
-                    <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
-                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
-                        <div className="inner">
-                          <div className="rbt-image-portion">
-                            <a href={`/shop?category_id=${cat.id}`}>
-                              <img src="/assets/images/catagory-img/cat-bg-electro-c-lg-02.webp" alt={cat.name} />
-                            </a>
-                          </div>
-                          <div className="content">
-                            <div className="top-content">
-                              <h2 className="title h5" style={{ maxWidth: '240px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
-                            </div>
-                            <div className="bottom-content">
-                              <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-marquee-btn marquee-auto rbt-btn-white rbt-btn-md">
-                                <span data-text="View All The Trending Collection">
-                                  View All The Trending Collection
-                                </span>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="rbt-right-corner-portion">
-                          <div className="rbt-corner-portion-wrapper">
-                            <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
-                              <i className="fa-solid fa-arrow-up-right"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
-                    <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated text-center">
-                      <div className="inner">
-                        <div className="rbt-image-portion">
-                          <a href={`/shop?category_id=${cat.id}`}>
-                            <img src={`/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} alt={cat.name} />
-                          </a>
-                        </div>
-                        <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
-                          {cat.name}
-                        </a>
-                      </div>
-                      <div className="rbt-right-corner-portion">
-                        <div className="rbt-corner-portion-wrapper">
-                          <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
-                            <i className="fa-solid fa-arrow-up-right"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
-
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Popular Products Area */}
       <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gapTop reveal">
         <div className="container">
           <div className="row">
-            <div className="col-lg-12 d-flex justify-content-between flex-row align-items-center flex-wrap rbt-gap--16 mb--32">
-              <div className="rbt-component-section-title rbt-gap--4 p-0 mb--0 border-0">
+            <div className="col-lg-12 d-flex justify-content-center flex-row align-items-center flex-wrap rbt-gap--16 mb--32">
+              <div className="rbt-component-section-title rbt-gap--4 p-0 mb--0 border-0 text-center">
                 <div>
                   <span className="osp-brand-chip mb-1">TOP SELECTION</span>
                 </div>
@@ -444,55 +589,6 @@ export default function MainContent() {
                   Popular <span className="rbt-bold--text text-success">Products</span>
                 </h2>
               </div>
-
-              <div className="mobile-horizontal-scroll-section">
-                <div className="rbt-product-nav-section rbt-nav-effect-activation rbt-scroll-trigger fade_in animation-order-2 justify-content-center">
-                  <ul className="rbt-product-nav-grp">
-                    <li>
-                      <button
-                        type="button"
-                        className={`rbt-product-nav ${popularTab === 'week' ? 'active' : ''}`}
-                        onClick={() => setPopularTab('week')}
-                      >
-                        This Week
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        className={`rbt-product-nav ${popularTab === 'month' ? 'active' : ''}`}
-                        onClick={() => setPopularTab('month')}
-                      >
-                        This Month
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        className={`rbt-product-nav ${popularTab === 'year' ? 'active' : ''}`}
-                        onClick={() => setPopularTab('year')}
-                      >
-                        This Year
-                      </button>
-                    </li>
-                  </ul>
-                  <ul className="rbt-product-nav-grp">
-                    <li>
-                      <button
-                        type="button"
-                        className={`rbt-product-nav ${popularTab === 'all' ? 'active' : ''}`}
-                        onClick={() => setPopularTab('all')}
-                      >
-                        All Time
-                      </button>
-                    </li>
-                  </ul>
-                  <span className="rbt-bg-highlight"></span>
-                </div>
-              </div>
-
-
-
             </div>
           </div>
 
@@ -506,20 +602,7 @@ export default function MainContent() {
           ) : (
             <>
               {(() => {
-                const getFilteredPopularProducts = () => {
-                  if (!products || products.length === 0) return [];
-                  const list = [...products];
-                  if (popularTab === 'month') {
-                    return list.reverse();
-                  } else if (popularTab === 'year') {
-                    return list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                  } else if (popularTab === 'all') {
-                    return list;
-                  }
-                  return list;
-                };
-
-                const displayProducts = getFilteredPopularProducts();
+                const displayProducts = products || [];
 
                 return (
                   <>
@@ -555,17 +638,33 @@ export default function MainContent() {
                         <div className="row row--12 mt_dec--24 h-100">
                           {displayProducts.slice(0, 2).map((product, pi) => {
                             const variant = product.variants?.[0];
-                            const price = variant?.prices?.[0];
-                            const calculated = variant?.calculated_price;
-                            const displayPrice = calculated ? calculated.calculated_amount : price?.amount;
-                            const originalPrice = calculated?.original_amount;
+                            const pricing = getPricing(product);
                             const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${(pi % 6) + 1}.webp`;
+                            const stock = variant ? (inventoryMap[variant.id] ?? 10) : 0;
 
                             return (
                               <div key={product.id} className="col-lg-6 col-6 mt--24 d-flex">
                                 <div className="rbt-card rbt-product-card rbt-scroll-trigger fade_in w-100 h-100 d-flex flex-column justify-content-between">
-                                  <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in flex-grow-1 d-flex align-items-center justify-content-center" style={{ minHeight: '320px', background: '#ffffff' }}>
+                                  <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in flex-grow-1 d-flex align-items-center justify-content-center position-relative" style={{ minHeight: '320px', background: '#ffffff' }}>
                                     <a href={`/product/${product.handle || product.id}`} className="w-100 h-100 d-flex align-items-center justify-content-center">
+                                      {stock === 0 && (
+                                        <span style={{
+                                          position: 'absolute',
+                                          top: '16px',
+                                          left: '16px',
+                                          backgroundColor: '#ef4444',
+                                          color: '#ffffff',
+                                          fontSize: '10px',
+                                          fontWeight: '700',
+                                          padding: '4px 8px',
+                                          borderRadius: '4px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.05em',
+                                          zIndex: 2
+                                        }}>
+                                          Out of stock
+                                        </span>
+                                      )}
                                       <img
                                         src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
                                         alt={product.title}
@@ -575,7 +674,124 @@ export default function MainContent() {
                                           e.currentTarget.src = fallbackImg;
                                         }}
                                       />
-                                    </a>                                    {variant && (
+                                    </a>
+                                    {variant && (
+                                      stock === 0 ? (
+                                        <a
+                                          className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                          href={`/product/${product.handle || product.id}`}
+                                          style={{
+                                            border: "none",
+                                            left: "16px",
+                                            right: "16px",
+                                            width: "calc(100% - 32px)",
+                                            borderRadius: "50px",
+                                            margin: "0 auto",
+                                            backgroundColor: "#1b2a47",
+                                            color: "#ffffff"
+                                          }}
+                                        >
+                                          READ MORE
+                                        </a>
+                                      ) : (
+                                        <button
+                                          className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
+                                          onClick={() => handleAddToCart(variant.id, product.id)}
+                                          disabled={addingId === product.id}
+                                          style={{
+                                            border: "none",
+                                            left: "16px",
+                                            right: "16px",
+                                            width: "calc(100% - 32px)",
+                                            borderRadius: "50px",
+                                            cursor: "pointer",
+                                            margin: "0 auto",
+                                          }}
+                                        >
+                                          <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
+                                        </button>
+                                      )
+                                    )}
+                                  </div>
+                                  <div className="rbt-card-body rbt-card-body-center-align">
+                                    <a href="/shop" className="rbt-card-subtitle rbt-card-catagories-text">
+                                      {getParentCategoryName(product.categories || [], categories)}
+                                    </a>
+                                    <h2 className="rbt-card-title product-title-clamp">
+                                      <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
+                                    </h2>
+                                    <div className="pricing-part">
+                                      <span className="price-text">{pricing.display}</span>
+
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {displayProducts.length > 2 && (
+                      <div className="row row--12 mt--24">
+                        {displayProducts.slice(2, 6).map((product, pi) => {
+                          const variant = product.variants?.[0];
+                          const pricing = getPricing(product);
+                          const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${((pi + 2) % 6) + 1}.webp`;
+                          const stock = variant ? (inventoryMap[variant.id] ?? 10) : 0;
+
+                          return (
+                            <div key={product.id} className="col-lg-3 col-6 mt--24">
+                              <div className="rbt-card rbt-product-card rbt-scroll-trigger fade_in">
+                                <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in position-relative">
+                                  <a href={`/product/${product.handle || product.id}`}>
+                                    {stock === 0 && (
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: '16px',
+                                        left: '16px',
+                                        backgroundColor: '#ef4444',
+                                        color: '#ffffff',
+                                        fontSize: '10px',
+                                        fontWeight: '700',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        zIndex: 2
+                                      }}>
+                                        Out of stock
+                                      </span>
+                                    )}
+                                    <img
+                                      src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
+                                      alt={product.title}
+                                      onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = fallbackImg;
+                                      }}
+                                    />
+                                  </a>
+                                  {variant && (
+                                    stock === 0 ? (
+                                      <a
+                                        className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                        href={`/product/${product.handle || product.id}`}
+                                        style={{
+                                          border: "none",
+                                          left: "16px",
+                                          right: "16px",
+                                          width: "calc(100% - 32px)",
+                                          borderRadius: "50px",
+                                          margin: "0 auto",
+                                          backgroundColor: "#1b2a47",
+                                          color: "#ffffff"
+                                        }}
+                                      >
+                                        READ MORE
+                                      </a>
+                                    ) : (
                                       <button
                                         className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
                                         onClick={() => handleAddToCart(variant.id, product.id)}
@@ -592,108 +808,18 @@ export default function MainContent() {
                                       >
                                         <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
                                       </button>
-                                    )}
-                                  </div>
-                                  <div className="rbt-card-body rbt-card-body-center-align">
-                                    <a href="/categories" className="rbt-card-subtitle rbt-card-catagories-text">
-                                      {product.collection?.title || "Electronic Components"}
-                                    </a>
-                                    <h2 className="rbt-card-title">
-                                      <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
-                                    </h2>
-                                    <div className="rbt-card-rating">
-                                      <ul className="rbt-rating-icon-list">
-                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                        <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                      </ul>
-                                      <p className="rating-digit">(25)</p>
-                                      <span className="icon"><i className="fa-sharp fa-solid fa-truck-fast"></i></span>
-                                    </div>
-                                    <div className="pricing-part">
-                                      {originalPrice && originalPrice !== displayPrice && (
-                                        <del className="price-text">{formatPrice(originalPrice)}</del>
-                                      )}
-                                      <span className="price-text">{formatPrice(displayPrice || 0)}</span>
-
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-                    {displayProducts.length > 2 && (
-                      <div className="row row--12 mt--24">
-                        {displayProducts.slice(2, 6).map((product, pi) => {
-                          const variant = product.variants?.[0];
-                          const price = variant?.prices?.[0];
-                          const calculated = variant?.calculated_price;
-                          const displayPrice = calculated ? calculated.calculated_amount : price?.amount;
-                          const originalPrice = calculated?.original_amount;
-                          const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${((pi + 2) % 6) + 1}.webp`;
-
-                          return (
-                            <div key={product.id} className="col-lg-3 col-6 mt--24">
-                              <div className="rbt-card rbt-product-card rbt-scroll-trigger fade_in">
-                                <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in">
-                                  <a href={`/product/${product.handle || product.id}`}>
-                                    <img
-                                      src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
-                                      alt={product.title}
-                                      onError={(e) => {
-                                        e.currentTarget.onerror = null;
-                                        e.currentTarget.src = fallbackImg;
-                                      }}
-                                    />
-                                  </a>
-                                  {variant && (
-                                    <button
-                                      className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
-                                      onClick={() => handleAddToCart(variant.id, product.id)}
-                                      disabled={addingId === product.id}
-                                      style={{
-                                        border: "none",
-                                        left: "16px",
-                                        right: "16px",
-                                        width: "calc(100% - 32px)",
-                                        borderRadius: "50px",
-                                        cursor: "pointer",
-                                        margin: "0 auto",
-                                      }}
-                                    >
-                                      <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
-                                    </button>
+                                    )
                                   )}
                                 </div>
                                 <div className="rbt-card-body rbt-card-body-center-align">
-                                  <a href="/categories" className="rbt-card-subtitle rbt-card-catagories-text">
-                                    {product.collection?.title || "Electronic Components"}
+                                  <a href="/shop" className="rbt-card-subtitle rbt-card-catagories-text">
+                                    {getParentCategoryName(product.categories || [], categories)}
                                   </a>
-                                  <h2 className="rbt-card-title">
+                                  <h2 className="rbt-card-title product-title-clamp">
                                     <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
                                   </h2>
-                                  <div className="rbt-card-rating">
-                                    <ul className="rbt-rating-icon-list">
-                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                      <li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-                                    </ul>
-                                    <p className="rating-digit">(25)</p>
-                                    <span className="icon"><i className="fa-sharp fa-solid fa-truck-fast"></i></span>
-                                  </div>
                                   <div className="pricing-part">
-                                    {originalPrice && originalPrice !== displayPrice && (
-                                      <del className="price-text">{formatPrice(originalPrice)}</del>
-                                    )}
-                                    <span className="price-text">{formatPrice(displayPrice || 0)}</span>
+                                    <span className="price-text">{pricing.display}</span>
 
                                   </div>
                                 </div>
@@ -721,28 +847,28 @@ export default function MainContent() {
       <div className="rbt-component-area rbt-section-gap rbt-bg-color-gray-light reveal">
         <div className="container">
           <div className="row row--12 mt_dec--24 justify-content-center">
-            <div className="col-lg-3 col-md-6 col-sm-6 mt--24 reveal reveal-delay-1">
+            <div className="col-lg-3 col-md-6 col-sm-6 col-6 mt--24 reveal reveal-delay-1">
               <div className="trust-card text-center bg-white p-4 rbt-rounded--16 h-100 card-hover-effect">
                 <div className="trust-icon-wrapper"><i className="fa-solid fa-truck-fast"></i></div>
                 <h4 className="trust-title h6 font-bold mb--8">Free Express Delivery</h4>
                 <p className="trust-text b3 text-muted">Free shipping on orders above ₹499 directly from hubs across India.</p>
               </div>
             </div>
-            <div className="col-lg-3 col-md-6 col-sm-6 mt--24 reveal reveal-delay-2">
+            <div className="col-lg-3 col-md-6 col-sm-6 col-6 mt--24 reveal reveal-delay-2">
               <div className="trust-card text-center bg-white p-4 rbt-rounded--16 h-100 card-hover-effect">
                 <div className="trust-icon-wrapper"><i className="fa-solid fa-rotate-left"></i></div>
                 <h4 className="trust-title h6 font-bold mb--8">100% Quality Guarantee</h4>
                 <p className="trust-text b3 text-muted">Each board and sensor is batch-tested for pin continuity and voltage stability.</p>
               </div>
             </div>
-            <div className="col-lg-3 col-md-6 col-sm-6 mt--24 reveal reveal-delay-3">
+            <div className="col-lg-3 col-md-6 col-sm-6 col-6 mt--24 reveal reveal-delay-3">
               <div className="trust-card text-center bg-white p-4 rbt-rounded--16 h-100 card-hover-effect">
                 <div className="trust-icon-wrapper"><i className="fa-solid fa-lock"></i></div>
                 <h4 className="trust-title h6 font-bold mb--8">Secure Payments</h4>
                 <p className="trust-text b3 text-muted">Protected transactions via UPI, card, net banking, or secure cash on delivery.</p>
               </div>
             </div>
-            <div className="col-lg-3 col-md-6 col-sm-6 mt--24 reveal reveal-delay-4">
+            <div className="col-lg-3 col-md-6 col-sm-6 col-6 mt--24 reveal reveal-delay-4">
               <div className="trust-card text-center bg-white p-4 rbt-rounded--16 h-100 card-hover-effect">
                 <div className="trust-icon-wrapper"><i className="fa-solid fa-headset"></i></div>
                 <h4 className="trust-title h6 font-bold mb--8">Dedicated Student Support</h4>
@@ -761,8 +887,6 @@ export default function MainContent() {
 
       {/* Brand Logos Marquee */}
       <Brand />
-
-
 
       {/* Newsletter */}
       <NewsletterSection />

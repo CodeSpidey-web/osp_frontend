@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import dynamic from "next/dynamic";
+import { useSearchParams } from 'next/navigation';
 import Breadcrumb from '@/components/Breadcrumb';
 import ShopSidebar from '@/components/ShopSidebar';
 import ProductGrid from '@/components/ProductGrid';
 import ShopBannerAndCategories from '@/components/ShopBannerAndCategories';
-import { useProducts } from '@/lib/hooks';
+import { useProducts, useCategories } from '@/lib/hooks';
 
 import ShopHeader from '@/components/ShopHeader';
 import Footer from '@/components/Footer';
@@ -15,27 +16,120 @@ const MobileMenu = dynamic(() => import("@/components/MobileMenu"), { ssr: false
 const SideNavs = dynamic(() => import("@/components/SideNavs"), { ssr: false });
 const Modals = dynamic(() => import("@/components/Modals"), { ssr: false });
 
-const ShopPage = () => {
+const ShopContent = () => {
+    const searchParams = useSearchParams();
+    const initialQ = searchParams.get('q') || searchParams.get('query') || '';
+    
     // States for sorting, filtering, searching and pagination
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(initialQ);
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialQ);
     const [sortOrder, setSortOrder] = useState('');
     const [offset, setOffset] = useState(0);
     const [priceRange, setPriceRange] = useState({ min: 0, max: 50000 });
     const limit = 12; // Standard 12 products per page
 
+    const { categories } = useCategories();
+
+    // Helper to recursively find all descendant category IDs (children and grandchildren)
+    const getCategoryIdsWithDescendants = (selectedIds: string[], allCats: any[]): string[] => {
+        const ids = new Set<string>();
+
+        const findCategoryInTree = (catId: string, categoriesList: any[]): any => {
+            for (const cat of categoriesList) {
+                if (cat.id === catId) return cat;
+                if (cat.category_children && cat.category_children.length > 0) {
+                    const found = findCategoryInTree(catId, cat.category_children);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const collect = (catId: string) => {
+            ids.add(catId);
+            const foundCat = findCategoryInTree(catId, allCats);
+            if (foundCat && foundCat.category_children) {
+                for (const child of foundCat.category_children) {
+                    collect(child.id);
+                }
+            }
+        };
+
+        for (const id of selectedIds) {
+            collect(id);
+        }
+
+        return Array.from(ids);
+    };
+
+    const activeCategoryIds = getCategoryIdsWithDescendants(selectedCategories, categories);
+
     const { products, count, loading } = useProducts({
-        q: searchQuery,
-        category_id: selectedCategories,
+        q: debouncedSearchQuery,
+        category_id: activeCategoryIds.length > 0 ? activeCategoryIds : undefined,
         limit,
         offset,
         order: sortOrder
     });
 
+    // Debounce search query changes to prevent API spam and lag
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
     // Reset page back to 1 (offset 0) whenever filters change
     useEffect(() => {
         setOffset(0);
-    }, [searchQuery, selectedCategories, sortOrder, priceRange]);
+    }, [debouncedSearchQuery, selectedCategories, sortOrder, priceRange]);
+
+    useEffect(() => {
+        const catId = searchParams.get('category_id') || searchParams.get('category');
+        if (catId) {
+            setSelectedCategories([catId]);
+        } else {
+            setSelectedCategories([]);
+        }
+        const q = searchParams.get('q') || searchParams.get('query') || '';
+        setSearchQuery(q);
+    }, [searchParams]);
+
+    // Sync query parameter into browser history smoothly without page transitions
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (typeof window !== 'undefined') {
+                const params = new URLSearchParams(window.location.search);
+                const currentQ = params.get('q') || '';
+                if (searchQuery.trim() !== currentQ.trim()) {
+                    if (searchQuery.trim()) {
+                        params.set('q', searchQuery.trim());
+                    } else {
+                        params.delete('q');
+                    }
+                    const newUrl = `${window.location.pathname}?${params.toString()}`;
+                    window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+                    // Also dispatch custom sync-search event to update header input if search bar loses focus
+                    window.dispatchEvent(new CustomEvent('sync-search', { detail: searchQuery }));
+                }
+            }
+        }, 400);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchQuery]);
+
+    // Synchronize search term from header events
+    useEffect(() => {
+        const handleSync = (e: Event) => {
+            setSearchQuery((e as CustomEvent).detail || '');
+        };
+        window.addEventListener('sync-search-shop', handleSync);
+        return () => {
+            window.removeEventListener('sync-search-shop', handleSync);
+        };
+    }, []);
 
     const handleCategoryChange = (categoryId: string) => {
         setSelectedCategories((prev) =>
@@ -155,7 +249,11 @@ const ShopPage = () => {
                                             type="text"
                                             placeholder="Search products..."
                                             value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setSearchQuery(val);
+                                                window.dispatchEvent(new CustomEvent('sync-search', { detail: val }));
+                                            }}
                                             style={{ 
                                                 width: '100%', 
                                                 padding: '10px 16px 10px 40px', 
@@ -304,6 +402,22 @@ const ShopPage = () => {
             <Modals />
             <Footer />
         </>
+    );
+};
+
+const ShopPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="rbt-preloader" style={{ position: 'relative', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="rbt-preloader-inner">
+                    <div className="preloader-text">
+                        <p className="preloader-msg">Loading Shop...</p>
+                    </div>
+                </div>
+            </div>
+        }>
+            <ShopContent />
+        </Suspense>
     );
 };
 

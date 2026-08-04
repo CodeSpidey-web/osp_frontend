@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   description: "Your one-stop shop for electronic components, Arduino, Raspberry Pi, and student project essentials in India",
 };
 
+import { AuthProvider } from "@/lib/AuthContext";
 import { CartProvider } from "@/lib/CartContext";
 import DebugToolbar from "@/components/DebugToolbar";
 
@@ -43,12 +44,28 @@ export default function RootLayout({
         <link rel="stylesheet" href="/assets/css/plugins/bootstrap-select.min.css" />
         <link rel="stylesheet" href="/assets/css/plugins/bootstrap-datepicker.min.css" />
         <link rel="stylesheet" href="/assets/css/style.min.css" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          /* Fix popular category button text clipping to allow wrapping */
+          .rbt-cat-box-5 .rbt-btn {
+            white-space: normal !important;
+            height: auto !important;
+            line-height: 1.3 !important;
+            padding: 8px 12px !important;
+            min-height: 50px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: visible !important;
+          }
+        `}} />
       </head>
       <body className="min-h-full flex flex-col rbt-header-sticky" suppressHydrationWarning>
-        <CartProvider>
-          {children}
-          <DebugToolbar />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            <DebugToolbar />
+          </CartProvider>
+        </AuthProvider>
         
         {/* Modernizer JS */}
         <Script src="/assets/js/vendor/modernizr.min.js" strategy="beforeInteractive" />
@@ -63,15 +80,12 @@ export default function RootLayout({
         <Script src="/assets/js/vendor/imageloaded.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/isotope.pkgd.min.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/odometer.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/jquery-appear.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/mavo.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/jquery-ui.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/fancybox.min.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/countdown.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/jquery.waypoints.min.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/bootstrap-select.min.js" strategy="lazyOnload" />
         <Script src="/assets/js/vendor/bootstrap-datepicker.min.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/elevatezoom.min.js" strategy="lazyOnload" />
         
         {/* Main JS */}
         <Script src="/assets/js/main.min.js" strategy="lazyOnload" />

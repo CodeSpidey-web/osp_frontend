@@ -16,13 +16,18 @@ const ELECTRONICS_CAT_IMAGES: Record<string, string> = {
 export default function ShopBannerAndCategories() {
   const { categories } = useCategories();
 
+  // Filter to show only root-level parent categories, ignoring generic "Uncategorized"
+  const parentCategories = categories.filter(
+    cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
+  );
+
   return (
     <>
-      {categories.length > 0 && (
+      {parentCategories.length > 0 && (
       <div className="rbt-component-area rbt-catagories-area pt--0 pt_sm--16 pt_md--16 rbt-bg-color-white mb--32">
         <div className="container">
           <div className="row row--12 rbt-tablet-row rbt-mobile-row justify-content-center">
-            {categories.slice(0, 8).map((cat, i) => {
+            {parentCategories.map((cat, i) => {
               const catKey = (cat.name || '').toLowerCase();
               const imgSrc = ELECTRONICS_CAT_IMAGES[catKey] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
 

@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import Header from "@/components/Header";
+import ShopHeader from "@/components/ShopHeader";
 import Footer from "@/components/Footer";
 import MainContent from "@/components/MainContent";
 
@@ -11,7 +11,7 @@ const Modals = dynamic(() => import("@/components/Modals"), { ssr: false });
 export default function Home() {
   return (
     <>
-      <Header />
+      <ShopHeader />
       <MobileMenu />
       <SideNavs />
       <main className="main-wrapper">

@@ -1165,7 +1165,7 @@ const SearchPage = () => {
                                                             </div>
                                                             <div className="rbt-card-body">
                                                                 <a href={`/shop?category_id=${product.categories?.[0]?.id || ''}`} className="rbt-card-subtitle rbt-card-catagories-text">{catName}</a>
-                                                                <h2 className="rbt-card-title"><a href={`/product/${product.handle || product.id}`}>{product.title}</a></h2>
+                                                                <h2 className="rbt-card-title product-title-clamp"><a href={`/product/${product.handle || product.id}`}>{product.title}</a></h2>
                                                                 <div className="pricing-part">
                                                                     {minPrice > 0 && (
                                                                         <span className="price-text">

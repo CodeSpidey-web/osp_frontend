@@ -1,10 +1,29 @@
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000'
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || 'pk_abd8e27126ac664d0d8042bea1fc954747cfdc4ad40a24974833f10a727a1211'
 
-async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
+export async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('medusa_auth_token') : null
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'x-publishable-api-key': PUBLISHABLE_API_KEY,
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  if (options?.headers) {
+    // Merge extra headers safely
+    const extraHeaders = options.headers as Record<string, string>
+    Object.keys(extraHeaders).forEach((key) => {
+      headers[key] = extraHeaders[key]
+    })
+  }
+
   const res = await fetch(`${BACKEND_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', 'x-publishable-api-key': PUBLISHABLE_API_KEY, ...options?.headers },
     ...options,
+    headers,
   })
   if (!res.ok) throw new Error(`Medusa API error: ${res.status} ${res.statusText}`)
   const json = await res.json()
@@ -26,10 +45,20 @@ export function getValidImageUrl(url?: string | null, fallback: string = '/asset
       return handleMap[productHandle];
     }
   }
-  if (!url || typeof url !== 'string' || url.includes('localhost:8000')) {
+  if (!url || typeof url !== 'string') {
     return fallback;
   }
-  return url;
+  
+  let cleanUrl = url;
+  if (cleanUrl.includes('/images/')) {
+    const idx = cleanUrl.indexOf('/images/');
+    cleanUrl = cleanUrl.substring(idx);
+  }
+  
+  if (cleanUrl.includes('localhost:8000')) {
+    return fallback;
+  }
+  return cleanUrl;
 }
 
 export interface MedusaProduct {
@@ -60,6 +89,7 @@ export interface MedusaCategory {
   name: string
   description?: string
   handle?: string
+  parent_category_id?: string | null
   category_children: MedusaCategory[]
 }
 
@@ -116,6 +146,71 @@ export const FALLBACK_PRODUCTS: MedusaProduct[] = [
 ]
 
 
+function calculateRelevance(product: MedusaProduct, query: string): number {
+  const title = (product.title || "").toLowerCase();
+  const desc = (product.description || "").toLowerCase();
+  const subtitle = (product.subtitle || "").toLowerCase();
+  const handle = (product.handle || "").toLowerCase();
+  const categoryNames = (product.categories || []).map(c => (c.name || "").toLowerCase());
+  
+  const cleanQuery = query.toLowerCase().trim();
+  if (!cleanQuery) return 0;
+  
+  let totalScore = 0;
+  
+  // 1. Full phrase matches
+  if (title === cleanQuery) {
+    totalScore += 2000;
+  } else if (title.startsWith(cleanQuery)) {
+    totalScore += 1500;
+  } else if (title.includes(cleanQuery)) {
+    totalScore += 1000;
+    const index = title.indexOf(cleanQuery);
+    totalScore += Math.max(0, 200 - index);
+  }
+  
+  // 2. Individual term matches (to support multi-word queries)
+  const terms = cleanQuery.split(/\s+/).filter(Boolean);
+  terms.forEach(term => {
+    let termScore = 0;
+    
+    // Title matches
+    if (title.split(/[^a-z0-9]+/).includes(term)) {
+      termScore += 300;
+    } else if (title.includes(term)) {
+      termScore += 150;
+    }
+    
+    // Category matches
+    if (categoryNames.some(cat => cat.split(/[^a-z0-9]+/).includes(term))) {
+      termScore += 80;
+    } else if (categoryNames.some(cat => cat.includes(term))) {
+      termScore += 40;
+    }
+    
+    // Handle matches
+    if (handle.includes(term)) {
+      termScore += 50;
+    }
+    
+    // Subtitle matches
+    if (subtitle.includes(term)) {
+      termScore += 30;
+    }
+    
+    // Description matches
+    if (desc.split(/[^a-z0-9]+/).includes(term)) {
+      termScore += 20;
+    } else if (desc.includes(term)) {
+      termScore += 10;
+    }
+    
+    totalScore += termScore;
+  });
+  
+  return totalScore;
+}
+
 export async function getProducts(params?: {
   q?: string
   category_id?: string[]
@@ -126,15 +221,46 @@ export async function getProducts(params?: {
 }): Promise<{ products: MedusaProduct[]; count: number }> {
   try {
     const q = new URLSearchParams()
+    
+    const isSearching = !!(params?.q && params.q.trim());
+    const apiLimit = isSearching ? '120' : (params?.limit ? String(params.limit) : '12');
+    const apiOffset = isSearching ? '0' : (params?.offset ? String(params.offset) : '0');
+
     if (params?.q) q.set('q', params.q)
     if (params?.category_id) for (const id of params.category_id) q.append('category_id[]', id)
     if (params?.collection_id) for (const id of params.collection_id) q.append('collection_id[]', id)
-    if (params?.offset) q.set('offset', String(params.offset))
-    if (params?.limit) q.set('limit', String(params.limit))
-    if (params?.order) q.set('order', params.order)
-    q.set('fields', '*variants.prices')
+    q.set('offset', apiOffset)
+    q.set('limit', apiLimit)
+    if (params?.order && !isSearching) q.set('order', params.order)
+    q.set('fields', '*variants.prices,*categories')
+    
     const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(`/store/products?${q.toString()}`)
-    return res
+    let productsList = res.products || [];
+    let totalCount = res.count || 0;
+    
+    if (isSearching && params?.q) {
+      const searchTerms = params.q;
+      const scoredProducts = productsList.map(prod => ({
+        product: prod,
+        score: calculateRelevance(prod, searchTerms)
+      }));
+      
+      // Sort by score descending
+      scoredProducts.sort((a, b) => b.score - a.score);
+      
+      // Filter out products with 0 score (just in case)
+      const matchedScored = scoredProducts.filter(x => x.score > 0);
+      
+      const sortedProducts = matchedScored.map(x => x.product);
+      totalCount = sortedProducts.length;
+      
+      // Slice for pagination
+      const start = params.offset || 0;
+      const size = params.limit || 12;
+      productsList = sortedProducts.slice(start, start + size);
+    }
+    
+    return { products: productsList, count: totalCount }
   } catch (err) {
     console.warn("Using fallback products due to API fetch error:", err)
     return { products: FALLBACK_PRODUCTS, count: FALLBACK_PRODUCTS.length }
@@ -144,10 +270,10 @@ export async function getProducts(params?: {
 export async function getProduct(handleOrId: string): Promise<MedusaProduct> {
   try {
     if (handleOrId.startsWith('prod_')) {
-      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices`)
+      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices,*categories`)
       return res.product
     } else {
-      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices`)
+      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices,*categories`)
       if (!res.products || res.products.length === 0) {
         const found = FALLBACK_PRODUCTS.find(p => p.handle === handleOrId)
         if (found) return found
@@ -175,18 +301,26 @@ export const DEFAULT_8_CATEGORIES: MedusaCategory[] = [
 
 export async function getCategories(): Promise<MedusaCategory[]> {
   try {
-    const res = await fetchApi<{ product_categories: MedusaCategory[] }>('/store/product-categories')
-    const list = res.product_categories || []
-    if (list.length >= 8) return list
-    const existingNames = new Set(list.map(c => (c.name || '').toLowerCase()))
-    const missing = DEFAULT_8_CATEGORIES.filter(c => !existingNames.has(c.name.toLowerCase()))
-    return [...list, ...missing].slice(0, 8)
+    const res = await fetchApi<{ product_categories: MedusaCategory[] }>(
+      '/store/product-categories?include_descendants_tree=true&limit=250',
+      { cache: 'no-store' }
+    )
+    return res.product_categories || []
   } catch (err) {
     console.warn("Using fallback categories due to API fetch error:", err)
-    return DEFAULT_8_CATEGORIES
+    return []
   }
 }
 
+export async function getCategoryProductCounts(): Promise<Record<string, number>> {
+  try {
+    const res = await fetchApi<{ counts: Record<string, number> }>('/store/category-product-counts')
+    return res.counts || {}
+  } catch (err) {
+    console.warn("Failed to fetch category product counts:", err)
+    return {}
+  }
+}
 
 export async function getRegions(): Promise<MedusaRegion[]> {
   try {
@@ -239,22 +373,30 @@ export async function updateLineItem(cartId: string, lineId: string, quantity: n
 }
 
 export async function removeLineItem(cartId: string, lineId: string): Promise<MedusaCart> {
-  const res = await fetchApi<{ cart: MedusaCart }>(`/store/carts/${cartId}/line-items/${lineId}`, {
+  const res = await fetchApi<{ parent: MedusaCart }>(`/store/carts/${cartId}/line-items/${lineId}`, {
     method: 'DELETE',
   })
-  return res.cart
+  return res.parent
 }
 
 export async function setShippingAddress(cartId: string, address: any): Promise<MedusaCart> {
+  const { email, ...addressWithoutEmail } = address;
+  const body: any = {
+    shipping_address: addressWithoutEmail
+  };
+  if (email) {
+    body.email = email;
+  }
+
   const res = await fetchApi<{ cart: MedusaCart }>(`/store/carts/${cartId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ shipping_address: address }),
+    method: 'POST',
+    body: JSON.stringify(body),
   })
   return res.cart
 }
 
 export async function getShippingOptions(cartId: string): Promise<any[]> {
-  const res = await fetchApi<{ shipping_options: any[] }>(`/store/shipping-options/${cartId}`)
+  const res = await fetchApi<{ shipping_options: any[] }>(`/store/shipping-options?cart_id=${cartId}`)
   return res.shipping_options
 }
 

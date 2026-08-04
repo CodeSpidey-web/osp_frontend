@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { getProducts, getProduct, getCategories, MedusaProduct, MedusaCategory } from './medusa'
+import { getProducts, getProduct, getCategories, getCategoryProductCounts, MedusaProduct, MedusaCategory } from './medusa'
 
 export function useProducts(params?: { q?: string; category_id?: string[]; limit?: number; offset?: number; order?: string }) {
   const [products, setProducts] = useState<MedusaProduct[]>([])
@@ -39,14 +39,19 @@ export function useProduct(handleOrId: string) {
 
 export function useCategories() {
   const [categories, setCategories] = useState<MedusaCategory[]>([])
+  const [counts, setCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getCategories()
-      .then(setCategories)
+    setLoading(true)
+    Promise.all([getCategories(), getCategoryProductCounts()])
+      .then(([cats, cnts]) => {
+        setCategories(cats)
+        setCounts(cnts)
+      })
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [])
 
-  return { categories, loading }
+  return { categories, counts, loading }
 }

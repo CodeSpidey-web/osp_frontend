@@ -1,23 +1,74 @@
 
 "use client";
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
+import { useCategories } from '@/lib/hooks';
+import { useAuth } from '@/lib/AuthContext';
 
 function formatPrice(amount: number, currencyCode: string = 'inr') {
   if (!amount) return '₹0.00';
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount);
+  }).format(amount / 100);
 }
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { cart } = useCart();
+  const { categories } = useCategories();
+  const { customer } = useAuth();
+  
+  const [searchVal, setSearchVal] = React.useState('');
+  const [selectedCatId, setSelectedCatId] = React.useState('');
+  
   const cartCount = cart?.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
   const cartTotal = cart?.total || 0;
   const currencyCode = cart?.currency_code || 'inr';
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setSearchVal(params.get('q') || '');
+      setSelectedCatId(params.get('category_id') || '');
+    }
+  }, [pathname]);
+
+  const getHierarchicalCategories = () => {
+    const rootCategories = categories.filter(c => !c.parent_category_id);
+    const result: any[] = [];
+    
+    rootCategories.forEach(root => {
+      result.push({ id: root.id, name: root.name, level: 0 });
+      if (root.category_children) {
+        root.category_children.forEach((child: any) => {
+          result.push({ id: child.id, name: child.name, level: 1 });
+          const fullChild = categories.find(c => c.id === child.id);
+          if (fullChild && fullChild.category_children) {
+            fullChild.category_children.forEach((grandchild: any) => {
+              result.push({ id: grandchild.id, name: grandchild.name, level: 2 });
+            });
+          }
+        });
+      }
+    });
+    
+    return result;
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchVal.trim()) {
+      params.set('q', searchVal.trim());
+    }
+    if (selectedCatId) {
+      params.set('category_id', selectedCatId);
+    }
+    router.push(`/shop?${params.toString()}`);
+  };
   return (
     <>
     <header className="rbt-header-6 rbt-header-has-shadow">
@@ -99,28 +150,45 @@ export default function Header() {
                     <div className="rbt-header-content ">
                         <div className="header-info d-none d-xl-block">
                             <div className="rbt-search-with-category uni-header-swc-one uni-header-swc-xl" style={{maxWidth: '800px'}}>
-                                <form>
+                                <form onSubmit={handleSearchSubmit}>
                                     <div className="rbt-inner-search-field border-0">
                                         <div
-                                            className="rbt-search-input-section has-left-catagory-section rbt-inner-search-label-animate-activation">
+                                            className="rbt-search-input-section has-left-catagory-section">
                                             <div className="filter-select rbt-modern-select search-by-category">
-                                                <select className="rbt-select-activation">
-                                                    <option>All Categories</option>
-                                                    <option>Boards & MCUs</option>
-                                                    <option>Sensors & Modules</option>
-                                                    <option>Raspberry Pi</option>
-                                                    <option>Arduino</option>
+                                                <select 
+                                                    className="header-category-select"
+                                                    value={selectedCatId}
+                                                    onChange={(e) => setSelectedCatId(e.target.value)}
+                                                >
+                                                    <option value="">All Categories</option>
+                                                    {getHierarchicalCategories().map((cat) => {
+                                                        const indent = "\u00A0\u00A0".repeat(cat.level * 2);
+                                                        const prefix = cat.level > 0 ? "— " : "";
+                                                        return (
+                                                            <option key={cat.id} value={cat.id}>
+                                                                {indent}{prefix}{cat.name}
+                                                            </option>
+                                                        );
+                                                    })}
                                                 </select>
                                             </div>
 
-                                            <input type="text" />
-                                            <span className="cd-headline clip is-full-width">
-                                                <span className="cd-words-wrapper">
-                                                    <b className="is-visible">Search for something...</b>
-                                                    <b className="is-hidden">Looking for something specific?</b>
-                                                    <b className="is-hidden">Explore what you need...</b>
-                                                </span>
-                                            </span>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Search for something..."
+                                                value={searchVal}
+                                                onChange={(e) => setSearchVal(e.target.value)}
+                                                style={{
+                                                    border: 'none',
+                                                    outline: 'none',
+                                                    width: '100%',
+                                                    padding: '10px 16px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '500',
+                                                    color: '#1a1a1a',
+                                                    background: 'transparent'
+                                                }}
+                                            />
                                         </div>
                                         <button className="rbt-round-btn search-btn" type="submit" aria-label="Search"><i
                                                 className="fa-sharp fa-solid fa-magnifying-glass"></i></button>
@@ -141,21 +209,8 @@ export default function Header() {
                         {/*  Navbar Icons  */}
                         <ul className="rbt-quick-access">
                             <li
-                                className="rbt-access-box rbt-scroll-trigger fade_in animation-order-4 rbt-access-box-has-bg-hover d-none d-lg-flex">
-                                <a href="#!" className="rbt-access-box-wrapper" data-bs-toggle="modal"
-                                    data-bs-target="#signinModal">
-                                    <div className="rbt-round-btn rbt-bg-static-gray">
-                                        <i className="fa-regular fa-user"></i>
-                                    </div>
-                                    <div className="content">
-                                        <p>Log in/Sign Up</p>
-                                        <span>Access Account</span>
-                                    </div>
-                                </a>
-                            </li>
-                            <li
-                                className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover rbt-mini-cart">
-                                <a href="/cart" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
+                                className="rbt-access-box rbt-scroll-trigger fade_in animation-order-4 rbt-access-box-has-bg-hover rbt-mini-cart">
+                                <a href="#!" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
                                     <div className="rbt-round-btn rbt-bg-static-gray">
                                         <i className="fa-regular fa-bag-shopping"></i>
                                         <span className="access-box-count rbt-shiny">{cartCount}</span>
@@ -163,6 +218,18 @@ export default function Header() {
                                     <div className="content p-0">
                                         <p>Total Cart</p>
                                         <span>Total {formatPrice(cartTotal)}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li
+                                className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover d-none d-lg-flex">
+                                <a href={customer ? "/profile" : "/login"} className="rbt-access-box-wrapper">
+                                    <div className="rbt-round-btn rbt-bg-static-gray">
+                                        <i className="fa-regular fa-user"></i>
+                                    </div>
+                                    <div className="content">
+                                        <p>{customer ? `Hello, ${customer.first_name}` : 'Log in/Sign Up'}</p>
+                                        <span>{customer ? 'My Account' : 'Access Account'}</span>
                                     </div>
                                 </a>
                             </li>
@@ -256,7 +323,7 @@ export default function Header() {
 
                             <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover rbt-mini-cart tooltips tooltip-distance-lg"
                                 data-tooltip="Cart" data-tooltip-position="bottom">
-                                <a className="rbt-cart-sidenav-activation" href="/cart">
+                                <a className="rbt-cart-sidenav-activation" href="#!">
                                     <span className="rbt-round-btn has-rbt-md-fsize">
                                         <i className="fa-regular fa-bag-shopping"></i>
                                         <span className="access-box-count rbt-shiny">{cartCount}</span>

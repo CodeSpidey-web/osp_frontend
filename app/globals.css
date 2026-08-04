@@ -12,17 +12,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
-body {
+html,
+body,
+.main-wrapper {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @keyframes float {
@@ -44,6 +42,15 @@ body {
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .reveal {
@@ -401,6 +408,252 @@ body {
   }
 }
 
+/* Mobile bottom toolbar ALWAYS visible perfectly */
+@media (max-width: 1199.98px) {
+  .rbt-toolbar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12) !important;
+    background-color: #ffffff !important;
+  }
+  
+  body,
+  .main-wrapper {
+    padding-bottom: 75px !important;
+  }
+}
 
+/* Restore default browser scrollbar behavior and remove custom scrollbar overrides */
+body {
+  overflow-y: auto !important;
+  scrollbar-width: auto !important;
+  scroll-behavior: auto !important;
+}
 
+html {
+  overflow-y: auto !important;
+  scrollbar-width: auto !important;
+  scroll-behavior: auto !important;
+}
 
+::-webkit-scrollbar {
+  width: initial !important;
+  height: initial !important;
+}
+
+::-webkit-scrollbar-button {
+  display: initial !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: initial !important;
+  border: initial !important;
+}
+
+::-webkit-scrollbar-track {
+  background: initial !important;
+}
+
+/* Pure CSS Sticky Header: high performance, zero layout shift, zero scroll bounce */
+.rbt-header-wrapper {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Bulletproof 2-line Text Clamp for Product Card Titles to prevent overlapping */
+.product-title-clamp {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-height: 2.8em !important;
+  max-height: 2.8em !important;
+  line-height: 1.4 !important;
+  font-size: 14px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Fix for header search categories dropdown width to prevent text wrapping */
+.search-by-category,
+.search-by-category .bootstrap-select,
+.search-by-category .bootstrap-select .dropdown-toggle {
+  min-width: 150px !important;
+  width: 150px !important;
+}
+
+/* Custom Native Select dropdown for header categories to prevent jQuery lifecycle glitches */
+.header-category-select {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--color-heading) !important;
+  padding: 0 24px 0 12px !important;
+  height: 100% !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 14px !important;
+  width: 100% !important;
+}
+
+/* Push the input text to the right so it never overlaps the category dropdown */
+.rbt-search-input-section.has-left-catagory-section input {
+  padding-left: 170px !important;
+}
+
+/* Fix popular category button text clipping to allow wrapping */
+.rbt-cat-box-5 .rbt-btn {
+  white-space: normal !important;
+  height: auto !important;
+  line-height: 1.3 !important;
+  padding: 8px 12px !important;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Fix sticky header search dropdown layout bleeding on inactive state */
+.rbt-header-common-sticky-activation {
+  position: relative !important;
+}
+.rbt-header-common-sticky-activation:not(.rbt-sticky) {
+  overflow: hidden !important;
+}
+.rbt-header-common-sticky-activation.rbt-sticky {
+  position: fixed !important;
+}
+
+/* Premium Search Dropdown Styling */
+.rbt-search-dropdown {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.rbt-search-dropdown .wrapper {
+    max-width: 900px !important;
+    margin: 40px auto !important;
+    padding: 0 24px !important;
+}
+
+/* Premium Title */
+.rbt-search-dropdown .rbt-component-section-title h2 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+    letter-spacing: -0.5px !important;
+    margin-bottom: 24px !important;
+}
+
+/* Premium Search Input Wrapper */
+.rbt-search-form {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.rbt-search-form .input-sectition {
+    background: #f8fafc !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 2px 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.rbt-search-form .input-sectition:focus-within {
+    background: #ffffff !important;
+    border-color: #136c39 !important;
+    box-shadow: 0 0 0 4px rgba(19, 108, 57, 0.15) !important;
+}
+
+.rbt-search-form .search-input {
+    border: none !important;
+    background: transparent !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1a1a1a !important;
+    height: 52px !important;
+    padding-left: 44px !important;
+    width: 100% !important;
+}
+
+.rbt-search-form .inner-search-icon {
+    position: absolute !important;
+    left: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #94a3b8 !important;
+    font-size: 18px !important;
+    transition: color 0.3s ease !important;
+}
+
+.rbt-search-form .input-sectition:focus-within .inner-search-icon {
+    color: #136c39 !important;
+}
+
+/* Premium Search Submit Button */
+.rbt-search-form .submit-btn button {
+    background: #136c39 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    height: 56px !important;
+    padding: 0 32px !important;
+    border-radius: 12px !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(19, 108, 57, 0.15) !important;
+}
+
+.rbt-search-form .submit-btn button:hover {
+    background: #0f542c !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(19, 108, 57, 0.25) !important;
+}
+
+.rbt-search-form .submit-btn button:active {
+    transform: translateY(0) !important;
+}
+
+/* Popular Tag Pills */
+.rbt-search-list-wrapper.rbt-tag-list a {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+    border-radius: 30px !important;
+    border: 1px solid #e2e8f0 !important;
+    transition: all 0.2s ease !important;
+    margin: 4px 6px !important;
+    display: inline-block !important;
+}
+
+.rbt-search-list-wrapper.rbt-tag-list a:hover {
+    background: #eef7f2 !important;
+    color: #136c39 !important;
+    border-color: #136c39 !important;
+    transform: translateY(-1px) !important;
+}

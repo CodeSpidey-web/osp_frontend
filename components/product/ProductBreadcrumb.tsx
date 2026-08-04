@@ -1,108 +1,74 @@
 import React from 'react';
+import { MedusaProduct } from '@/lib/medusa';
 
-const ProductBreadcrumb = () => {
-    return (
-        <div className="rbt-breadcrumb-two rbt-bg-color-white">
-<div className="container">
-<div className="row">
-<div className="col-lg-12">
-<div className="rbt-breadcrumb-inner d-flex align-items-center justify-content-between">
-<ul className="rbt-breadcrumb-page-list justify-content-start mt--0">
-<li className="rbt-breadcrumb-item"><a href="/">Home</a></li>
-<li>
-<div className="icon-right"><i className="fa-solid fa-chevron-right"></i></div>
-</li>
-<li className="rbt-breadcrumb-item"><a href="/shop">Products</a></li>
-<li>
-<div className="icon-right"><i className="fa-solid fa-chevron-right"></i></div>
-</li>
-<li className="rbt-breadcrumb-item"><a href="#">Headphones</a></li>
-<li>
-<div className="icon-right"><i className="fa-solid fa-chevron-right"></i></div>
-</li>
-<li className="rbt-breadcrumb-item active">Beats Wireless Earbuds with Charging Case - Bluetooth
-                                In-Ear Headphones</li>
-</ul>
-<div className="rbt-single-nav">
-<div className="rbt-products-nav">
-<div className="rbt-event-hover tooltips" data-tooltip="Previous Product" data-tooltip-position="top">
-<a aria-label="Previous product" className="rbt-product-nav-btn rbt-round-btn rbt-btn-prev" href="product-single-electronics.html">
-<i className="fa-regular fa-chevron-left"></i>
-</a>
-<div className="rbt-dropdown rbt-dropdown-from-right">
-<div className="rbt-card rbt-product-card rbt-list-view-variation rbt-list-view-sm rbt-bg-color-gray-light">
-<div className="inner rbt-scroll-trigger fade_in animation-order-1">
-<div className="rbt-card-body">
-<div className="rbt-card-rating">
-<ul className="rbt-rating-icon-list">
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star"></i></li>
-</ul>
-<p className="rating-digit">(42)</p>
-</div>
-<h2 className="rbt-card-title"><a href="product-single-electronics.html">Beats Studio Pro
-                                                            Wireless
-                                                            Earbuds –
-                                                            Black</a></h2>
-<div className="pricing-part">
-<del className="price-text">₹4,999</del>
-<span className="price-text">₹1,999</span>
-</div>
-</div>
-<div className="rbt-card-img rbt-bg-color-default">
-<a href="#"><img alt="Card Image" src="/assets/images/product-single/earphone/earphone-05.webp"/></a>
-</div>
-</div>
-</div>
-</div>
-</div>
-<a className="rbt-product-nav-btn rbt-round-btn tooltips" data-tooltip="Back To Products" data-tooltip-position="top" href="/shop">
-<i className="fa-regular fa-grid-2"></i>
-</a>
-<div className="rbt-event-hover tooltips" data-tooltip="Next Product" data-tooltip-position="top">
-<a aria-label="Next product" className="rbt-product-nav-btn rbt-round-btn rbt-btn-next" href="product-single-electronics.html">
-<i className="fa-regular fa-chevron-right"></i>
-</a>
-<div className="rbt-dropdown rbt-dropdown-from-right">
-<div className="rbt-card rbt-product-card rbt-list-view-variation rbt-list-view-sm rbt-bg-color-gray-light">
-<div className="inner rbt-scroll-trigger fade_in animation-order-1">
-<div className="rbt-card-body">
-<div className="rbt-card-rating">
-<ul className="rbt-rating-icon-list">
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star rbt-rated-icon"></i></li>
-<li><i className="fa-solid fa-star"></i></li>
-</ul>
-<p className="rating-digit">(42)</p>
-</div>
-<h2 className="rbt-card-title"><a href="product-single-electronics.html">Xiaomi Pill -
-                                                            Portable
-                                                            Bluetooth Wireless Speaker</a></h2>
-<div className="pricing-part">
-<del className="price-text">₹4,999</del>
-<span className="price-text">₹1,999</span>
-</div>
-</div>
-<div className="rbt-card-img rbt-bg-color-default">
-<a href="#"><img alt="Card Image" src="/assets/images/product-img/electronics/electronics-bg-trans-list-01.webp"/></a>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-    );
+interface ProductBreadcrumbProps {
+  product: MedusaProduct;
+}
+
+const ProductBreadcrumb = ({ product }: ProductBreadcrumbProps) => {
+  const categories = (product.categories || []) as any[];
+
+  // Helper to build categories trail
+  const getCrumbs = () => {
+    const crumbs = [];
+    if (categories.length > 0) {
+      const parent = categories.find(c => !c.parent_category_id);
+      if (parent) {
+        crumbs.push(parent);
+        const child = categories.find(c => c.parent_category_id === parent.id);
+        if (child) {
+          crumbs.push(child);
+          const grandchild = categories.find(c => c.parent_category_id === child.id);
+          if (grandchild) {
+            crumbs.push(grandchild);
+          }
+        }
+      } else {
+        crumbs.push(categories[0]);
+      }
+    }
+    return crumbs;
+  };
+
+  const crumbsTrail = getCrumbs();
+
+  return (
+    <div className="rbt-breadcrumb-two rbt-bg-color-white" style={{ borderBottom: '1px solid #f1f3f5', padding: '15px 0' }}>
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="rbt-breadcrumb-inner d-flex align-items-center justify-content-between">
+              <ul className="rbt-breadcrumb-page-list justify-content-start mt--0" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <li className="rbt-breadcrumb-item"><a href="/" style={{ fontSize: '13px', fontWeight: '500', color: '#6c757d' }}>Home</a></li>
+                <li>
+                  <div className="icon-right" style={{ fontSize: '10px', color: '#adb5bd' }}><i className="fa-solid fa-chevron-right"></i></div>
+                </li>
+                <li className="rbt-breadcrumb-item"><a href="/shop" style={{ fontSize: '13px', fontWeight: '500', color: '#6c757d' }}>Shop</a></li>
+                
+                {crumbsTrail.map((crumb) => (
+                  <React.Fragment key={crumb.id}>
+                    <li>
+                      <div className="icon-right" style={{ fontSize: '10px', color: '#adb5bd' }}><i className="fa-solid fa-chevron-right"></i></div>
+                    </li>
+                    <li className="rbt-breadcrumb-item">
+                      <a href={`/shop?category_id=${crumb.id}`} style={{ fontSize: '13px', fontWeight: '500', color: '#6c757d' }}>{crumb.name}</a>
+                    </li>
+                  </React.Fragment>
+                ))}
+
+                <li>
+                  <div className="icon-right" style={{ fontSize: '10px', color: '#adb5bd' }}><i className="fa-solid fa-chevron-right"></i></div>
+                </li>
+                <li className="rbt-breadcrumb-item active" style={{ fontSize: '13px', fontWeight: '600', color: '#1a1a1a' }}>{product.title}</li>
+              </ul>
+              
+              {/* Product navigators removed as requested */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProductBreadcrumb;

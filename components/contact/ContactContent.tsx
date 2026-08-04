@@ -1,107 +1,296 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 
 export default function ContactContent() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    }, 800);
+  };
+
   return (
     <>
-      <div className="rbt-component-area rbt-bg-color-gray-light">
-        <div className="container">
-          <div className="row row--24 mt_dec--24">
-            <div className="col-12 col-xl-6 mt--24">
-              <div className="rbt-component-section-title rbt-gap--4 mb--24 p-0 border-0 text-left">
-                <h2 className="rbt-title h1 mb--16"><span className="rbt-bold--text">Contact Us</span></h2>
-                <p className="desc mb--0">Have a question about a product, order, or project? We are here to help.</p>
+      <style>{`
+        .contact-container {
+          background-color: #ffffff;
+          padding: 80px 0;
+          color: #2b303a;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .contact-content {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 0 20px;
+        }
+        .contact-grid {
+          display: flex;
+          gap: 60px;
+          margin-bottom: 60px;
+          align-items: flex-start;
+        }
+        .contact-info-col {
+          flex: 1;
+        }
+        .contact-form-col {
+          flex: 1.2;
+        }
+        .contact-title {
+          font-size: 36px;
+          font-weight: 800;
+          color: #0b2545;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
+        }
+        .contact-subtitle {
+          font-size: 16px;
+          line-height: 1.6;
+          color: #6c757d;
+          margin-bottom: 40px;
+        }
+        .contact-item {
+          margin-bottom: 30px;
+        }
+        .contact-item-title {
+          font-size: 13px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #136c39;
+          margin-bottom: 8px;
+        }
+        .contact-item-detail {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #333333;
+        }
+        .contact-item-detail a {
+          color: #1c61e7 !important;
+          text-decoration: underline !important;
+        }
+        .minimal-input-group {
+          margin-bottom: 24px;
+        }
+        .minimal-input-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 8px;
+          display: block;
+        }
+        .minimal-input {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #000000;
+          background: #ffffff;
+          outline: none;
+          transition: all 0.3s ease;
+        }
+        .minimal-input:focus {
+          border-color: #136c39;
+          box-shadow: 0 0 0 3px rgba(19, 108, 57, 0.1);
+        }
+        .minimal-button {
+          background-color: #136c39;
+          color: #ffffff;
+          border: none;
+          font-weight: 600;
+          padding: 12px 30px;
+          border-radius: 50px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .minimal-button:hover {
+          background-color: #0f542c;
+          transform: translateY(-1px);
+        }
+        .map-section {
+          border-top: 1px solid #eef0f2;
+          padding-top: 50px;
+        }
+        @media (max-width: 768px) {
+          .contact-grid {
+            flex-direction: column;
+            gap: 40px;
+          }
+        }
+      `}</style>
+
+      <div className="contact-container">
+        <div className="contact-content">
+          
+          <div className="contact-grid">
+            
+            {/* Left Info Column */}
+            <div className="contact-info-col">
+              <h1 className="contact-title">Contact Us</h1>
+              <p className="contact-subtitle">
+                Have a question about a product, order, or project? Get in touch and our team will get back to you shortly.
+              </p>
+              
+              <div className="contact-item">
+                <h3 className="contact-item-title">Registered Office</h3>
+                <div className="contact-item-detail">
+                  Ocean Student Projects<br />
+                  12, Narasingapuram Street,<br />
+                  Near Ritchie Street, Mount Road,<br />
+                  Chennai - 600002, Tamil Nadu, India.
+                </div>
               </div>
-              <div className="rbt-btn-grp justify-content-between rbt-gap--16 flex-wrap">
-                <a className="rbt-trns-modern-btn tooltips" data-tooltip="Call via Phone" data-tooltip-position="top" href="tel:+919999999999">
-                  <span className="icon">
-                    <svg fill="none" height="33" viewBox="0 0 32 33" width="32" xmlns="http://www.w3.org/2000/svg">
-                      <g clipPath="url(#clip0_5767_2922)">
-                        <path d="M32 16.5C32 7.66344 24.8366 0.5 16 0.5C7.16344 0.5 0 7.66344 0 16.5C0 25.3366 7.16344 32.5 16 32.5C24.8366 32.5 32 25.3366 32 16.5Z" fill="#1C61E7"></path>
-                        <path d="M22.7163 19.749V22.4265C22.7164 22.6182 22.6438 22.8028 22.5131 22.9431C22.3824 23.0834 22.2033 23.1688 22.0121 23.1822C21.6812 23.205 21.4109 23.2171 21.2019 23.2171C14.5107 23.2171 9.08691 17.793 9.08691 11.1014C9.08691 10.8924 9.09827 10.6221 9.12174 10.2912C9.13516 10.0999 9.22062 9.92086 9.36087 9.79016C9.50112 9.65946 9.68572 9.58682 9.87742 9.58691H12.5548C12.6488 9.58682 12.7394 9.62164 12.809 9.68461C12.8787 9.74758 12.9225 9.83421 12.9319 9.92766C12.9493 10.1018 12.9652 10.2404 12.9804 10.3457C13.1309 11.3959 13.4392 12.4173 13.8951 13.3754C13.967 13.5268 13.92 13.7078 13.7838 13.8047L12.1497 14.9724C13.1488 17.3004 15.004 19.1557 17.3319 20.1548L18.498 18.5238C18.5457 18.4571 18.6152 18.4093 18.6945 18.3887C18.7738 18.3681 18.8578 18.376 18.9319 18.4109C19.8897 18.8659 20.9108 19.1736 21.9606 19.3234C22.0659 19.3385 22.2044 19.3552 22.3771 19.3719C22.4704 19.3814 22.5568 19.4253 22.6196 19.495C22.6825 19.5646 22.7164 19.6551 22.7163 19.749Z" fill="white"></path>
-                      </g>
-                      <defs><clipPath id="clip0_5767_2922"><rect fill="white" height="33" width="32"></rect></clipPath></defs>
-                    </svg>
-                  </span>
-                  +91 733 897 5699
-                </a>
-                <a className="rbt-trns-modern-btn tooltips" data-tooltip="Send Email" data-tooltip-position="top" href="mailto:support@oceanstudentprojects.in">
-                  <span className="icon">
-                    <svg fill="none" height="32" viewBox="0 0 33 32" width="33" xmlns="http://www.w3.org/2000/svg">
-                      <g clipPath="url(#clip0_5767_2927)">
-                        <path d="M32.3333 16C32.3333 7.16344 25.1698 0 16.3333 0C7.4967 0 0.333252 7.16344 0.333252 16C0.333252 24.8366 7.4967 32 16.3333 32C25.1698 32 32.3333 24.8366 32.3333 16Z" fill="#E7961C"></path>
-                        <path d="M8.83325 19.5001V13.1924L15.2122 17.5104C15.8893 17.9688 16.7773 17.9688 17.4544 17.5104L23.8333 13.1924V19.5001C23.8333 20.6047 22.9379 21.5001 21.8333 21.5001H10.8333C9.72868 21.5001 8.83325 20.6047 8.83325 19.5001Z" fill="white"></path>
-                        <path d="M15.2122 16.1642L8.83325 11.8462C8.83325 11.1027 9.43594 10.5 10.1794 10.5H22.4871C23.2306 10.5 23.8333 11.1027 23.8333 11.8462L17.4544 16.1642C16.7773 16.6225 15.8893 16.6225 15.2122 16.1642Z" fill="white"></path>
-                      </g>
-                      <defs><clipPath id="clip0_5767_2927"><rect fill="white" height="32" transform="translate(0.333252)" width="32"></rect></clipPath></defs>
-                    </svg>
-                  </span>
-                  support@oceanstudentprojects.in
-                </a>
+              
+              <div className="contact-item">
+                <h3 className="contact-item-title">Phone Contact</h3>
+                <div className="contact-item-detail">
+                  +91-7338975699
+                </div>
               </div>
-              <div className="row row--12 mt--24 mt_sm--0 mt_md--0">
-                <div className="col-12 mt--24">
-                  <div className="rbt-location-card style-two">
-                    <div className="inner">
-                      <h2 className="rbt-location-card-title h6"><i className="fa-sharp fa-regular fa-location-dot mr--4"></i>Our Location</h2>
-                      <p className="rbt-location-card-text">India</p>
-                      <ul className="rbt-contact-info-list">
-                        <li>
-                          <span>Email : </span>
-                          <a className="rbt-contact-info-single color-primary" href="mailto:support@oceanstudentprojects.in">support@oceanstudentprojects.in</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+              
+              <div className="contact-item">
+                <h3 className="contact-item-title">Email Inquiries</h3>
+                <div className="contact-item-detail">
+                  <a href="mailto:support@oceanstudentprojects.in">support@oceanstudentprojects.in</a>
                 </div>
               </div>
             </div>
-            <div className="col-12 col-xl-6 mt--24">
-              <div className="rbt-contact-form">
-                <div className="rbt-fshape-box-outline-style">
-                  <div className="row">
-                    <div className="col-lg-12">
-                      <div className="rbt-component-section-title rbt-contact-form-title rbt-bg-color-white rbt-border-color-gray-100">
-                        <h2 className="rbt-title h6"><span className="rbt-bold--text">Get in Touch</span></h2>
-                      </div>
+            
+            {/* Right Form Column */}
+            <div className="contact-form-col">
+              <div 
+                style={{ 
+                  background: '#ffffff', 
+                  border: '1px solid #eef0f2', 
+                  borderRadius: '16px', 
+                  padding: '40px',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.02)'
+                }}
+              >
+                {submitted ? (
+                  <div className="text-center py-4" style={{ animation: 'fadeIn 0.5s ease-in-out' }}>
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#d1e7dd', color: '#0f5132', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', marginBottom: '16px' }}>
+                      <i className="fa-solid fa-check"></i>
                     </div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f5132', marginBottom: '8px' }}>Message Sent!</h3>
+                    <p style={{ fontSize: '14px', color: '#41464b', lineHeight: '1.6', marginBottom: 0 }}>
+                      Thank you for reaching out. We will get back to you within 24 hours.
+                    </p>
+                    <button 
+                      onClick={() => setSubmitted(false)}
+                      className="minimal-button mt--24"
+                      style={{ padding: '8px 24px', fontSize: '12px' }}
+                    >
+                      Send Another Message
+                    </button>
                   </div>
-                  <div className="rbt-fshape-box rbt-bg-color-white rbt-contact-form-fshape rbt-border-color-gray-100">
-                    <form className="rainbow-dynamic-form" id="contact-form" method="POST">
-                      <div className="row">
-                        <div className="col-md-6 col-12 mb--16">
-                          <div className="rbt-input-field-grp form-group">
-                            <label htmlFor="f_name">First Name</label>
-                            <input className="rbt-contact-input-field" id="f_name" type="text" />
-                          </div>
-                        </div>
-                        <div className="col-md-6 col-12 mb--16">
-                          <div className="rbt-input-field-grp form-group">
-                            <label htmlFor="l_name">Last Name</label>
-                            <input className="rbt-contact-input-field" id="l_name" type="text" />
-                          </div>
-                        </div>
-                        <div className="col-12 mb--16">
-                          <div className="rbt-input-field-grp form-group">
-                            <label htmlFor="email">Email Address</label>
-                            <input className="rbt-contact-input-field" id="email" type="email" />
-                          </div>
-                        </div>
-                        <div className="col-12 mb--16">
-                          <div className="rbt-input-field-grp form-group">
-                            <label htmlFor="message">Your Message</label>
-                            <textarea className="rbt-contact-input-field" id="message" name="message"></textarea>
-                          </div>
-                        </div>
-                        <div className="col-12 d-block mt--0">
-                          <button className="rbt-btn rbt-btn-md d-block text-center w-100" id="submit" name="submit" type="submit">Send Message</button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                </div>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_name">Full Name *</label>
+                      <input 
+                        type="text" 
+                        id="user_name" 
+                        required
+                        className="minimal-input"
+                        placeholder="Enter your name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_email">Email Address *</label>
+                      <input 
+                        type="email" 
+                        id="user_email" 
+                        required
+                        className="minimal-input"
+                        placeholder="email@example.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_subject">Subject</label>
+                      <input 
+                        type="text" 
+                        id="user_subject" 
+                        className="minimal-input"
+                        placeholder="Message topic (optional)"
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_message">Your Message *</label>
+                      <textarea 
+                        id="user_message" 
+                        required
+                        rows={4}
+                        className="minimal-input"
+                        placeholder="Write your comments or questions..."
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        style={{ minHeight: '120px', resize: 'vertical' }}
+                      ></textarea>
+                    </div>
+                    
+                    <button 
+                      type="submit" 
+                      className="minimal-button w-100"
+                      disabled={loading}
+                    >
+                      {loading ? "Sending Message..." : "Send Message"}
+                    </button>
+                  </form>
+                )}
               </div>
+            </div>
+            
+          </div>
+          
+          {/* Map Section */}
+          <div className="map-section">
+            <div 
+              style={{ 
+                borderRadius: '16px', 
+                overflow: 'hidden', 
+                boxShadow: '0 15px 40px rgba(0,0,0,0.04)', 
+                border: '1px solid #eef0f2'
+              }}
+            >
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.4776323142755!2d80.26828627588819!3d13.068887512736245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5267b09d5ff91b%3A0xc1a5a013b7da86fa!2sOcean%20Student%20Projects!5e0!3m2!1sen!2sin!4v1785832554350!5m2!1sen!2sin" 
+                width="100%" 
+                height="450" 
+                style={{ border: 0, display: 'block' }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="strict-origin-when-cross-origin"
+              ></iframe>
             </div>
           </div>
+          
         </div>
       </div>
     </>

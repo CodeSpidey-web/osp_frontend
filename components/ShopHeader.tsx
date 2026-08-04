@@ -1,22 +1,105 @@
 "use client";
 import React, { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
+import { useCategories } from '@/lib/hooks';
+import { useAuth } from '@/lib/AuthContext';
 
 function formatPrice(amount: number, currencyCode: string = 'inr') {
   if (!amount) return '₹0.00';
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount);
+  }).format(amount / 100);
 }
 
-export default function ShopHeader() {
+function ShopHeaderContent() {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { cart } = useCart();
+  const { categories } = useCategories();
+  const { customer } = useAuth();
+  
+  const [searchVal, setSearchVal] = React.useState('');
+  const [selectedCatId, setSelectedCatId] = React.useState('');
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  
   const cartCount = cart?.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
   const cartTotal = cart?.total || 0;
   const currencyCode = cart?.currency_code || 'inr';
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchVal(searchParams.get('q') || '');
+      setSelectedCatId(searchParams.get('category_id') || '');
+    }
+  }, [searchParams, pathname]);
+
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const htmlEl = document.documentElement;
+      if (isSearchOpen) {
+        htmlEl.classList.add('menu-nav-opened');
+        htmlEl.classList.add('header-top-menu-nav-opened');
+      } else {
+        htmlEl.classList.remove('menu-nav-opened');
+        htmlEl.classList.remove('header-top-menu-nav-opened');
+      }
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        const htmlEl = document.documentElement;
+        htmlEl.classList.remove('menu-nav-opened');
+        htmlEl.classList.remove('header-top-menu-nav-opened');
+      }
+    };
+  }, [isSearchOpen]);
+
+  React.useEffect(() => {
+    const handleSync = (e: Event) => {
+      setSearchVal((e as CustomEvent).detail || '');
+    };
+    window.addEventListener('sync-search', handleSync);
+    return () => {
+      window.removeEventListener('sync-search', handleSync);
+    };
+  }, []);
+
+  const getHierarchicalCategories = () => {
+    const rootCategories = categories.filter(c => !c.parent_category_id);
+    const result: any[] = [];
+    
+    rootCategories.forEach(root => {
+      result.push({ id: root.id, name: root.name, level: 0 });
+      if (root.category_children) {
+        root.category_children.forEach((child: any) => {
+          result.push({ id: child.id, name: child.name, level: 1 });
+          const fullChild = categories.find(c => c.id === child.id);
+          if (fullChild && fullChild.category_children) {
+            fullChild.category_children.forEach((grandchild: any) => {
+              result.push({ id: grandchild.id, name: grandchild.name, level: 2 });
+            });
+          }
+        });
+      }
+    });
+    
+    return result;
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSearchOpen(false);
+    const params = new URLSearchParams();
+    if (searchVal.trim()) {
+      params.set('q', searchVal.trim());
+    }
+    if (selectedCatId) {
+      params.set('category_id', selectedCatId);
+    }
+    router.push(`/shop?${params.toString()}`);
+  };
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).$) {
       setTimeout(() => {
@@ -27,11 +110,75 @@ export default function ShopHeader() {
       }, 500);
     }
   }, []);
+
+  const renderSearchDropdown = () => (
+    <div className={`rbt-search-dropdown rbt-search-dropdown-activation rbt-common-search-dropdown-activation ${isSearchOpen ? 'active' : ''}`}>
+        <div className="wrapper" style={{ position: 'relative' }}>
+            <button 
+                type="button" 
+                className="rbt-close-search-btn"
+                style={{
+                    position: 'absolute',
+                    top: '0px',
+                    right: '15px',
+                    border: 'none',
+                    background: '#f1f5f9',
+                    color: '#64748b',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    zIndex: 10
+                }}
+                onClick={() => setIsSearchOpen(false)}
+            >
+                <i className="fa-solid fa-xmark" style={{ fontSize: '16px' }}></i>
+            </button>
+            <div className="row">
+                <div className="col-lg-12">
+                    <div className="rbt-component-section-title border-0 p-0 text-center">
+                        <h2 className="rbt-title text-start text-md-center"><span className="rbt-bold--text">Search For
+                                Products</span></h2>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-lg-12">
+                    <form className="rbt-search-form" onSubmit={handleSearchSubmit}>
+                        <div className="input-sectition position-relative w-100 mr--12 mr_sm--4">
+                            <input 
+                                className="search-input" 
+                                type="text" 
+                                placeholder="What Are You Looking For?" 
+                                value={searchVal}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setSearchVal(val);
+                                    window.dispatchEvent(new CustomEvent('sync-search-shop', { detail: val }));
+                                }}
+                            />
+                            <i className="fa-sharp fa-regular inner-search-icon fa-magnifying-glass"></i>
+                        </div>
+                        <div className="submit-btn">
+                            <button type="submit" className="rbt-btn btn-md">Search</button>
+                        </div>
+                        <a href="#" className="rbt-ms-dismiss-outsider" onClick={(e) => { e.preventDefault(); setIsSearchOpen(false); }}></a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  );
+
   return (
     <>
 <header className="rbt-header-2">
 
-    <div className="rbt-header-wrapper rbt-header-sticky-activation rbt-header-wrapper-one header-space-between rbt-bg-color-white header-not-transparent header-sticky plr--0 position-relative z-5">
+    <div className="rbt-header-wrapper rbt-header-wrapper-one header-space-between rbt-bg-color-white header-not-transparent plr--0 position-relative z-5">
     <div className="rbt-separator-mid">
         <hr className="rbt-separator rbt-separator-gray100 m-0" />
     </div>
@@ -51,7 +198,7 @@ export default function ShopHeader() {
                     <div className="rbt-header-content">
                         <div className="header-info">
                             <div className="logo">
-                                <a href="index-2.html">
+                                <a href="/">
                                     <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                                 </a>
                             </div>
@@ -74,38 +221,88 @@ export default function ShopHeader() {
                 </div>
 
 
-                <div className="rbt-header-content d-none d-xl-block">
-                    <div className="header-info">
-                        <div className="rbt-search-with-category uni-header-swc-one uni-header-swc-xl" style={{maxWidth: '800px'}}>
-                            <form>
-                                <div className="rbt-inner-search-field border-0">
-                                    <div
-                                        className="rbt-search-input-section has-left-catagory-section rbt-inner-search-label-animate-activation">
-                                        <div className="filter-select rbt-modern-select search-by-category">
-                                            <select className="rbt-select-activation" data-live-search="true"
-                                                data-live-search-placeholder="Search Catagories">
-                                                <option>All Categories</option>
-                                                <option>Boards & MCUs</option>
-                                                <option>Sensors & Modules</option>
-                                                <option>Raspberry Pi</option>
-                                                <option>Arduino</option>
-                                            </select>
-                                        </div>
-
-                                        <input type="text" />
-                                        <span className="cd-headline clip is-full-width">
-                                            <span className="cd-words-wrapper">
-                                                <b className="is-visible">Search for something...</b>
-                                                <b className="is-hidden">Looking for something specific?</b>
-                                                <b className="is-hidden">Explore what you need...</b>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <button className="rbt-round-btn search-btn" type="submit" aria-label="Search"><i
-                                            className="fa-sharp fa-solid fa-magnifying-glass"></i></button>
-                                </div>
-                            </form>
-                        </div>
+                <div className="rbt-header-content d-none d-xl-block w-100" style={{ maxWidth: '420px' }}>
+                    <div className="header-info w-100">
+                        <form onSubmit={handleSearchSubmit} className="w-100">
+                            <div 
+                                className="premium-nav-search-bar"
+                                style={{ 
+                                    position: 'relative',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                    background: '#f3f4f6',
+                                    borderRadius: '50px',
+                                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                                    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.04)'
+                                }}
+                                onFocus={(e) => {
+                                    e.currentTarget.style.background = '#ffffff';
+                                    e.currentTarget.style.borderColor = '#136c39';
+                                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(19, 108, 57, 0.08), 0 2px 6px rgba(19, 108, 57, 0.04)';
+                                }}
+                                onBlur={(e) => {
+                                    e.currentTarget.style.background = '#f3f4f6';
+                                    e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                                    e.currentTarget.style.boxShadow = 'inset 0 2px 4px rgba(0, 0, 0, 0.04)';
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (document.activeElement !== e.currentTarget.querySelector('input')) {
+                                        e.currentTarget.style.borderColor = 'rgba(19, 108, 57, 0.3)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(19, 108, 57, 0.04)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (document.activeElement !== e.currentTarget.querySelector('input')) {
+                                        e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                                        e.currentTarget.style.boxShadow = 'inset 0 2px 4px rgba(0, 0, 0, 0.04)';
+                                    }
+                                }}
+                            >
+                                <button 
+                                    type="submit" 
+                                    style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        padding: '0 0 0 18px',
+                                        cursor: 'pointer',
+                                        color: '#136c39',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '15px',
+                                        transition: 'transform 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    aria-label="Search"
+                                >
+                                    <i className="fa-regular fa-magnifying-glass"></i>
+                                </button>
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={searchVal}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setSearchVal(val);
+                                        window.dispatchEvent(new CustomEvent('sync-search-shop', { detail: val }));
+                                    }}
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '12px 18px 12px 12px', 
+                                        borderRadius: '50px',
+                                        border: 'none',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        backgroundColor: 'transparent',
+                                        color: '#111111',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -113,27 +310,6 @@ export default function ShopHeader() {
                     {/* Navbar Icons */}
                     <ul className="rbt-quick-access">
 
-                        <li
-                            className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover d-none d-lg-flex">
-                            <a href="#!" className="rbt-access-box-wrapper" data-bs-toggle="modal"
-                                data-bs-target="#signinModal">
-                                <div className="rbt-round-btn rbt-bg-static-gray">
-                                    <i className="fa-regular fa-user"></i>
-                                </div>
-                                <div className="content">
-                                    <p>Log in/Sign Up</p>
-                                    <span>Access Account</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li
-                            className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover d-flex d-lg-none">
-                            <a className="search-trigger-active rbt-round-btn rbt-bg-static-gray rbt-modern-close-btn"
-                                href="#">
-                                <i className="fa-regular fa-search search-icon"></i>
-                                <div className="modern-close-wrapper"></div>
-                            </a>
-                        </li>
                         <li
                             className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover rbt-mini-cart">
                             <a href="#" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
@@ -147,6 +323,32 @@ export default function ShopHeader() {
                                 </div>
                             </a>
                         </li>
+                        <li
+                            className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover d-flex d-lg-none">
+                            <a 
+                                className={`rbt-round-btn rbt-bg-static-gray rbt-modern-close-btn search-trigger-active ${isSearchOpen ? 'open' : ''}`}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setIsSearchOpen(!isSearchOpen);
+                                }}
+                            >
+                                <i className="fa-regular fa-search search-icon"></i>
+                                <div className="modern-close-wrapper"></div>
+                            </a>
+                        </li>
+                        <li
+                            className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover d-none d-lg-flex">
+                            <a href={customer ? "/profile" : "/login"} className="rbt-access-box-wrapper">
+                                <div className="rbt-round-btn rbt-bg-static-gray">
+                                    <i className="fa-regular fa-user"></i>
+                                </div>
+                                <div className="content">
+                                    <p>{customer ? `Hello, ${customer.first_name}` : 'Log in/Sign Up'}</p>
+                                    <span>{customer ? 'My Account' : 'Access Account'}</span>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
 
 
@@ -154,7 +356,7 @@ export default function ShopHeader() {
             </div>
         </div>
     </div>
-    
+    {renderSearchDropdown()}
 </div>
     {/* Start Header Mid */}
 <div className="rbt-header-middle position-relative rbt-header-mid-1 rbt-bg-color-primary d-none d-xl-block">
@@ -203,7 +405,7 @@ export default function ShopHeader() {
                     </div>
                     <div className="header-info d-xl-block d-none">
                         <div className="logo rbt-logo-height-sm">
-                            <a href="index-2.html">
+                            <a href="/">
                                 <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                             </a>
                         </div>
@@ -212,7 +414,14 @@ export default function ShopHeader() {
                 {/* Start Mobile-Menu-Bar */}
                 <div className="mobile-menu-bar d-block d-xl-none">
                     <div className="hamberger">
-                        <button className="hamberger-button rbt-round-btn">
+                        <button onClick={() => {
+                            if (typeof document !== 'undefined') {
+                                const mobileMenu = document.querySelector('.popup-mobile-menu');
+                                if (mobileMenu) {
+                                    mobileMenu.classList.add('active');
+                                }
+                            }
+                        }} className="hamberger-button rbt-round-btn">
                             <i className="fa-solid fa-bars"></i>
                         </button>
                     </div>
@@ -222,7 +431,7 @@ export default function ShopHeader() {
 
             <div className="header-info d-xl-none d-block">
                 <div className="logo">
-                    <a href="index-2.html">
+                    <a href="/">
                         <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
                     </a>
                 </div>
@@ -246,26 +455,24 @@ export default function ShopHeader() {
                 {/* Navbar Icons */}
                 <ul className="rbt-quick-access rbt-gap--12">
 
-                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 tooltips tooltip-distance-lg"
+                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover rbt-mini-cart tooltips tooltip-distance-lg"
                         data-tooltip="Search" data-tooltip-position="bottom">
-                        <a className="rbt-round-btn has-rbt-md-fsize rbt-common-search-trigger-active rbt-modern-close-btn"
-                            href="#">
+                        <a 
+                            className={`rbt-round-btn has-rbt-md-fsize rbt-common-search-trigger-active rbt-modern-close-btn ${isSearchOpen ? 'open' : ''}`}
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setIsSearchOpen(!isSearchOpen);
+                            }}
+                        >
                             <i className="fa-regular fa-search search-icon"></i>
                             <div className="modern-close-wrapper"></div>
                         </a>
                     </li>
 
-                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 d-none d-lg-flex tooltips tooltip-distance-lg"
-                        data-tooltip="Sign In" data-tooltip-position="bottom">
-                        <a className="rbt-round-btn has-rbt-md-fsize" href="#!" data-bs-toggle="modal"
-                            data-bs-target="#signinModal">
-                            <i className="fa-regular fa-user"></i>
-                        </a>
-                    </li>
-
-                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover rbt-mini-cart tooltips tooltip-distance-lg"
+                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover rbt-mini-cart tooltips tooltip-distance-lg"
                         data-tooltip="Cart" data-tooltip-position="bottom">
-                        <a className="rbt-cart-sidenav-activation" href="/cart">
+                        <a className="rbt-cart-sidenav-activation" href="#!">
                             <span className="rbt-round-btn has-rbt-md-fsize">
                                 <i className="fa-regular fa-bag-shopping"></i>
                                 <span className="access-box-count rbt-shiny">{cartCount}</span>
@@ -275,103 +482,28 @@ export default function ShopHeader() {
                             </div>
                         </a>
                     </li>
+
+                    <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 d-none d-lg-flex tooltips tooltip-distance-lg"
+                        data-tooltip={customer ? "My Profile" : "Sign In"} data-tooltip-position="bottom">
+                        <a className="rbt-round-btn has-rbt-md-fsize" href={customer ? "/profile" : "/login"}>
+                            <i className="fa-regular fa-user"></i>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
-
-
-    {/* Start Search Dropdown  */}
-    <div className="rbt-search-dropdown rbt-common-search-dropdown-activation">
-        <div className="wrapper">
-            <div className="row">
-                <div className="col-lg-12">
-                    <div className="rbt-component-section-title border-0 p-0 text-center">
-                        <h2 className="rbt-title text-start text-md-center"><span className="rbt-bold--text">Search For
-                                Products</span></h2>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-lg-12">
-                    <form className="rbt-search-form">
-                        <div className="input-sectition position-relative w-100 mr--12 mr_sm--4">
-                            <input className="search-input" type="text" placeholder="What Are You Looking For?" />
-                            <i className="fa-sharp fa-regular inner-search-icon fa-magnifying-glass"></i>
-                            <button className="media-search-btn media-search-popupactivation">
-                                <i className="fa-sharp fa-regular fa-camera"></i>
-                            </button>
-                        </div>
-                        <div className="submit-btn">
-                            <a className="rbt-btn btn-md" href="#">Search</a>
-                        </div>
-                        <div className="rbt-media-search-section">
-                            <div className="rbt-media-wrapper">
-                                <div className="section-title"><span className="title b1">Find product inspiration with Image
-                                        Search</span></div>
-                                <div className="rbt-file-upload-container">
-                                    <input type="file" className="fileInput" multiple hidden />
-                                    <div className="file-upload-area fileUploadArea">
-                                        <div className="file-upload-content">
-                                            <span className="rbt-icon"><i className="fa-solid fa-cloud-arrow-up"></i></span>
-                                            <p className="rbt-title">Drag & Drop Files Here <span
-                                                    className="rbt-text-color-gray-400">Or</span></p>
-                                            <button className="browseFilesButton rbt-btn rbt-btn-sm">Browse Files</button>
-                                        </div>
-                                        <div className="fileList file-list"></div>
-                                    </div>
-                                    <p className="fileCount">0 of 10</p>
-                                </div>
-                                <div className="rbt-copy-link-part rbt-text-copy-activation">
-                                    <input className="rbt-copy-value-field" type="text"
-                                        value="https://oceanstudentprojects.in/wishlist" readOnly />
-                                    <button className="rbt-btn rbt-btn-xs has-left-icon rbt-copy-btn" data-tooltip="Copy">
-                                        <i className="fa-regular fa-copy"></i>
-                                        <span className="rbt-btn-text">Copy</span>
-                                    </button>
-                                </div>
-                                <button type="button" className="rbt-round-btn rbt-ms-dismiss-btn">
-                                    <i className="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <a href="#" className="rbt-ms-dismiss-outsider"></a>
-                    </form>
-                </div>
-            </div>
-            <div className="rbt-search-scroll-vertical-wrapper rbt-scroll-vertical">
-                <div className="inner">
-                    <div className="row row--0">
-                        <div className="col-lg-12">
-                            <div className="border-0 p-0 text-left title-sm-fsize">
-                                <h2 className="title"><span className="rbt-bold--text">Popular searches</span></h2>
-                            </div>
-                        </div>
-
-                        <div className="rbt-search-list-wrapper rbt-tag-list rbt-tag-list-rounded-lg">
-                            <a href="/shop">Raspberry Pi</a>
-                            <a href="/shop">Arduino</a>
-                            <a href="/shop">ESP32</a>
-                            <a href="/shop">Sensors</a>
-                            <a href="/shop">Displays</a>
-                            <a href="/shop">Robotics</a>
-                            <a href="/shop">DIY Kits</a>
-                            <a href="/shop">Breadboards</a>
-                            <a href="/shop">Components</a>
-                            <a href="/shop">Microcontrollers</a>
-                            <a href="/shop">IoT Devices</a>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
-
-        </div>
-    </div>
-    {/* End Search Dropdown  */}
+    {renderSearchDropdown()}
 </div>
-    </header>
+</header>
     </>
+  );
+}
+
+export default function ShopHeader() {
+  return (
+    <React.Suspense fallback={<div className="rbt-header-2" style={{ minHeight: '120px' }}></div>}>
+      <ShopHeaderContent />
+    </React.Suspense>
   );
 }

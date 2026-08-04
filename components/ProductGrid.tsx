@@ -1,6 +1,6 @@
 'use client'
-import React, { useState } from 'react';
-import { MedusaProduct, getValidImageUrl } from '@/lib/medusa';
+import React, { useState, useEffect } from 'react';
+import { MedusaProduct, getValidImageUrl, fetchApi } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 
 interface ProductGridProps {
@@ -25,6 +25,30 @@ function getPricing(product: MedusaProduct): { display: string; min: number; max
 export default function ProductGrid({ products, loading, count, offset, limit }: ProductGridProps) {
   const { addToCart } = useCart();
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (products.length === 0) return;
+    const variantIds = products.map(p => p.variants?.[0]?.id).filter(Boolean);
+    if (variantIds.length === 0) return;
+    
+    // Check mock fallbacks
+    const mockVariantIds = ['variant_rpi4', 'variant_ard_kit', 'variant_uno', 'variant_sr04', 'variant_esp32', 'variant_bb'];
+    
+    fetchApi<{ inventory: Record<string, number> }>(`/store/inventory?variant_ids=${variantIds.join(',')}`)
+      .then(res => {
+        const map = { ...res.inventory };
+        mockVariantIds.forEach(id => {
+          if (variantIds.includes(id)) {
+            map[id] = 10;
+          }
+        });
+        setInventoryMap(map);
+      })
+      .catch(err => {
+        console.error("Failed to load inventory for grid:", err);
+      });
+  }, [products]);
 
   async function handleAddToCart(product: MedusaProduct) {
     const variantId = product.variants?.[0]?.id;
@@ -41,12 +65,30 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
 
   if (loading) {
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <>
+        <div className="mb--20" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ margin: 0, fontWeight: '600', color: 'var(--color-heading)', fontSize: '15px' }}>
+            Loading products...
+          </p>
         </div>
-      </div>
-    )
+        <div className="row row--12 mt_sm--8 mt_md--8">
+          {Array.from({ length: limit }).map((_, i) => (
+            <div key={i} className="col-xxl-3 col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt--24 d-flex animate-pulse">
+              <div className="rbt-card rbt-product-card w-100 h-100 d-flex flex-column" style={{ opacity: 0.6 }}>
+                <div className="inner w-100 h-100 d-flex flex-column">
+                  <div className="rbt-card-img" style={{ background: '#f1f3f5', minHeight: '260px', borderRadius: '6px' }}></div>
+                  <div className="rbt-card-body mt--16" style={{ flexGrow: 1, padding: '16px' }}>
+                    <div style={{ height: '14px', backgroundColor: '#e9ecef', width: '40%', marginBottom: '10px', borderRadius: '4px' }}></div>
+                    <div style={{ height: '20px', backgroundColor: '#e9ecef', width: '90%', marginBottom: '10px', borderRadius: '4px' }}></div>
+                    <div style={{ height: '16px', backgroundColor: '#e9ecef', width: '60%', borderRadius: '4px' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
+    );
   }
 
   const startResult = count === 0 ? 0 : offset + 1;
@@ -64,12 +106,33 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
         {products.map((product) => {
           const pricing = getPricing(product)
           const categoryName = product.collection?.title || product.categories?.[0]?.name || ''
+          const firstVariantId = product.variants?.[0]?.id;
+          const stock = firstVariantId ? (inventoryMap[firstVariantId] ?? 10) : 0;
+
           return (
-            <div key={product.id} className="col-xxl-4 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6 mt--24 d-flex">
-              <div className="rbt-card rbt-product-card has-hover-box-shadow w-100 h-100 d-flex flex-column justify-content-between">
+            <div key={product.id} className="col-xxl-3 col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt--24 d-flex">
+              <div className="rbt-card rbt-product-card w-100 h-100 d-flex flex-column justify-content-between">
                 <div className="inner w-100 h-100 d-flex flex-column justify-content-between">
-                  <div className="rbt-card-img rbt-has-hover-img flex-grow-1 d-flex align-items-center justify-content-center" style={{ background: '#ffffff', minHeight: '260px' }}>
+                  <div className="rbt-card-img flex-grow-1 d-flex align-items-center justify-content-center position-relative" style={{ background: '#ffffff', minHeight: '260px' }}>
                     <a href={`/product/${product.handle || product.id}`} className="w-100 h-100 d-flex align-items-center justify-content-center">
+                      {stock === 0 && (
+                        <span style={{
+                          position: 'absolute',
+                          top: '12px',
+                          left: '12px',
+                          backgroundColor: '#ef4444',
+                          color: '#ffffff',
+                          fontSize: '10px',
+                          fontWeight: '700',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          zIndex: 2
+                        }}>
+                          Out of stock
+                        </span>
+                      )}
                       <img className="rbt-prd-img"
                         src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, '/assets/images/product-img/electronics/electro-c-01.webp', product.handle)}
                         alt={product.title}
@@ -79,31 +142,14 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
                           e.currentTarget.src = '/assets/images/product-img/electronics/electro-c-01.webp';
                         }}
                       />
-                      <img className="rbt-hover-img"
-                        src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, '/assets/images/product-img/electronics/electro-c-01.webp', product.handle)}
-                        alt={product.title}
-                        style={{ maxHeight: '220px', objectFit: 'contain' }}
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = '/assets/images/product-img/electronics/electro-c-01.webp';
-                        }}
-                      />
                     </a>
-                    <div className="rbt-quick-btn-grp has-mixup-midlayer bottom-right--position">
-                      <button className="rbt-search-btn rbt-quick-btn tooltips" type="button" data-bs-toggle="modal"
-                        data-bs-target="#quickviewModal" data-tooltip="Quick View" data-tooltip-position="left"><i
-                          className="fa-regular fa-magnifying-glass-plus"></i></button>
-                      <button className="rbt-wishlisted-btn rbt-quick-btn tooltips" type="button" data-bs-toggle="modal"
-                        data-bs-target="#wishlistModal" data-tooltip="Add to wishlist"
-                        data-tooltip-position="left"><i className="fa-regular fa-heart"></i></button>
-                    </div>
                   </div>
                   <div className="rbt-card-body d-flex flex-column justify-content-between flex-grow-0" style={{ minHeight: '170px' }}>
                     <div>
                       {categoryName && (
                         <a href="/shop" className="rbt-card-subtitle rbt-card-catagories-text">{categoryName}</a>
                       )}
-                      <h2 className="rbt-card-title mb--8" style={{ minHeight: '2.6rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <h2 className="rbt-card-title product-title-clamp">
                         <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
                       </h2>
                     </div>
@@ -112,8 +158,16 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
                         <span className="price-text">{pricing.display}</span>
                       </div>
                       <div className="prd-btn-grp">
-                        <button className="rbt-btn rbt-btn-border rbt-btn-sm rbt-square-btn d-block has-left-icon w-100"
-                          onClick={() => handleAddToCart(product)} disabled={addingId === product.id}><i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? 'Adding...' : 'Add To Cart'}</button>
+                        {stock === 0 ? (
+                          <a href={`/product/${product.handle || product.id}`} className="rbt-btn rbt-btn-border rbt-btn-sm text-center d-block w-100" style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.05em', borderRadius: '4px', border: '1px solid #1b2a47', backgroundColor: '#1b2a47', color: '#ffffff' }}>
+                            READ MORE
+                          </a>
+                        ) : (
+                          <button className="rbt-btn rbt-btn-border rbt-btn-sm rbt-square-btn d-block has-left-icon w-100"
+                            onClick={() => handleAddToCart(product)} disabled={addingId === product.id}>
+                            <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? 'Adding...' : 'Add To Cart'}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -46,6 +46,10 @@ export default function MobilePreviewPage() {
               -ms-overflow-style: none !important;
               scrollbar-width: none !important;
             }
+            /* Custom touch cursor on all elements inside the mobile preview */
+            *, a, button, input, select, textarea {
+              cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='7' fill='rgba(16, 185, 129, 0.3)' stroke='%2310b981' stroke-width='2'/></svg>") 12 12, auto !important;
+            }
           `;
           doc.head.appendChild(style);
         }

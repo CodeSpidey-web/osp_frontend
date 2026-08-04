@@ -1,6 +1,10 @@
+'use client'
+
 import React from 'react';
+import { useAuth } from '@/lib/AuthContext';
 
 const Footer = () => {
+    const { customer } = useAuth();
     return (
         <>
             <footer className="rbt-footer rbt-footer-style-ten rbt-bg-color-gray-light">
@@ -35,7 +39,7 @@ const Footer = () => {
                                     <ul className="ft-link p-0 list-unstyled">
                                         <li><a href="/about">About Us</a></li>
                                         <li><a href="/contact">Contact Us</a></li>
-                                        <li><a href="/cart">Shopping Cart</a></li>
+                                        <li><a href="#!" className="rbt-cart-sidenav-activation">Shopping Cart</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -135,16 +139,16 @@ const Footer = () => {
                                 </li>
 
                                 <li className="rbt-access-box">
-                                    <a className="rbt-round-btn has-rbt-md-fsize" href="/cart">
-                                        <i className="fa-regular fa-cart-shopping"></i>
-                                        <span className="rbt-toolbar-label"> Cart</span>
-                                    </a>
-                                </li>
+                                     <a className="rbt-round-btn has-rbt-md-fsize rbt-cart-sidenav-activation" href="#!">
+                                         <i className="fa-regular fa-cart-shopping"></i>
+                                         <span className="rbt-toolbar-label"> Cart</span>
+                                     </a>
+                                 </li>
 
                                 <li className="rbt-access-box">
-                                    <a className="rbt-round-btn has-rbt-md-fsize" href="/contact">
-                                        <i className="fa-regular fa-envelope"></i>
-                                        <span className="rbt-toolbar-label"> Contact</span>
+                                    <a className="rbt-round-btn has-rbt-md-fsize" href={customer ? "/profile" : "/login"}>
+                                        <i className="fa-regular fa-user"></i>
+                                        <span className="rbt-toolbar-label"> Profile</span>
                                     </a>
                                 </li>
                             </ul>
