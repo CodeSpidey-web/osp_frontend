@@ -73,19 +73,19 @@ export default function RootLayout({
         <Script src="/assets/js/vendor/jquery.js" strategy="beforeInteractive" />
         <Script src="/assets/js/vendor/jquery-ui.js" strategy="beforeInteractive" />
         {/* Bootstrap JS */}
-        <Script src="/assets/js/vendor/bootstrap.min.js" strategy="lazyOnload" />
+        <Script src="/assets/js/vendor/bootstrap.min.js" strategy="afterInteractive" />
         
         {/* Plugins */}
-        <Script src="/assets/js/vendor/swiper.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/imageloaded.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/isotope.pkgd.min.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/odometer.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/mavo.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/jquery-ui.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/fancybox.min.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/countdown.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/bootstrap-select.min.js" strategy="lazyOnload" />
-        <Script src="/assets/js/vendor/bootstrap-datepicker.min.js" strategy="lazyOnload" />
+        <Script src="/assets/js/vendor/swiper.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/imageloaded.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/isotope.pkgd.min.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/odometer.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/mavo.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/jquery-ui.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/fancybox.min.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/countdown.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/bootstrap-select.min.js" strategy="afterInteractive" />
+        <Script src="/assets/js/vendor/bootstrap-datepicker.min.js" strategy="afterInteractive" />
         
         {/* Main JS */}
         <Script src="/assets/js/main.min.js" strategy="lazyOnload" />

@@ -10,7 +10,7 @@ function formatPrice(amount: number, currencyCode: string = 'inr') {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount / 100);
+  }).format(amount);
 }
 
 function ShopHeaderContent() {
@@ -86,6 +86,69 @@ function ShopHeaderContent() {
     });
     
     return result;
+  };
+
+  const renderCategoriesDropdown = () => {
+    const parentCategories = categories.filter(
+      cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
+    );
+    const isCategoryActive = pathname === '/shop' && !!selectedCatId;
+
+    return (
+      <li className="relative group-dropdown-main" style={{ margin: '0 15px', display: 'flex', alignItems: 'center' }}>
+        <a className="categories-trigger-btn" href="/shop">
+          <i className="fa-solid fa-bars"></i>
+          <span>Categories</span>
+          <i className="fa-solid fa-chevron-down" style={{ fontSize: '11px' }}></i>
+        </a>
+        
+        {/* Level 1 Dropdown */}
+        <ul className="categories-dropdown-menu">
+          {parentCategories.map((parent) => {
+            const hasChildren = parent.category_children && parent.category_children.length > 0;
+            return (
+              <li key={parent.id} className="categories-dropdown-item">
+                <a href={`/shop?category_id=${parent.id}`} className="dropdown-link">
+                  <span>{parent.name}</span>
+                  {hasChildren && <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" style={{ fontSize: '10px' }}></i>}
+                </a>
+                
+                {/* Level 2 Subcategories */}
+                {hasChildren && (
+                  <ul className="categories-sub-dropdown-menu">
+                    {parent.category_children.map((child) => {
+                      const fullChild = categories.find(c => c.id === child.id);
+                      const hasGrandchildren = fullChild && fullChild.category_children && fullChild.category_children.length > 0;
+                      return (
+                        <li key={child.id} className="categories-dropdown-item">
+                          <a href={`/shop?category_id=${child.id}`} className="dropdown-link">
+                            <span>{child.name}</span>
+                            {hasGrandchildren && <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" style={{ fontSize: '10px' }}></i>}
+                          </a>
+                          
+                          {/* Level 3 Grandchildren */}
+                          {hasGrandchildren && (
+                            <ul className="categories-sub-dropdown-menu">
+                              {fullChild.category_children.map((grandchild) => (
+                                <li key={grandchild.id} className="categories-dropdown-item">
+                                  <a href={`/shop?category_id=${grandchild.id}`} className="dropdown-link">
+                                    <span>{grandchild.name}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </li>
+    );
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -199,7 +262,16 @@ function ShopHeaderContent() {
                         <div className="header-info">
                             <div className="logo">
                                 <a href="/">
-                                    <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                    <img
+                                        src="/assets/images/logo/bitmap_cropped.png"
+                                        alt="Ocean Student Projects Logo"
+                                        style={{
+                                            height: '48px',
+                                            width: 'auto',
+                                            objectFit: 'contain',
+                                            display: 'block'
+                                        }}
+                                    />
                                 </a>
                             </div>
                         </div>
@@ -312,14 +384,10 @@ function ShopHeaderContent() {
 
                         <li
                             className="rbt-access-box rbt-scroll-trigger fade_in animation-order-3 rbt-access-box-has-bg-hover rbt-mini-cart">
-                            <a href="#" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
+                            <a href="#" className="rbt-cart-sidenav-activation">
                                 <div className="rbt-round-btn rbt-bg-static-gray">
                                     <i className="fa-regular fa-bag-shopping"></i>
                                     <span className="access-box-count rbt-shiny">{cartCount}</span>
-                                </div>
-                                <div className="content p-0">
-                                    <p>Total Cart</p>
-                                    <span>Total {formatPrice(cartTotal, currencyCode)}</span>
                                 </div>
                             </a>
                         </li>
@@ -366,16 +434,57 @@ function ShopHeaderContent() {
             <div className="rbt-main-navigation d-none d-xl-block">
                         <nav className="rbt-mainmenu-nav">
                             <ul className="mainmenu has-nav-bg-shape-hover">
+                                {renderCategoriesDropdown()}
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/' ? 'active' : ''} href="/">Home</a></li>
-                                <li style={{ margin: '0 15px' }}><a className={pathname === '/shop' ? 'active' : ''} href="/shop">Shop</a></li>
-
+                                <li style={{ margin: '0 15px' }}><a className={pathname === '/shop' && !selectedCatId ? 'active' : ''} href="/shop">Educational Kits</a></li>
+                                <li style={{ margin: '0 15px' }}><a href="/contact">Project Enquiry</a></li>
+                                <li style={{ margin: '0 15px' }}><a href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/about' ? 'active' : ''} href="/about">About Us</a></li>
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/contact' ? 'active' : ''} href="/contact">Contact Us</a></li>
                             </ul>
                         </nav>
             </div>
 
-                            <div className="rbt-header-sec-col rbt-header-right">
+                            <div className="rbt-header-sec-col rbt-header-right d-none d-xl-flex align-items-center gap-3" style={{ marginLeft: 'auto' }}>
+                                <a 
+                                    href="mailto:oceanstudentprojects@gmail.com" 
+                                    className="nav-header-contact-link"
+                                    style={{
+                                        color: '#ffffff',
+                                        fontSize: '12px',
+                                        fontWeight: '700',
+                                        letterSpacing: '0.5px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        textTransform: 'uppercase',
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <i className="fa-regular fa-envelope"></i>
+                                    <span>Email</span>
+                                </a>
+                                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>|</span>
+                                <a 
+                                    href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects." 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="nav-header-contact-link"
+                                    style={{
+                                        color: '#ffffff',
+                                        fontSize: '12px',
+                                        fontWeight: '700',
+                                        letterSpacing: '0.5px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        textTransform: 'uppercase',
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <i className="fa-brands fa-whatsapp"></i>
+                                    <span>Whatsapp</span>
+                                </a>
                             </div>
         </div>  
     </div>
@@ -406,7 +515,16 @@ function ShopHeaderContent() {
                     <div className="header-info d-xl-block d-none">
                         <div className="logo rbt-logo-height-sm">
                             <a href="/">
-                                <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                <img
+                                    src="/assets/images/logo/bitmap_cropped.png"
+                                    alt="Ocean Student Projects Logo"
+                                    style={{
+                                        height: '44px',
+                                        width: 'auto',
+                                        objectFit: 'contain',
+                                        display: 'block'
+                                    }}
+                                />
                             </a>
                         </div>
                     </div>
@@ -432,7 +550,16 @@ function ShopHeaderContent() {
             <div className="header-info d-xl-none d-block">
                 <div className="logo">
                     <a href="/">
-                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                        <img
+                            src="/assets/images/logo/bitmap_cropped.png"
+                            alt="Ocean Student Projects Logo"
+                            style={{
+                                height: '44px',
+                                width: 'auto',
+                                objectFit: 'contain',
+                                display: 'block'
+                            }}
+                        />
                     </a>
                 </div>
             </div>
@@ -441,9 +568,11 @@ function ShopHeaderContent() {
                 <div className="header-info">
                                 <nav className="rbt-mainmenu-nav">
                                     <ul className="mainmenu mainmenu has-nav-bg-shape-hover">
+                                        {renderCategoriesDropdown()}
                                         <li style={{ margin: '0 15px' }}><a className={pathname === '/' ? 'active' : ''} href="/">Home</a></li>
-                                        <li style={{ margin: '0 15px' }}><a className={pathname === '/shop' ? 'active' : ''} href="/shop">Shop</a></li>
-        
+                                        <li style={{ margin: '0 15px' }}><a className={pathname === '/shop' && !selectedCatId ? 'active' : ''} href="/shop">Educational Kits</a></li>
+                                        <li style={{ margin: '0 15px' }}><a href="/contact">Project Enquiry</a></li>
+                                        <li style={{ margin: '0 15px' }}><a href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                         <li style={{ margin: '0 15px' }}><a className={pathname === '/about' ? 'active' : ''} href="/about">About Us</a></li>
                                         <li style={{ margin: '0 15px' }}><a className={pathname === '/contact' ? 'active' : ''} href="/contact">Contact Us</a></li>
                                     </ul>
@@ -477,9 +606,6 @@ function ShopHeaderContent() {
                                 <i className="fa-regular fa-bag-shopping"></i>
                                 <span className="access-box-count rbt-shiny">{cartCount}</span>
                             </span>
-                            <div className="content ml--4">
-                                <span className="title-text">{formatPrice(cartTotal, currencyCode)}</span>
-                            </div>
                         </a>
                     </li>
 

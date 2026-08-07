@@ -12,7 +12,7 @@ const Breadcrumb = () => {
                                 <li>
                                     <div className="icon-right"><i className="fa-solid fa-chevron-right"></i></div>
                                 </li>
-                                <li className="rbt-breadcrumb-item active">Shop</li>
+                                <li className="rbt-breadcrumb-item active">Educational Kits</li>
                             </ul>
                         </div>
                     </div>

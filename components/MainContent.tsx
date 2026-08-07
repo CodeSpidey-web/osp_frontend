@@ -24,8 +24,8 @@ function getPricing(product: MedusaProduct): { display: string; min: number; max
   if (amounts.length === 0) return { display: '', min: 0, max: 0 }
   const min = Math.min(...amounts)
   const max = Math.max(...amounts)
-  if (min === max) return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
-  return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${(max / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+  if (min === max) return { display: `₹${min.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+  return { display: `₹${min.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${max.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
 }
 
 function getParentCategoryName(productCategories: any[], allCategories: MedusaCategory[]): string {
@@ -60,16 +60,29 @@ function getParentCategoryName(productCategories: any[], allCategories: MedusaCa
   return productCategories[0]?.name || "Electronic Components";
 }
 
-export default function MainContent() {
+interface MainContentProps {
+  initialProducts?: MedusaProduct[];
+  initialCategories?: MedusaCategory[];
+  initialCategoryImages?: Record<string, string>;
+}
+
+export default function MainContent({
+  initialProducts = [],
+  initialCategories = [],
+  initialCategoryImages = {},
+}: MainContentProps) {
   const { addToCart } = useCart();
-  const [products, setProducts] = useState<MedusaProduct[]>([]);
-  const [categories, setCategories] = useState<MedusaCategory[]>([]);
-  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<MedusaProduct[]>(initialProducts);
+  const [categories, setCategories] = useState<MedusaCategory[]>(initialCategories);
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>(initialCategoryImages);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
+    if (initialProducts.length > 0) {
+      return;
+    }
     async function fetchData() {
       try {
         const [productsData, categoriesData] = await Promise.all([

@@ -53,9 +53,19 @@ export default function MobileMenu() {
                     <div className="mobile-menu-top">
                         <div className="inner-top">
                             <div className="content">
-                                <div className="logo" style={{ width: 'auto', maxWidth: '180px', flexGrow: 1 }}>
+                                <div className="logo" style={{ width: 'auto', maxWidth: '220px', flexGrow: 1 }}>
                                     <a href="/" onClick={handleCloseMenu} style={{ display: 'block', width: '100%' }}>
-                                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" style={{ width: '100%', height: 'auto', objectFit: 'contain', display: 'block' }} />
+                                        <img
+                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            alt="Ocean Student Projects Logo"
+                                            style={{
+                                                width: '100%',
+                                                height: 'auto',
+                                                maxHeight: '56px',
+                                                objectFit: 'contain',
+                                                display: 'block'
+                                            }}
+                                        />
                                     </a>
                                 </div>
                                 <div className="rbt-btn-close">
@@ -89,7 +99,9 @@ export default function MobileMenu() {
                                     <nav className="rbt-mainmenu-nav">
                                         <ul className="mainmenu">
                                             <li><a href="/" onClick={handleCloseMenu}>Home</a></li>
-                                            <li><a href="/shop" onClick={handleCloseMenu}>Shop</a></li>
+                                            <li><a href="/shop" onClick={handleCloseMenu}>Educational Kits</a></li>
+                                            <li><a href="/contact" onClick={handleCloseMenu}>Project Enquiry</a></li>
+                                            <li><a href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer" onClick={handleCloseMenu}>Bulk purchase</a></li>
                                             <li><a href="/about" onClick={handleCloseMenu}>About Us</a></li>
                                             <li><a href="/contact" onClick={handleCloseMenu}>Contact Us</a></li>
                                             {customer ? (
@@ -185,6 +197,55 @@ export default function MobileMenu() {
                         </div>
                     </div>
 
+                    {/* Mobile Menu Bottom Contacts */}
+                    <div 
+                        className="mobile-menu-bottom-contact"
+                        style={{
+                            padding: '16px 24px 80px 24px', // Extra bottom padding prevents overlap with the mobile bottom toolbar
+                            borderTop: '1px solid var(--color-gray-100)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                            background: '#f8fafc'
+                        }}
+                    >
+                        <a 
+                            href="mailto:oceanstudentprojects@gmail.com"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                fontSize: '12px',
+                                fontWeight: '700',
+                                color: 'var(--color-heading)',
+                                textTransform: 'uppercase',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            <i className="fa-regular fa-envelope text-primary" style={{ fontSize: '14px', color: '#136c39' }}></i>
+                            <span>Email</span>
+                        </a>
+                        <span style={{ color: 'var(--color-gray-300)', fontSize: '12px' }}>|</span>
+                        <a 
+                            href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                fontSize: '12px',
+                                fontWeight: '700',
+                                color: 'var(--color-heading)',
+                                textTransform: 'uppercase',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            <i className="fa-brands fa-whatsapp text-success" style={{ fontSize: '16px', color: '#25d366' }}></i>
+                            <span>Whatsapp</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </>

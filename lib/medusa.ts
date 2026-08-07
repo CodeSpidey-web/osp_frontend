@@ -7,6 +7,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'x-publishable-api-key': PUBLISHABLE_API_KEY,
+    'ngrok-skip-browser-warning': 'true',
   }
 
   if (token) {
@@ -22,10 +23,18 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
   }
 
   const res = await fetch(`${BACKEND_URL}${path}`, {
+    cache: 'no-store',
     ...options,
     headers,
   })
-  if (!res.ok) throw new Error(`Medusa API error: ${res.status} ${res.statusText}`)
+  if (!res.ok) {
+    let errorMsg = ''
+    try {
+      const errJson = await res.json()
+      errorMsg = errJson.message || JSON.stringify(errJson)
+    } catch (_) {}
+    throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`)
+  }
   const json = await res.json()
   return json as T
 }
@@ -119,6 +128,7 @@ export interface MedusaLineItem {
   title: string
   quantity: number
   unit_price: number
+  total: number
   thumbnail?: string
   variant_sku?: string
   variant_id?: string
@@ -409,9 +419,9 @@ export async function addShippingMethod(cartId: string, optionId: string): Promi
 }
 
 export async function createPaymentCollection(cartId: string): Promise<{ payment_collection: any }> {
-  const res = await fetchApi<{ payment_collection: any }>(`/store/carts/${cartId}/payment-collections`, {
+  const res = await fetchApi<{ payment_collection: any }>(`/store/payment-collections`, {
     method: 'POST',
-    body: JSON.stringify({}),
+    body: JSON.stringify({ cart_id: cartId }),
   })
   return res
 }
@@ -434,6 +444,7 @@ export async function completeCart(cartId: string): Promise<{ type: string; orde
 export interface MedusaOrder {
   id: string
   display_id?: number
+  currency_code?: string
   status?: string
   created_at?: string
   total?: number
@@ -449,6 +460,6 @@ export interface MedusaOrder {
 }
 
 export async function getOrder(orderId: string): Promise<MedusaOrder> {
-  const res = await fetchApi<{ order: MedusaOrder }>(`/store/orders/${orderId}`)
+  const res = await fetchApi<{ order: MedusaOrder }>(`/store/orders/${orderId}?fields=*payment_collections.payments`)
   return res.order
 }

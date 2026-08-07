@@ -11,7 +11,7 @@ function formatPrice(amount: number, currencyCode: string = 'inr') {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount / 100);
+  }).format(amount);
 }
 
 export default function Header() {
@@ -58,6 +58,67 @@ export default function Header() {
     return result;
   };
 
+  const renderCategoriesDropdown = () => {
+    const parentCategories = categories.filter(
+      cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
+    );
+    const isCategoryActive = pathname === '/shop' && !!selectedCatId;
+
+    return (
+      <li className="relative group-dropdown-main">
+        <a className={`nav-link-custom ${isCategoryActive ? 'active' : ''}`} href="/shop" style={{ display: 'inline-flex', alignItems: 'center' }}>
+          Categories <i className="fa-solid fa-chevron-down text-[10px]" style={{ fontSize: '10px', marginLeft: '4px' }}></i>
+        </a>
+        
+        {/* Level 1 Dropdown */}
+        <ul className="categories-dropdown-menu">
+          {parentCategories.map((parent) => {
+            const hasChildren = parent.category_children && parent.category_children.length > 0;
+            return (
+              <li key={parent.id} className="categories-dropdown-item">
+                <a href={`/shop?category_id=${parent.id}`} className="dropdown-link">
+                  <span>{parent.name}</span>
+                  {hasChildren && <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" style={{ fontSize: '10px' }}></i>}
+                </a>
+                
+                {/* Level 2 Subcategories */}
+                {hasChildren && (
+                  <ul className="categories-sub-dropdown-menu">
+                    {parent.category_children.map((child) => {
+                      const fullChild = categories.find(c => c.id === child.id);
+                      const hasGrandchildren = fullChild && fullChild.category_children && fullChild.category_children.length > 0;
+                      return (
+                        <li key={child.id} className="categories-dropdown-item">
+                          <a href={`/shop?category_id=${child.id}`} className="dropdown-link">
+                            <span>{child.name}</span>
+                            {hasGrandchildren && <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" style={{ fontSize: '10px' }}></i>}
+                          </a>
+                          
+                          {/* Level 3 Grandchildren */}
+                          {hasGrandchildren && (
+                            <ul className="categories-sub-dropdown-menu">
+                              {fullChild.category_children.map((grandchild) => (
+                                <li key={grandchild.id} className="categories-dropdown-item">
+                                  <a href={`/shop?category_id=${grandchild.id}`} className="dropdown-link">
+                                    <span>{grandchild.name}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </li>
+    );
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -87,9 +148,11 @@ export default function Header() {
                         <div className="rbt-main-navigation d-none d-xl-block">
                             <nav className="rbt-mainmenu-nav">
                                 <ul className="mainmenu has-nav-bg-shape-hover">
+                                    {renderCategoriesDropdown()}
                                     <li><a className={`nav-link-custom ${pathname === '/' ? 'active' : ''}`} href="/">Home</a></li>
-                                    <li><a className={`nav-link-custom ${pathname === '/shop' ? 'active' : ''}`} href="/shop">Shop</a></li>
-
+                                    <li><a className={`nav-link-custom ${pathname === '/shop' && !selectedCatId ? 'active' : ''}`} href="/shop">Educational Kits</a></li>
+                                    <li><a className="nav-link-custom" href="/contact">Project Enquiry</a></li>
+                                    <li><a className="nav-link-custom" href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/about' ? 'active' : ''}`} href="/about">About Us</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/contact' ? 'active' : ''}`} href="/contact">Contact Us</a></li>
                                 </ul>
@@ -140,7 +203,16 @@ export default function Header() {
                             <div className="header-info p-0  d-none d-xl-block">
                                 <div className="logo">
                                     <a href="/">
-                                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img
+                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            alt="Ocean Student Projects Logo"
+                                            style={{
+                                                height: '48px',
+                                                width: 'auto',
+                                                objectFit: 'contain',
+                                                display: 'block'
+                                            }}
+                                        />
                                     </a>
                                 </div>
                             </div>
@@ -199,7 +271,16 @@ export default function Header() {
                         <div className="header-info p-0  d-block d-xl-none">
                             <div className="logo">
                                 <a href="/">
-                                    <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                    <img
+                                        src="/assets/images/logo/bitmap_cropped.png"
+                                        alt="Ocean Student Projects Logo"
+                                        style={{
+                                            height: '44px',
+                                            width: 'auto',
+                                            objectFit: 'contain',
+                                            display: 'block'
+                                        }}
+                                    />
                                 </a>
                             </div>
                         </div>
@@ -210,14 +291,10 @@ export default function Header() {
                         <ul className="rbt-quick-access">
                             <li
                                 className="rbt-access-box rbt-scroll-trigger fade_in animation-order-4 rbt-access-box-has-bg-hover rbt-mini-cart">
-                                <a href="#!" className="rbt-access-box-wrapper rbt-cart-sidenav-activation">
+                                <a href="#!" className="rbt-cart-sidenav-activation">
                                     <div className="rbt-round-btn rbt-bg-static-gray">
                                         <i className="fa-regular fa-bag-shopping"></i>
                                         <span className="access-box-count rbt-shiny">{cartCount}</span>
-                                    </div>
-                                    <div className="content p-0">
-                                        <p>Total Cart</p>
-                                        <span>Total {formatPrice(cartTotal)}</span>
                                     </div>
                                 </a>
                             </li>
@@ -262,7 +339,16 @@ export default function Header() {
                             <div className="header-info d-xl-block d-none">
                                 <div className="logo rbt-logo-height-sm">
                                     <a href="/">
-                                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img
+                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            alt="Ocean Student Projects Logo"
+                                            style={{
+                                                height: '44px',
+                                                width: 'auto',
+                                                objectFit: 'contain',
+                                                display: 'block'
+                                            }}
+                                        />
                                     </a>
                                 </div>
                             </div>
@@ -281,7 +367,16 @@ export default function Header() {
                     <div className="header-info d-xl-none d-block">
                         <div className="logo">
                             <a href="/">
-                                <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                <img
+                                    src="/assets/images/logo/bitmap_cropped.png"
+                                    alt="Ocean Student Projects Logo"
+                                    style={{
+                                        height: '44px',
+                                        width: 'auto',
+                                        objectFit: 'contain',
+                                        display: 'block'
+                                    }}
+                                />
                             </a>
                         </div>
                     </div>
@@ -290,9 +385,11 @@ export default function Header() {
                         <div className="header-info">
                             <nav className="rbt-mainmenu-nav">
                                 <ul className="mainmenu mainmenu has-nav-bg-shape-hover">
+                                    {renderCategoriesDropdown()}
                                     <li><a className={`nav-link-custom ${pathname === '/' ? 'active' : ''}`} href="/">Home</a></li>
-                                    <li><a className={`nav-link-custom ${pathname === '/shop' ? 'active' : ''}`} href="/shop">Shop</a></li>
-
+                                    <li><a className={`nav-link-custom ${pathname === '/shop' && !selectedCatId ? 'active' : ''}`} href="/shop">Educational Kits</a></li>
+                                    <li><a className="nav-link-custom" href="/contact">Project Enquiry</a></li>
+                                    <li><a className="nav-link-custom" href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/about' ? 'active' : ''}`} href="/about">About Us</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/contact' ? 'active' : ''}`} href="/contact">Contact Us</a></li>
                                 </ul>

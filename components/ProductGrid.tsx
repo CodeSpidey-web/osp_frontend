@@ -18,8 +18,8 @@ function getPricing(product: MedusaProduct): { display: string; min: number; max
   if (amounts.length === 0) return { display: '', min: 0, max: 0 }
   const min = Math.min(...amounts)
   const max = Math.max(...amounts)
-  if (min === max) return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
-  return { display: `₹${(min / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${(max / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+  if (min === max) return { display: `₹${min.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
+  return { display: `₹${min.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ₹${max.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, min, max }
 }
 
 export default function ProductGrid({ products, loading, count, offset, limit }: ProductGridProps) {

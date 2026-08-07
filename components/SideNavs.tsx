@@ -8,7 +8,7 @@ function formatPrice(amount: number, currencyCode: string = 'inr') {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount / 100);
+  }).format(amount);
 }
 
 export default function SideNavs() {
@@ -29,10 +29,10 @@ export default function SideNavs() {
 
   const items = cart?.items || [];
   const subtotal = items.reduce((sum, i) => sum + (i.unit_price * i.quantity), 0);
-  const shipping = subtotal >= (freeShippingThreshold * 100) ? 0 : (flatShippingRate * 100);
+  const shipping = subtotal >= freeShippingThreshold ? 0 : flatShippingRate;
   const total = subtotal + shipping;
   const currencyCode = cart?.currency_code || 'inr';
-  const amountNeeded = (freeShippingThreshold * 100) - subtotal;
+  const amountNeeded = freeShippingThreshold - subtotal;
   const fallbackProducts: MedusaProduct[] = [
     { id: '1', title: 'Raspberry Pi 4 Model B', handle: 'raspberry-pi-4', thumbnail: '/assets/images/product-img/electronics/electronics-bg-trans-03-a-1-hover.webp', variants: [{ prices: [{ amount: 5000, currency_code: 'inr' }] }], images: [] } as any,
     { id: '2', title: 'Arduino Uno R3 Board', handle: 'arduino-uno', thumbnail: '/assets/images/product-img/electronics/electronics-bg-trans-06-a-1-hover.webp', variants: [{ prices: [{ amount: 1600, currency_code: 'inr' }] }], images: [] } as any,
@@ -56,7 +56,16 @@ export default function SideNavs() {
                             <div className="rbt-categories-sidebar-top-content mb--24">
                                 <div className="logo">
                                     <a href="/">
-                                        <img src="/assets/images/logo/logo.webp" alt="Ocean Student Projects Logo" />
+                                        <img
+                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            alt="Ocean Student Projects Logo"
+                                            style={{
+                                                height: '48px',
+                                                width: 'auto',
+                                                objectFit: 'contain',
+                                                display: 'block'
+                                            }}
+                                        />
                                     </a>
                                 </div>
                                 <button className="rbt-sidebar-close-btn">
@@ -1353,7 +1362,7 @@ export default function SideNavs() {
                         )}
                         <div className="progress" role="progressbar" aria-label="Shipping-progress"
                           aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} style={{ height: '6px', borderRadius: '3px', backgroundColor: '#e9ecef', overflow: 'hidden' }}>
-                          <div className="progress-bar" style={{ width: `${Math.min(100, (subtotal / (freeShippingThreshold * 100)) * 100)}%`, height: '100%', backgroundColor: '#c85a17', transition: 'width 0.3s ease' }}></div>
+                           <div className="progress-bar" style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%`, height: '100%', backgroundColor: '#c85a17', transition: 'width 0.3s ease' }}></div>
                         </div>
                     </div>
                     <hr className="mb--0 mt--16" />

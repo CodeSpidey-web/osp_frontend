@@ -5,24 +5,71 @@ export default function ContactContent() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    phone: '',
+    college: '',
     message: ''
   });
+  const [file, setFile] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      alert("Please fill in all required fields.");
+    if (!formData.name || !formData.email || !formData.phone || !formData.college || !formData.message) {
+      setErrorMsg("Please fill in all required fields.");
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setErrorMsg('');
+
+    try {
+      let file_data = null;
+      let file_name = null;
+      let file_type = null;
+
+      if (file) {
+        file_name = file.name;
+        file_type = file.type;
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = (err) => reject(err);
+        });
+        reader.readAsDataURL(file);
+        file_data = await base64Promise;
+      }
+
+      const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || 'pk_abd8e27126ac664d0d8042bea1fc954747cfdc4ad40a24974833f10a727a1211';
+      const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+      const response = await fetch(`${BACKEND_URL}/store/enquiries`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-publishable-api-key': PUBLISHABLE_API_KEY
+        },
+        body: JSON.stringify({
+          ...formData,
+          file_name,
+          file_data,
+          file_type
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to submit enquiry");
+      }
+
       setSubmitted(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 800);
+      setFormData({ name: '', email: '', phone: '', college: '', message: '' });
+      setFile(null);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -152,9 +199,9 @@ export default function ContactContent() {
                 <h3 className="contact-item-title">Registered Office</h3>
                 <div className="contact-item-detail">
                   Ocean Student Projects<br />
-                  12, Narasingapuram Street,<br />
-                  Near Ritchie Street, Mount Road,<br />
-                  Chennai - 600002, Tamil Nadu, India.
+                  No.10 Kareem Mohideen sahib St,<br />
+                  Chintadripet, Chennai - 600002,<br />
+                  Tamil Nadu, India.
                 </div>
               </div>
               
@@ -168,7 +215,7 @@ export default function ContactContent() {
               <div className="contact-item">
                 <h3 className="contact-item-title">Email Inquiries</h3>
                 <div className="contact-item-detail">
-                  <a href="mailto:support@oceanstudentprojects.in">support@oceanstudentprojects.in</a>
+                  <a href="mailto:oceanstudentprojects@gmail.com">oceanstudentprojects@gmail.com</a>
                 </div>
               </div>
             </div>
@@ -203,6 +250,12 @@ export default function ContactContent() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
+                    {errorMsg && (
+                      <div style={{ color: '#ef4444', backgroundColor: '#fef2f2', border: '1px solid #fecaca', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '13px', fontWeight: '500' }}>
+                        {errorMsg}
+                      </div>
+                    )}
+
                     <div className="minimal-input-group">
                       <label className="minimal-input-label" htmlFor="user_name">Full Name *</label>
                       <input 
@@ -230,25 +283,72 @@ export default function ContactContent() {
                     </div>
                     
                     <div className="minimal-input-group">
-                      <label className="minimal-input-label" htmlFor="user_subject">Subject</label>
+                      <label className="minimal-input-label" htmlFor="user_phone">Phone Number *</label>
+                      <input 
+                        type="tel" 
+                        id="user_phone" 
+                        required
+                        className="minimal-input"
+                        placeholder="e.g. +91 73389 75699"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_college">College Name *</label>
                       <input 
                         type="text" 
-                        id="user_subject" 
+                        id="user_college" 
+                        required
                         className="minimal-input"
-                        placeholder="Message topic (optional)"
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        placeholder="Name of your institution"
+                        value={formData.college}
+                        onChange={(e) => setFormData({ ...formData, college: e.target.value })}
                       />
+                    </div>
+
+                    <div className="minimal-input-group">
+                      <label className="minimal-input-label" htmlFor="user_file">Project Abstract / Proposal (PPT or PDF - Optional)</label>
+                      <input 
+                        type="file" 
+                        id="user_file" 
+                        accept=".pdf,.ppt,.pptx"
+                        className="minimal-input"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            setFile(e.target.files[0]);
+                          } else {
+                            setFile(null);
+                          }
+                        }}
+                      />
+                      {file && (
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: '#136c39', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>📁 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                          <button 
+                            type="button" 
+                            onClick={() => {
+                              setFile(null);
+                              const inputEl = document.getElementById('user_file') as HTMLInputElement;
+                              if (inputEl) inputEl.value = '';
+                            }}
+                            style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '11px', textDecoration: 'underline' }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="minimal-input-group">
-                      <label className="minimal-input-label" htmlFor="user_message">Your Message *</label>
+                      <label className="minimal-input-label" htmlFor="user_message">Project Details *</label>
                       <textarea 
                         id="user_message" 
                         required
                         rows={4}
                         className="minimal-input"
-                        placeholder="Write your comments or questions..."
+                        placeholder="Describe your project concept, requirements, or help needed..."
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         style={{ minHeight: '120px', resize: 'vertical' }}
@@ -260,7 +360,7 @@ export default function ContactContent() {
                       className="minimal-button w-100"
                       disabled={loading}
                     >
-                      {loading ? "Sending Message..." : "Send Message"}
+                      {loading ? "Submitting Enquiry..." : "Submit Enquiry"}
                     </button>
                   </form>
                 )}

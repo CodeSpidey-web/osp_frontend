@@ -43,7 +43,7 @@ const ProductBreadcrumb = ({ product }: ProductBreadcrumbProps) => {
                 <li>
                   <div className="icon-right" style={{ fontSize: '10px', color: '#adb5bd' }}><i className="fa-solid fa-chevron-right"></i></div>
                 </li>
-                <li className="rbt-breadcrumb-item"><a href="/shop" style={{ fontSize: '13px', fontWeight: '500', color: '#6c757d' }}>Shop</a></li>
+                <li className="rbt-breadcrumb-item"><a href="/shop" style={{ fontSize: '13px', fontWeight: '500', color: '#6c757d' }}>Educational Kits</a></li>
                 
                 {crumbsTrail.map((crumb) => (
                   <React.Fragment key={crumb.id}>

@@ -1170,8 +1170,8 @@ const SearchPage = () => {
                                                                     {minPrice > 0 && (
                                                                         <span className="price-text">
                                                                             {minPrice === maxPrice
-                                                                                ? `$${(minPrice / 100).toFixed(2)}`
-                                                                                : `$${(minPrice / 100).toFixed(2)} - $${(maxPrice / 100).toFixed(2)}`
+                                                                                ? `₹${minPrice.toFixed(2)}`
+                                                                                : `₹${minPrice.toFixed(2)} - ₹${maxPrice.toFixed(2)}`
                                                                             }
                                                                         </span>
                                                                     )}

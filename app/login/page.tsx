@@ -51,10 +51,15 @@ function LoginFormInner() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
 
+  // Show/Hide Password States
+  const [showLoginPassword, setShowLoginPassword] = useState(false)
+  const [showRegPassword, setShowRegPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   useEffect(() => {
-    // If already logged in, redirect to profile
     if (customer) {
-      router.push('/profile')
+      router.push('/')
     }
   }, [customer, router])
 
@@ -65,7 +70,7 @@ function LoginFormInner() {
     const success = await login(loginEmail, loginPassword)
     setIsSubmitting(false)
     if (success) {
-      router.push('/profile')
+      router.push('/')
     }
   }
 
@@ -76,7 +81,7 @@ function LoginFormInner() {
     const success = await register(regEmail, regPassword, firstName, lastName)
     setIsSubmitting(false)
     if (success) {
-      router.push('/profile')
+      router.push('/')
     }
   }
 
@@ -142,36 +147,96 @@ function LoginFormInner() {
   }
 
   return (
-    <main className="rbt-main-wrapper" style={{ backgroundColor: '#09090b', minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
+    <main className="rbt-main-wrapper" style={{
+      minHeight: '80vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '60px 20px',
+      position: 'relative',
+      overflow: 'hidden',
+      background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: '-20%',
+        left: '-10%',
+        width: '500px',
+        height: '500px',
+        background: 'radial-gradient(circle, rgba(254, 208, 0, 0.18) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-15%',
+        right: '-10%',
+        width: '600px',
+        height: '600px',
+        background: 'radial-gradient(circle, rgba(19, 108, 57, 0.25) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        right: '20%',
+        width: '300px',
+        height: '300px',
+        background: 'radial-gradient(circle, rgba(235, 127, 35, 0.12) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '30%',
+        left: '15%',
+        width: '250px',
+        height: '250px',
+        background: 'radial-gradient(circle, rgba(254, 208, 0, 0.10) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }} />
       <div style={{
         width: '100%',
         maxWidth: '480px',
-        background: 'rgba(15, 15, 20, 0.7)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '16px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        borderRadius: '20px',
         padding: '40px 30px',
-        boxShadow: '0 20px 45px rgba(0,0,0,0.5)',
-        color: '#fff',
-        fontFamily: 'Inter, sans-serif'
+        boxShadow: '0 25px 60px rgba(11, 37, 69, 0.35), 0 0 0 1px rgba(254, 208, 0, 0.1)',
+        color: '#18181b',
+        fontFamily: 'Inter, sans-serif',
+        position: 'relative',
+        zIndex: 1
       }}>
         {/* Render Forgot/Reset password view */}
         {isForgotPassword ? (
           <div>
             <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#f4f4f5', margin: 0 }}>
+              <h2 style={{
+                fontSize: '26px',
+                fontWeight: '800',
+                margin: 0,
+                background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
                 {resetToken ? 'Reset Password' : 'Forgot Password'}
               </h2>
-              <p style={{ color: '#71717a', fontSize: '13px', marginTop: '6px' }}>
+              <p style={{ color: '#71717a', fontSize: '13px', marginTop: '8px' }}>
                 {resetToken ? 'Set a strong password for your account' : 'Enter your email to receive password reset instructions'}
               </p>
             </div>
 
             {(error || localError) && (
               <div style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.25)',
-                color: '#f87171',
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
                 padding: '12px 16px',
                 borderRadius: '8px',
                 fontSize: '13px',
@@ -185,57 +250,105 @@ function LoginFormInner() {
             {resetToken ? (
               /* Set New Password Form */
               resetSuccess ? (
-                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '16px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' }}>
+                <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '16px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' }}>
                   <i className="fa-solid fa-circle-check" style={{ fontSize: '24px', marginBottom: '10px', display: 'block' }}></i>
                   Password has been reset successfully! Redirecting you to login...
                 </div>
               ) : (
                 <form onSubmit={handleResetSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>New Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="••••••••"
-                      style={{
-                        backgroundColor: '#18181b',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '8px',
-                        padding: '12px 14px',
-                        color: '#fff',
-                        fontSize: '14px',
-                        outline: 'none'
-                      }}
-                    />
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>New Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        required
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          padding: '12px 40px 12px 14px',
+                          color: '#1f2937',
+                          fontSize: '14px',
+                          outline: 'none',
+                          width: '100%'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#71717a',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px'
+                        }}
+                      >
+                        <i className={`fa-regular ${showNewPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Confirm New Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      style={{
-                        backgroundColor: '#18181b',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '8px',
-                        padding: '12px 14px',
-                        color: '#fff',
-                        fontSize: '14px',
-                        outline: 'none'
-                      }}
-                    />
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Confirm New Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          padding: '12px 40px 12px 14px',
+                          color: '#1f2937',
+                          fontSize: '14px',
+                          outline: 'none',
+                          width: '100%'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#71717a',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px'
+                        }}
+                      >
+                        <i className={`fa-regular ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={forgotLoading}
                     style={{
-                      backgroundColor: '#10b981',
+                      backgroundColor: '#136c39',
                       color: '#fff',
                       border: 'none',
                       borderRadius: '8px',
@@ -253,7 +366,7 @@ function LoginFormInner() {
                   <button
                     type="button"
                     onClick={() => { setIsForgotPassword(false); setResetToken(''); clearError(); setLocalError(null); }}
-                    style={{ background: 'none', border: 'none', color: '#a1a1aa', fontSize: '13px', cursor: 'pointer', textAlign: 'center', marginTop: '10px' }}
+                    style={{ background: 'none', border: 'none', color: '#71717a', fontSize: '13px', cursor: 'pointer', textAlign: 'center', marginTop: '10px' }}
                   >
                     Back to login
                   </button>
@@ -263,13 +376,13 @@ function LoginFormInner() {
               /* Request Reset Email Form */
               forgotSent ? (
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '16px', borderRadius: '8px', fontSize: '14px', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '16px', borderRadius: '8px', fontSize: '14px', marginBottom: '20px' }}>
                     Password reset link generated! In development, check the file <strong>password_resets.log</strong> in the project artifacts folder to retrieve your token.
                   </div>
                   <button
                     type="button"
                     onClick={() => { setIsForgotPassword(false); setForgotSent(false); }}
-                    style={{ background: 'none', border: 'none', color: '#10b981', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}
+                    style={{ background: 'none', border: 'none', color: '#136c39', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}
                   >
                     Back to Sign In
                   </button>
@@ -277,7 +390,7 @@ function LoginFormInner() {
               ) : (
                 <form onSubmit={handleForgotSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Email Address</label>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Email Address</label>
                     <input
                       type="email"
                       required
@@ -285,11 +398,11 @@ function LoginFormInner() {
                       onChange={(e) => setResetEmail(e.target.value)}
                       placeholder="name@example.com"
                       style={{
-                        backgroundColor: '#18181b',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #d1d5db',
                         borderRadius: '8px',
                         padding: '12px 14px',
-                        color: '#fff',
+                        color: '#1f2937',
                         fontSize: '14px',
                         outline: 'none'
                       }}
@@ -300,7 +413,7 @@ function LoginFormInner() {
                     type="submit"
                     disabled={forgotLoading}
                     style={{
-                      backgroundColor: '#10b981',
+                      backgroundColor: '#136c39',
                       color: '#fff',
                       border: 'none',
                       borderRadius: '8px',
@@ -318,7 +431,7 @@ function LoginFormInner() {
                   <button
                     type="button"
                     onClick={() => { setIsForgotPassword(false); clearError(); setLocalError(null); }}
-                    style={{ background: 'none', border: 'none', color: '#a1a1aa', fontSize: '13px', cursor: 'pointer', textAlign: 'center', marginTop: '10px' }}
+                    style={{ background: 'none', border: 'none', color: '#71717a', fontSize: '13px', cursor: 'pointer', textAlign: 'center', marginTop: '10px' }}
                   >
                     Back to login
                   </button>
@@ -330,7 +443,7 @@ function LoginFormInner() {
           /* Normal Login/Register views */
           <>
             {/* Header tabs */}
-            <div style={{ display: 'flex', marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', marginBottom: '30px', borderBottom: '1px solid #e4e4e7' }}>
               <button
                 onClick={() => { setIsLoginTab(true); clearError(); setLocalError(null); }}
                 style={{
@@ -338,9 +451,9 @@ function LoginFormInner() {
                   padding: '12px',
                   background: 'none',
                   border: 'none',
-                  color: isLoginTab ? '#10b981' : '#a1a1aa',
+                  color: isLoginTab ? '#136c39' : '#71717a',
                   fontWeight: isLoginTab ? '700' : '500',
-                  borderBottom: isLoginTab ? '2px solid #10b981' : 'none',
+                  borderBottom: isLoginTab ? '2px solid #136c39' : 'none',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   fontSize: '16px'
@@ -355,9 +468,9 @@ function LoginFormInner() {
                   padding: '12px',
                   background: 'none',
                   border: 'none',
-                  color: !isLoginTab ? '#10b981' : '#a1a1aa',
+                  color: !isLoginTab ? '#136c39' : '#71717a',
                   fontWeight: !isLoginTab ? '700' : '500',
-                  borderBottom: !isLoginTab ? '2px solid #10b981' : 'none',
+                  borderBottom: !isLoginTab ? '2px solid #136c39' : 'none',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   fontSize: '16px'
@@ -368,19 +481,27 @@ function LoginFormInner() {
             </div>
 
             <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#f4f4f5', margin: 0 }}>
+              <h2 style={{
+                fontSize: '26px',
+                fontWeight: '800',
+                margin: 0,
+                background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
                 {isLoginTab ? 'Welcome Back' : 'Get Started'}
               </h2>
-              <p style={{ color: '#71717a', fontSize: '13px', marginTop: '6px' }}>
+              <p style={{ color: '#71717a', fontSize: '13px', marginTop: '8px' }}>
                 {isLoginTab ? 'Sign in to access your projects and orders' : 'Join India\'s trusted electronics student store'}
               </p>
             </div>
 
             {error && (
               <div style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.25)',
-                color: '#f87171',
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
                 padding: '12px 16px',
                 borderRadius: '8px',
                 fontSize: '13px',
@@ -394,7 +515,7 @@ function LoginFormInner() {
             {isLoginTab ? (
               <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Email Address</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Email Address</label>
                   <input
                     type="email"
                     required
@@ -402,57 +523,72 @@ function LoginFormInner() {
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="name@example.com"
                     style={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #d1d5db',
                       borderRadius: '8px',
                       padding: '12px 14px',
-                      color: '#fff',
+                      color: '#1f2937',
                       fontSize: '14px',
                       outline: 'none',
                       transition: 'border-color 0.2s'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                    onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                   />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Password</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showLoginPassword ? 'text' : 'password'}
+                      required
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        padding: '12px 40px 12px 14px',
+                        color: '#1f2937',
+                        fontSize: '14px',
+                        outline: 'none',
+                        width: '100%',
+                        transition: 'border-color 0.2s'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                      onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                    />
                     <button
                       type="button"
-                      onClick={() => { setIsForgotPassword(true); clearError(); setLocalError(null); }}
-                      style={{ background: 'none', border: 'none', color: '#10b981', fontSize: '12px', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#71717a',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px'
+                      }}
                     >
-                      Forgot Password?
+                      <i className={`fa-regular ${showLoginPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                     </button>
                   </div>
-                  <input
-                    type="password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    style={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '8px',
-                      padding: '12px 14px',
-                      color: '#fff',
-                      fontSize: '14px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
-                  />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{
-                    backgroundColor: '#10b981',
+                    backgroundColor: '#136c39',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '8px',
@@ -475,7 +611,7 @@ function LoginFormInner() {
               <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>First Name</label>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>First Name</label>
                     <input
                       type="text"
                       required
@@ -483,21 +619,21 @@ function LoginFormInner() {
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="John"
                       style={{
-                        backgroundColor: '#18181b',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #d1d5db',
                         borderRadius: '8px',
                         padding: '10px 12px',
-                        color: '#fff',
+                        color: '#1f2937',
                         fontSize: '14px',
                         outline: 'none',
                         transition: 'border-color 0.2s'
                       }}
-                      onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                      onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                      onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                      onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                     />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Last Name</label>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Last Name</label>
                     <input
                       type="text"
                       required
@@ -505,23 +641,23 @@ function LoginFormInner() {
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Doe"
                       style={{
-                        backgroundColor: '#18181b',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #d1d5db',
                         borderRadius: '8px',
                         padding: '10px 12px',
-                        color: '#fff',
+                        color: '#1f2937',
                         fontSize: '14px',
                         outline: 'none',
                         transition: 'border-color 0.2s'
                       }}
-                      onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                      onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                      onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                      onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                     />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Email Address</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Email Address</label>
                   <input
                     type="email"
                     required
@@ -529,49 +665,73 @@ function LoginFormInner() {
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="john.doe@example.com"
                     style={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #d1d5db',
                       borderRadius: '8px',
                       padding: '10px 12px',
-                      color: '#fff',
+                      color: '#1f2937',
                       fontSize: '14px',
                       outline: 'none',
                       transition: 'border-color 0.2s'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                    onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                   />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    placeholder="Min 6 characters"
-                    minLength={6}
-                    style={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '8px',
-                      padding: '10px 12px',
-                      color: '#fff',
-                      fontSize: '14px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#10b981'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
-                  />
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      placeholder="Min 6 characters"
+                      minLength={6}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        padding: '10px 40px 10px 12px',
+                        color: '#1f2937',
+                        fontSize: '14px',
+                        outline: 'none',
+                        width: '100%',
+                        transition: 'border-color 0.2s'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = '#136c39'}
+                      onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#71717a',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <i className={`fa-regular ${showRegPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
+                  </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   style={{
-                    backgroundColor: '#10b981',
+                    backgroundColor: '#136c39',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '8px',
@@ -605,8 +765,16 @@ export default function LoginPage() {
       <MobileMenu />
       <SideNavs />
       <Suspense fallback={
-        <div style={{ backgroundColor: '#09090b', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-          <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#18181b',
+          fontFamily: 'Inter, sans-serif',
+          background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%)'
+        }}>
+          <div className="spinner-border text-light" role="status" style={{ width: '3rem', height: '3rem' }}></div>
         </div>
       }>
         <LoginFormInner />

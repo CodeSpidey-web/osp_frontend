@@ -17,7 +17,7 @@ function formatPrice(amount: number, currencyCode: string = 'inr') {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currencyCode,
-  }).format(amount / 100);
+  }).format(amount);
 }
 
 export default function ProfilePage() {
@@ -258,10 +258,40 @@ export default function ProfilePage() {
 
   if (authLoading || (!customer && authLoading)) {
     return (
-      <div style={{ backgroundColor: '#09090b', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem', marginBottom: '15px' }}></div>
-          <p style={{ color: '#a1a1aa' }}>Loading profile...</p>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#18181b',
+        fontFamily: 'Inter, sans-serif',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%)'
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: '-10%',
+          left: '-5%',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(254, 208, 0, 0.15) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-10%',
+          right: '-5%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(19, 108, 57, 0.2) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <div className="spinner-border text-light" role="status" style={{ width: '3rem', height: '3rem', marginBottom: '15px' }}></div>
+          <p style={{ color: 'rgba(255,255,255,0.8)' }}>Loading profile...</p>
         </div>
       </div>
     )
@@ -286,26 +316,28 @@ export default function ProfilePage() {
             display: flex !important;
             overflow-x: auto;
             white-space: nowrap;
-            background: rgba(15, 15, 20, 0.7);
+            background: rgba(255, 255, 255, 0.92) !important;
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-radius: 14px !important;
             padding: 6px 6px 10px 6px;
             margin-bottom: 20px;
             gap: 6px;
+            box-shadow: 0 12px 35px rgba(11, 37, 69, 0.15);
             scrollbar-width: thin;
-            scrollbar-color: rgba(16, 185, 129, 0.4) rgba(255, 255, 255, 0.03);
+            scrollbar-color: rgba(19, 108, 57, 0.5) rgba(255,255,255,0.2);
           }
           .mobile-tabs-container::-webkit-scrollbar {
             display: block !important;
             height: 3px !important;
           }
           .mobile-tabs-container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03) !important;
+            background: rgba(244, 244, 245, 0.5) !important;
             border-radius: 10px !important;
           }
           .mobile-tabs-container::-webkit-scrollbar-thumb {
-            background: rgba(16, 185, 129, 0.4) !important;
+            background: rgba(19, 108, 57, 0.5) !important;
             border-radius: 10px !important;
           }
           .mobile-tab-btn {
@@ -334,35 +366,96 @@ export default function ProfilePage() {
       <ShopHeader />
       <MobileMenu />
       <SideNavs />
-      <main className="rbt-main-wrapper" style={{ backgroundColor: '#09090b', minHeight: '85vh', padding: '60px 0', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-        <div className="container">
+      <main className="rbt-main-wrapper" style={{
+        minHeight: '85vh',
+        padding: '60px 0',
+        color: '#18181b',
+        fontFamily: 'Inter, sans-serif',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%)'
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(254, 208, 0, 0.18) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-15%',
+          right: '-10%',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(19, 108, 57, 0.25) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          top: '40%',
+          right: '20%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(235, 127, 35, 0.12) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '30%',
+          left: '15%',
+          width: '250px',
+          height: '250px',
+          background: 'radial-gradient(circle, rgba(254, 208, 0, 0.10) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           
           {/* Mobile User Header (Avatar + Name) */}
           <div className="d-block d-md-none" style={{
-            background: 'rgba(15, 15, 20, 0.7)',
+            background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '14px',
             padding: '16px',
-            marginBottom: '16px'
+            marginBottom: '16px',
+            boxShadow: '0 12px 35px rgba(11, 37, 69, 0.18)',
+            color: '#18181b'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
-                width: '44px',
-                height: '44px',
+                width: '48px',
+                height: '48px',
                 borderRadius: '50%',
-                backgroundColor: '#10b981',
+                background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
                 color: '#fff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '18px',
-                fontWeight: '700'
+                fontSize: '19px',
+                fontWeight: '700',
+                boxShadow: '0 6px 16px rgba(19, 108, 57, 0.3)',
+                border: '2px solid rgba(254, 208, 0, 0.3)'
               }}>
                 {customer.first_name?.[0]?.toUpperCase() || customer.email[0].toUpperCase()}
               </div>
               <div>
-                <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#f4f4f5', margin: 0 }}>
+                <h4 style={{
+                  fontSize: '15px',
+                  fontWeight: '800',
+                  margin: 0,
+                  background: 'linear-gradient(135deg, #0b2545 0%, #136c39 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
                   {customer.first_name} {customer.last_name}
                 </h4>
                 <p style={{ color: '#71717a', fontSize: '11px', margin: 0 }}>{customer.email}</p>
@@ -376,8 +469,8 @@ export default function ProfilePage() {
               onClick={() => setActiveTab('profile')}
               className="mobile-tab-btn"
               style={{
-                background: activeTab === 'profile' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeTab === 'profile' ? '#10b981' : '#a1a1aa'
+                background: activeTab === 'profile' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
+                color: activeTab === 'profile' ? '#136c39' : '#71717a'
               }}
             >
               <i className="fa-regular fa-user" style={{ marginRight: '6px' }}></i> Profile
@@ -386,8 +479,8 @@ export default function ProfilePage() {
               onClick={() => setActiveTab('addresses')}
               className="mobile-tab-btn"
               style={{
-                background: activeTab === 'addresses' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeTab === 'addresses' ? '#10b981' : '#a1a1aa'
+                background: activeTab === 'addresses' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
+                color: activeTab === 'addresses' ? '#136c39' : '#71717a'
               }}
             >
               <i className="fa-regular fa-location-dot" style={{ marginRight: '6px' }}></i> Addresses
@@ -396,8 +489,8 @@ export default function ProfilePage() {
               onClick={() => setActiveTab('password')}
               className="mobile-tab-btn"
               style={{
-                background: activeTab === 'password' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeTab === 'password' ? '#10b981' : '#a1a1aa'
+                background: activeTab === 'password' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
+                color: activeTab === 'password' ? '#136c39' : '#71717a'
               }}
             >
               <i className="fa-regular fa-lock" style={{ marginRight: '6px' }}></i> Password
@@ -406,8 +499,8 @@ export default function ProfilePage() {
               onClick={() => setActiveTab('orders')}
               className="mobile-tab-btn"
               style={{
-                background: activeTab === 'orders' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeTab === 'orders' ? '#10b981' : '#a1a1aa'
+                background: activeTab === 'orders' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
+                color: activeTab === 'orders' ? '#136c39' : '#71717a'
               }}
             >
               <i className="fa-regular fa-bag-shopping" style={{ marginRight: '6px' }}></i> Orders
@@ -427,30 +520,42 @@ export default function ProfilePage() {
             {/* Sidebar Navigation */}
             <div className="col-lg-3 col-md-4 mb--30 desktop-sidebar">
               <div style={{
-                background: 'rgba(15, 15, 20, 0.7)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                borderRadius: '18px',
                 padding: '24px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                boxShadow: '0 20px 50px rgba(11, 37, 69, 0.2), 0 0 0 1px rgba(254, 208, 0, 0.08)',
+                color: '#18181b'
               }}>
                 <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                   <div style={{
-                    width: '64px',
-                    height: '64px',
+                    width: '72px',
+                    height: '72px',
                     borderRadius: '50%',
-                    backgroundColor: '#10b981',
+                    background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
                     color: '#fff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '24px',
+                    fontSize: '26px',
                     fontWeight: '700',
-                    margin: '0 auto 12px auto'
+                    margin: '0 auto 14px auto',
+                    boxShadow: '0 8px 20px rgba(19, 108, 57, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    border: '2px solid rgba(254, 208, 0, 0.3)'
                   }}>
                     {customer.first_name?.[0]?.toUpperCase() || customer.email[0].toUpperCase()}
                   </div>
-                  <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#f4f4f5', margin: '0 0 4px 0' }}>
+                  <h4 style={{
+                    fontSize: '17px',
+                    fontWeight: '800',
+                    margin: '0 0 4px 0',
+                    background: 'linear-gradient(135deg, #0b2545 0%, #136c39 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
                     {customer.first_name} {customer.last_name}
                   </h4>
                   <p style={{ color: '#71717a', fontSize: '12px', margin: 0 }}>{customer.email}</p>
@@ -463,9 +568,9 @@ export default function ProfilePage() {
                       textAlign: 'left',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      background: activeTab === 'profile' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                      background: activeTab === 'profile' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
                       border: 'none',
-                      color: activeTab === 'profile' ? '#10b981' : '#a1a1aa',
+                      color: activeTab === 'profile' ? '#136c39' : '#71717a',
                       fontWeight: activeTab === 'profile' ? '600' : '500',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
@@ -480,9 +585,9 @@ export default function ProfilePage() {
                       textAlign: 'left',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      background: activeTab === 'addresses' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                      background: activeTab === 'addresses' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
                       border: 'none',
-                      color: activeTab === 'addresses' ? '#10b981' : '#a1a1aa',
+                      color: activeTab === 'addresses' ? '#136c39' : '#71717a',
                       fontWeight: activeTab === 'addresses' ? '600' : '500',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
@@ -497,9 +602,9 @@ export default function ProfilePage() {
                       textAlign: 'left',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      background: activeTab === 'password' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                      background: activeTab === 'password' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
                       border: 'none',
-                      color: activeTab === 'password' ? '#10b981' : '#a1a1aa',
+                      color: activeTab === 'password' ? '#136c39' : '#71717a',
                       fontWeight: activeTab === 'password' ? '600' : '500',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
@@ -514,9 +619,9 @@ export default function ProfilePage() {
                       textAlign: 'left',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      background: activeTab === 'orders' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                      background: activeTab === 'orders' ? 'rgba(19, 108, 57, 0.08)' : 'transparent',
                       border: 'none',
-                      color: activeTab === 'orders' ? '#10b981' : '#a1a1aa',
+                      color: activeTab === 'orders' ? '#136c39' : '#71717a',
                       fontWeight: activeTab === 'orders' ? '600' : '500',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
@@ -525,7 +630,7 @@ export default function ProfilePage() {
                   >
                     <i className="fa-regular fa-bag-shopping" style={{ marginRight: '10px' }}></i> My Orders
                   </button>
-                  <hr style={{ borderColor: 'rgba(255,255,255,0.08)', margin: '12px 0' }} />
+                  <hr style={{ borderColor: '#e4e4e7', margin: '12px 0' }} />
                   <button
                     onClick={handleLogout}
                     style={{
@@ -550,28 +655,38 @@ export default function ProfilePage() {
             {/* Dashboard Content */}
             <div className="col-lg-9 col-md-8">
               <div style={{
-                background: 'rgba(15, 15, 20, 0.7)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(255, 255, 255, 0.96)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                borderRadius: '20px',
                 padding: '30px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                minHeight: '400px'
+                boxShadow: '0 20px 55px rgba(11, 37, 69, 0.18), 0 0 0 1px rgba(254, 208, 0, 0.06)',
+                minHeight: '400px',
+                color: '#18181b'
               }}>
                 
                 {/* 1. PROFILE DETAILS TAB */}
                 {activeTab === 'profile' && (
                   <div>
-                    <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '6px', color: '#f4f4f5' }}>Profile Details</h3>
+                    <h3 style={{
+                      fontSize: '22px',
+                      fontWeight: '800',
+                      marginBottom: '6px',
+                      background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>Profile Details</h3>
                     <p style={{ color: '#71717a', fontSize: '13px', marginBottom: '24px' }}>Keep your account profile and contact details up to date</p>
 
                     {updateSuccess && (
-                      <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
+                      <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
                         Profile updated successfully!
                       </div>
                     )}
                     {authError && (
-                      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', color: '#f87171', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
+                      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
                         {authError}
                       </div>
                     )}
@@ -579,36 +694,36 @@ export default function ProfilePage() {
                     <form onSubmit={handleProfileUpdateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '500px' }}>
                       <div className="profile-form-grid">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>First Name</label>
+                          <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>First Name</label>
                           <input
                             type="text"
                             required
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
                             style={{
-                              backgroundColor: '#18181b',
-                              border: '1px solid rgba(255,255,255,0.08)',
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #d1d5db',
                               borderRadius: '8px',
                               padding: '10px 12px',
-                              color: '#fff',
+                              color: '#1f2937',
                               fontSize: '14px',
                               outline: 'none'
                             }}
                           />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Last Name</label>
+                          <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Last Name</label>
                           <input
                             type="text"
                             required
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             style={{
-                              backgroundColor: '#18181b',
-                              border: '1px solid rgba(255,255,255,0.08)',
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #d1d5db',
                               borderRadius: '8px',
                               padding: '10px 12px',
-                              color: '#fff',
+                              color: '#1f2937',
                               fontSize: '14px',
                               outline: 'none'
                             }}
@@ -617,14 +732,14 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Email Address (read-only)</label>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Email Address (read-only)</label>
                         <input
                           type="email"
                           disabled
                           value={customer.email}
                           style={{
-                            backgroundColor: '#09090b',
-                            border: '1px solid rgba(255,255,255,0.04)',
+                            backgroundColor: '#f3f4f6',
+                            border: '1px solid #e5e7eb',
                             borderRadius: '8px',
                             padding: '10px 12px',
                             color: '#71717a',
@@ -635,18 +750,18 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Phone Number</label>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Phone Number</label>
                         <input
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+91 99999 99999"
                           style={{
-                            backgroundColor: '#18181b',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #d1d5db',
                             borderRadius: '8px',
                             padding: '10px 12px',
-                            color: '#fff',
+                            color: '#1f2937',
                             fontSize: '14px',
                             outline: 'none'
                           }}
@@ -657,7 +772,7 @@ export default function ProfilePage() {
                         type="submit"
                         disabled={updating}
                         style={{
-                          backgroundColor: '#10b981',
+                          backgroundColor: '#136c39',
                           color: '#fff',
                           border: 'none',
                           borderRadius: '8px',
@@ -681,14 +796,22 @@ export default function ProfilePage() {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                       <div>
-                        <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '6px', color: '#f4f4f5' }}>Saved Addresses</h3>
+                        <h3 style={{
+                          fontSize: '22px',
+                          fontWeight: '800',
+                          marginBottom: '6px',
+                          background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        }}>Saved Addresses</h3>
                         <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>Manage your shipping addresses for faster checkout</p>
                       </div>
                       {!isAddressFormOpen && (
                         <button
                           onClick={openAddAddress}
                           style={{
-                            backgroundColor: '#10b981',
+                            backgroundColor: '#136c39',
                             color: '#fff',
                             border: 'none',
                             borderRadius: '8px',
@@ -706,23 +829,23 @@ export default function ProfilePage() {
                     {isAddressFormOpen ? (
                       /* Add/Edit Address Form */
                       <div style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        backgroundColor: '#f9fafb',
+                        border: '1px solid #e5e7eb',
                         borderRadius: '12px',
                         padding: '24px',
                         marginBottom: '20px'
                       }}>
-                        <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#e4e4e7', marginBottom: '20px' }}>
+                        <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#18181b', marginBottom: '20px' }}>
                           {editingAddressId ? 'Edit Address' : 'New Shipping Address'}
                         </h4>
 
                         {addressError && (
-                          <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', color: '#f87171', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
+                          <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
                             {addressError}
                           </div>
                         )}
                         {addressSuccess && (
-                          <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
+                          <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
                             Address saved successfully!
                           </div>
                         )}
@@ -730,55 +853,55 @@ export default function ProfilePage() {
                         <form onSubmit={handleSaveAddressSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <div className="profile-form-grid">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>First Name *</label>
-                              <input type="text" required value={addrFirstName} onChange={(e) => setAddrFirstName(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>First Name *</label>
+                              <input type="text" required value={addrFirstName} onChange={(e) => setAddrFirstName(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Last Name *</label>
-                              <input type="text" required value={addrLastName} onChange={(e) => setAddrLastName(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Last Name *</label>
+                              <input type="text" required value={addrLastName} onChange={(e) => setAddrLastName(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                           </div>
 
                           <div className="profile-form-grid">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Company / College (Optional)</label>
-                              <input type="text" value={addrCompany} onChange={(e) => setAddrCompany(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Company / College (Optional)</label>
+                              <input type="text" value={addrCompany} onChange={(e) => setAddrCompany(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Phone Number *</label>
-                              <input type="tel" required value={addrPhone} onChange={(e) => setAddrPhone(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Phone Number *</label>
+                              <input type="tel" required value={addrPhone} onChange={(e) => setAddrPhone(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Address Line 1 *</label>
-                            <input type="text" required value={addr1} onChange={(e) => setAddr1(e.target.value)} placeholder="Hostel/Room No, Street Name" style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                            <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Address Line 1 *</label>
+                            <input type="text" required value={addr1} onChange={(e) => setAddr1(e.target.value)} placeholder="Hostel/Room No, Street Name" style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Address Line 2 (Optional)</label>
-                            <input type="text" value={addr2} onChange={(e) => setAddr2(e.target.value)} placeholder="Landmark, Area" style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                            <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Address Line 2 (Optional)</label>
+                            <input type="text" value={addr2} onChange={(e) => setAddr2(e.target.value)} placeholder="Landmark, Area" style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                           </div>
 
                           <div className="profile-form-grid">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>City *</label>
-                              <input type="text" required value={addrCity} onChange={(e) => setAddrCity(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>City *</label>
+                              <input type="text" required value={addrCity} onChange={(e) => setAddrCity(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Province / State *</label>
-                              <input type="text" required value={addrProvince} onChange={(e) => setAddrProvince(e.target.value)} placeholder="e.g. Maharashtra" style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Province / State *</label>
+                              <input type="text" required value={addrProvince} onChange={(e) => setAddrProvince(e.target.value)} placeholder="e.g. Maharashtra" style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                           </div>
 
                           <div className="profile-form-grid">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>PIN / Postal Code *</label>
-                              <input type="text" required value={addrPostalCode} onChange={(e) => setAddrPostalCode(e.target.value)} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>PIN / Postal Code *</label>
+                              <input type="text" required value={addrPostalCode} onChange={(e) => setAddrPostalCode(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#a1a1aa' }}>Country ISO Code *</label>
-                              <input type="text" required value={addrCountryCode} onChange={(e) => setAddrCountryCode(e.target.value)} placeholder="in" maxLength={2} style={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '13px' }} />
+                              <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563' }}>Country ISO Code *</label>
+                              <input type="text" required value={addrCountryCode} onChange={(e) => setAddrCountryCode(e.target.value)} placeholder="in" maxLength={2} style={{ backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px', color: '#1f2937', fontSize: '13px' }} />
                             </div>
                           </div>
 
@@ -787,7 +910,7 @@ export default function ProfilePage() {
                               type="submit"
                               disabled={addressLoading}
                               style={{
-                                backgroundColor: '#10b981',
+                                backgroundColor: '#136c39',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '8px',
@@ -803,8 +926,8 @@ export default function ProfilePage() {
                               type="button"
                               onClick={() => { setIsAddressFormOpen(false); setEditingAddressId(null); }}
                               style={{
-                                backgroundColor: 'rgba(255,255,255,0.08)',
-                                color: '#a1a1aa',
+                                backgroundColor: '#f3f4f6',
+                                color: '#71717a',
                                 border: 'none',
                                 borderRadius: '8px',
                                 padding: '10px 20px',
@@ -822,8 +945,8 @@ export default function ProfilePage() {
                       <div style={{
                         padding: '40px 20px',
                         textAlign: 'center',
-                        backgroundColor: '#18181b/30',
-                        border: '1px dashed rgba(255,255,255,0.08)',
+                        backgroundColor: '#f9fafb',
+                        border: '1px dashed #e4e4e7',
                         borderRadius: '12px',
                         color: '#71717a'
                       }}>
@@ -836,8 +959,8 @@ export default function ProfilePage() {
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                         {addresses.map((addr: any) => (
                           <div key={addr.id} style={{
-                            backgroundColor: 'rgba(255,255,255,0.02)',
-                            border: '1px solid rgba(255,255,255,0.06)',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #e4e4e7',
                             borderRadius: '12px',
                             padding: '20px',
                             display: 'flex',
@@ -846,19 +969,19 @@ export default function ProfilePage() {
                             gap: '16px'
                           }}>
                             <div>
-                              <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#f4f4f5', margin: '0 0 6px 0' }}>
+                              <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#18181b', margin: '0 0 6px 0' }}>
                                 {addr.first_name} {addr.last_name}
                               </h4>
                               {addr.company && (
-                                <span style={{ fontSize: '12px', color: '#10b981', display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                <span style={{ fontSize: '12px', color: '#136c39', display: 'block', marginBottom: '8px', fontWeight: '600' }}>
                                   {addr.company}
                                 </span>
                               )}
-                              <p style={{ fontSize: '13px', color: '#a1a1aa', margin: '0 0 4px 0', lineHeight: '1.4' }}>
+                              <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 4px 0', lineHeight: '1.4' }}>
                                 {addr.address_1}
                                 {addr.address_2 ? `, ${addr.address_2}` : ''}
                               </p>
-                              <p style={{ fontSize: '13px', color: '#a1a1aa', margin: '0 0 10px 0' }}>
+                              <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 10px 0' }}>
                                 {addr.city}, {addr.province} - {addr.postal_code}
                               </p>
                               {addr.phone && (
@@ -868,13 +991,13 @@ export default function ProfilePage() {
                               )}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '12px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+                            <div style={{ display: 'flex', gap: '12px', borderTop: '1px solid #e4e4e7', paddingTop: '12px' }}>
                               <button
                                 onClick={() => openEditAddress(addr)}
                                 style={{
                                   background: 'none',
                                   border: 'none',
-                                  color: '#10b981',
+                                  color: '#136c39',
                                   fontSize: '12px',
                                   fontWeight: '600',
                                   cursor: 'pointer',
@@ -908,23 +1031,31 @@ export default function ProfilePage() {
                 {/* 3. CHANGE PASSWORD TAB */}
                 {activeTab === 'password' && (
                   <div>
-                    <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '6px', color: '#f4f4f5' }}>Change Password</h3>
+                    <h3 style={{
+                      fontSize: '22px',
+                      fontWeight: '800',
+                      marginBottom: '6px',
+                      background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>Change Password</h3>
                     <p style={{ color: '#71717a', fontSize: '13px', marginBottom: '24px' }}>Update your account password to ensure security</p>
 
                     {passSuccess && (
-                      <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
+                      <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
                         Password updated successfully!
                       </div>
                     )}
                     {passError && (
-                      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', color: '#f87171', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
+                      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', marginBottom: '20px' }}>
                         {passError}
                       </div>
                     )}
 
                     <form onSubmit={handleChangePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Current Password</label>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Current Password</label>
                         <input
                           type="password"
                           required
@@ -932,11 +1063,11 @@ export default function ProfilePage() {
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           placeholder="••••••••"
                           style={{
-                            backgroundColor: '#18181b',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #d1d5db',
                             borderRadius: '8px',
                             padding: '10px 12px',
-                            color: '#fff',
+                            color: '#1f2937',
                             fontSize: '14px',
                             outline: 'none'
                           }}
@@ -944,7 +1075,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>New Password</label>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>New Password</label>
                         <input
                           type="password"
                           required
@@ -952,11 +1083,11 @@ export default function ProfilePage() {
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="Min 6 characters"
                           style={{
-                            backgroundColor: '#18181b',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #d1d5db',
                             borderRadius: '8px',
                             padding: '10px 12px',
-                            color: '#fff',
+                            color: '#1f2937',
                             fontSize: '14px',
                             outline: 'none'
                           }}
@@ -964,7 +1095,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#a1a1aa' }}>Confirm New Password</label>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Confirm New Password</label>
                         <input
                           type="password"
                           required
@@ -972,11 +1103,11 @@ export default function ProfilePage() {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="••••••••"
                           style={{
-                            backgroundColor: '#18181b',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #d1d5db',
                             borderRadius: '8px',
                             padding: '10px 12px',
-                            color: '#fff',
+                            color: '#1f2937',
                             fontSize: '14px',
                             outline: 'none'
                           }}
@@ -987,7 +1118,7 @@ export default function ProfilePage() {
                         type="submit"
                         disabled={passLoading}
                         style={{
-                          backgroundColor: '#10b981',
+                          backgroundColor: '#136c39',
                           color: '#fff',
                           border: 'none',
                           borderRadius: '8px',
@@ -1009,7 +1140,15 @@ export default function ProfilePage() {
                 {/* 4. ORDER HISTORY TAB */}
                 {activeTab === 'orders' && (
                   <div>
-                    <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '6px', color: '#f4f4f5' }}>Order History</h3>
+                    <h3 style={{
+                      fontSize: '22px',
+                      fontWeight: '800',
+                      marginBottom: '6px',
+                      background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #eb7f23 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>Order History</h3>
                     <p style={{ color: '#71717a', fontSize: '13px', marginBottom: '24px' }}>View all your past orders and project purchases</p>
 
                     {ordersLoading ? (
@@ -1021,8 +1160,8 @@ export default function ProfilePage() {
                       <div style={{
                         padding: '40px 20px',
                         textAlign: 'center',
-                        backgroundColor: '#18181b/30',
-                        border: '1px dashed rgba(255,255,255,0.08)',
+                        backgroundColor: '#f9fafb',
+                        border: '1px dashed #e4e4e7',
                         borderRadius: '12px',
                         color: '#71717a'
                       }}>
@@ -1036,27 +1175,33 @@ export default function ProfilePage() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {orders.map((order) => {
-                          const statusColor = order.status === 'completed' ? '#34d399' : '#f59e0b';
+                          const mapStatus = (fulfillment: string, payment: string): string => {
+                            if (fulfillment === "fulfilled" || fulfillment === "shipped") return "Shipped"
+                            if (fulfillment === "partially_fulfilled" || payment === "captured" || payment === "paid") return "Processing"
+                            return "Pending"
+                          }
+                          const mappedStatus = mapStatus(order.fulfillment_status, order.payment_status);
+                          const statusColor = mappedStatus === 'Shipped' ? '#10b981' : (mappedStatus === 'Processing' ? '#eb7f23' : '#f59e0b');
                           return (
                             <div key={order.id} style={{
-                              backgroundColor: '#18181b/40',
-                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              backgroundColor: '#f9fafb',
+                              border: '1px solid #e4e4e7',
                               borderRadius: '12px',
                               padding: '20px',
                               display: 'flex',
                               flexDirection: 'column',
                               gap: '12px'
                             }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e4e4e7', paddingBottom: '12px' }}>
                                 <div>
                                   <span style={{ fontSize: '12px', color: '#71717a', display: 'block' }}>Order ID</span>
-                                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#f4f4f5', fontFamily: 'monospace' }}>
+                                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#18181b', fontFamily: 'monospace' }}>
                                     {order.display_id ? `#${order.display_id}` : order.id.substring(0, 12)}
                                   </span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                   <span style={{ fontSize: '12px', color: '#71717a', display: 'block' }}>Placed On</span>
-                                  <span style={{ fontSize: '13px', color: '#e4e4e7' }}>{new Date(order.created_at).toLocaleDateString()}</span>
+                                  <span style={{ fontSize: '13px', color: '#4b5563' }}>{new Date(order.created_at).toLocaleDateString()}</span>
                                 </div>
                               </div>
 
@@ -1065,7 +1210,7 @@ export default function ProfilePage() {
                                   <span style={{ fontSize: '12px', color: '#71717a', display: 'block', marginBottom: '4px' }}>Items</span>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                     {order.items?.map((item: any) => (
-                                      <span key={item.id} style={{ fontSize: '13px', color: '#e4e4e7' }}>
+                                      <span key={item.id} style={{ fontSize: '13px', color: '#1f2937' }}>
                                         {item.quantity}x {item.title} {item.variant_title ? `(${item.variant_title})` : ''}
                                       </span>
                                     ))}
@@ -1073,7 +1218,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                   <span style={{ fontSize: '12px', color: '#71717a', display: 'block' }}>Total</span>
-                                  <span style={{ fontSize: '16px', fontWeight: '800', color: '#10b981' }}>{formatPrice(order.total, order.currency_code)}</span>
+                                  <span style={{ fontSize: '16px', fontWeight: '800', color: '#136c39' }}>{formatPrice(order.total, order.currency_code)}</span>
                                   <span style={{
                                     display: 'inline-block',
                                     fontSize: '10px',
@@ -1085,8 +1230,21 @@ export default function ProfilePage() {
                                     border: `1px solid ${statusColor}30`,
                                     marginTop: '6px'
                                   }}>
-                                    {order.status?.toUpperCase()}
+                                    {mappedStatus.toUpperCase()}
                                   </span>
+                                  {mappedStatus === 'Shipped' && (
+                                    <span style={{
+                                      display: 'block',
+                                      fontSize: '11px',
+                                      color: '#71717a',
+                                      marginTop: '6px',
+                                      fontStyle: 'italic',
+                                      maxWidth: '220px',
+                                      lineHeight: '1.4'
+                                    }}>
+                                      From here you will receive product status from the courier service
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>

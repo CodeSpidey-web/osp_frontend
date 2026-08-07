@@ -152,7 +152,7 @@ const ShopContent = () => {
             v.prices?.map((p: any) => p.amount) || []
         ) || [];
         if (amounts.length === 0) return { min: 0, max: 0 };
-        return { min: Math.min(...amounts) / 100, max: Math.max(...amounts) / 100 };
+        return { min: Math.min(...amounts), max: Math.max(...amounts) };
     };
 
     const displayedProducts = products.filter(p => {
@@ -411,7 +411,7 @@ const ShopPage = () => {
             <div className="rbt-preloader" style={{ position: 'relative', height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="rbt-preloader-inner">
                     <div className="preloader-text">
-                        <p className="preloader-msg">Loading Shop...</p>
+                        <p className="preloader-msg">Loading Educational Kits...</p>
                     </div>
                 </div>
             </div>

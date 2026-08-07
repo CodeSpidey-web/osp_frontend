@@ -104,6 +104,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, first_name, last_name })
       })
 
+      // 2b. Dispatch welcome email with raw password
+      await fetchApi('/store/customer-welcome-email', {
+        method: 'POST',
+        body: JSON.stringify({ email, first_name, password })
+      }).catch((err) => {
+        console.warn("Failed to trigger registration greeting email:", err);
+      });
+
       // 3. Log in again to get session token with actor_id
       const loginRes = await fetchApi<{ token: string }>('/auth/customer/emailpass', {
         method: 'POST',
@@ -121,7 +129,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Failed to authenticate after registration")
     } catch (err: any) {
       console.error("Registration failed:", err)
-      setError("Registration failed. Email may already be in use or format is invalid.")
+      if (err.message?.includes("401")) {
+        setError("This email address is already registered. If you have placed an order before, please try logging in or resetting your password.")
+      } else {
+        setError("Registration failed. Email may already be in use or format is invalid.")
+      }
       localStorage.removeItem('medusa_auth_token')
       setToken(null)
       setCustomer(null)
