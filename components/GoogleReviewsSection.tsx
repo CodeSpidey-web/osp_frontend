@@ -45,7 +45,7 @@ export default function GoogleReviewsSection() {
         {/* Elfsight Google Reviews Widget */}
         {isInView ? (
           <div 
-            className="elfsight-app-a92c4b10-c673-415e-994e-34521f4eb825" 
+            className="elfsight-app-49b78c59-895e-496f-bff3-22ff29d0cee1" 
             data-elfsight-app-lazy 
           />
         ) : (
