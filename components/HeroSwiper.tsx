@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 const HERO_IMAGES = [
   { id: 1, src: "/assets/images/hero/1.jpg", alt: "Hero Banner 1" },
@@ -64,15 +65,20 @@ export default function HeroSwiper() {
         className="flex transition-transform duration-700 ease-out w-full"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {HERO_IMAGES.map((img) => (
+        {HERO_IMAGES.map((img, index) => (
           <div
             key={img.id}
             className="w-full shrink-0 relative overflow-hidden"
           >
-            <img
+            <Image
               src={img.src}
               alt={img.alt}
+              width={1920}
+              height={600}
+              priority={index === 0}
+              loading={index === 0 ? undefined : "lazy"}
               className="w-full h-auto block"
+              sizes="100vw"
             />
           </div>
         ))}

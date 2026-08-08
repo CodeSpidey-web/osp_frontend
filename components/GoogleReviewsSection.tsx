@@ -1,9 +1,34 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function GoogleReviewsSection() {
+  const [isInView, setIsInView] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isInView) return;
+
     const scriptId = "elfsight-platform-script";
     if (!document.getElementById(scriptId)) {
       const script = document.createElement("script");
@@ -12,16 +37,22 @@ export default function GoogleReviewsSection() {
       script.async = true;
       document.body.appendChild(script);
     }
-  }, []);
+  }, [isInView]);
 
   return (
-    <section className="py-12 bg-slate-50/70 text-slate-800 font-sans">
+    <section ref={sectionRef} className="py-12 bg-slate-50/70 text-slate-800 font-sans min-h-[300px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Elfsight Google Reviews Widget */}
-        <div 
-          className="elfsight-app-a92c4b10-c673-415e-994e-34521f4eb825" 
-          data-elfsight-app-lazy 
-        />
+        {isInView ? (
+          <div 
+            className="elfsight-app-a92c4b10-c673-415e-994e-34521f4eb825" 
+            data-elfsight-app-lazy 
+          />
+        ) : (
+          <div className="flex items-center justify-center py-12" style={{ minHeight: "150px" }}>
+            <span className="text-muted small">Loading reviews...</span>
+          </div>
+        )}
       </div>
     </section>
   );

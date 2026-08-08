@@ -295,7 +295,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-7.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Action Camera</a></h2>
@@ -310,7 +310,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-8.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Camera lenses</a></h2>
@@ -325,7 +325,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-9.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Digital Camera</a></h2>
@@ -340,7 +340,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-10.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">DSLR</a></h2>
@@ -355,7 +355,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-11.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Handycam</a></h2>
@@ -370,7 +370,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-12.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Mirrorless Camera</a></h2>
@@ -386,7 +386,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-13.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Dash Cam</a></h2>
@@ -401,7 +401,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-14.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Video Camera</a></h2>
@@ -416,7 +416,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-15.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Instant Camera</a></h2>
@@ -432,7 +432,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-16.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Camera Accessories</a></h2>
@@ -447,7 +447,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-17.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Camera Tripod</a></h2>
@@ -464,7 +464,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Camera Accessories
@@ -493,7 +493,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-1.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Fitness Tracker</a></h2>
@@ -508,7 +508,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-2.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Bluetooth</a></h2>
@@ -523,7 +523,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-3.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Hybrid</a></h2>
@@ -538,7 +538,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-4.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Regular</a></h2>
@@ -553,7 +553,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-5.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Touchscreen</a></h2>
@@ -570,7 +570,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Starting From <span
@@ -598,7 +598,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-18.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">QLED TV</a></h2>
@@ -617,7 +617,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-19.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Smart TV</a></h2>
@@ -636,7 +636,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-20.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">UHD TV</a></h2>
@@ -655,7 +655,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-21.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">HD TV</a></h2>
@@ -674,7 +674,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-22.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">LED TV</a></h2>
@@ -693,7 +693,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-23.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">4K TV</a></h2>
@@ -714,7 +714,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Starting From <span
@@ -742,7 +742,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-24.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Gaming Keyboard</a></h2>
@@ -757,7 +757,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-25.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Gaming Headset</a></h2>
@@ -772,7 +772,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-26.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Gaming Chair</a></h2>
@@ -787,7 +787,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-27.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Mouse Pads</a></h2>
@@ -802,7 +802,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-28.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Joystick</a></h2>
@@ -817,7 +817,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-29.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">VR headset</a></h2>
@@ -832,7 +832,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-30.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">PlayStation Acce...</a></h2>
@@ -847,7 +847,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-31.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Gaming Desk</a></h2>
@@ -862,7 +862,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-32.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Gaming Sofa</a></h2>
@@ -879,7 +879,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Starting From <span
@@ -907,7 +907,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-33.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Bluetooth Headphone</a></h2>
@@ -922,7 +922,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-34.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Headphone Stand</a></h2>
@@ -937,7 +937,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-35.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Home Theater</a></h2>
@@ -952,7 +952,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-36.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Bluetooth Speaker</a></h2>
@@ -967,7 +967,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-37.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Soundbar</a></h2>
@@ -982,7 +982,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-38.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Microphone</a></h2>
@@ -997,7 +997,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-39.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Voice Recorder</a></h2>
@@ -1012,7 +1012,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-40.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Sound Card</a></h2>
@@ -1029,7 +1029,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Starting From <span
@@ -1055,7 +1055,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-41.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Air Conditioner</a></h2>
@@ -1070,7 +1070,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-42.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Geyser</a></h2>
@@ -1085,7 +1085,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-43.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Oven</a></h2>
@@ -1100,7 +1100,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-44.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Air Fryer</a></h2>
@@ -1115,7 +1115,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-45.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Washing Machine</a></h2>
@@ -1130,7 +1130,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-46.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Sewing Machine</a></h2>
@@ -1145,7 +1145,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-47.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Air Purifier</a></h2>
@@ -1160,7 +1160,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-48.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Vacuum Cleaner</a></h2>
@@ -1175,7 +1175,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-49.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Blender</a></h2>
@@ -1190,7 +1190,7 @@ export default function SideNavs() {
                                         <div className="rbt-sub-category-product">
                                             <a href="#" className="rbt-sidebar-category-img">
                                                 <img src="/assets/images/product-img/sidebar-category/category-product-50.webp"
-                                                    alt="Product Image" />
+                                                    alt="Product Image" loading="lazy" />
                                             </a>
                                             <h2 className="rbt-category-offcanvas-header h5"><a
                                                     href="shop-by-categories.html">Cooker</a></h2>
@@ -1237,7 +1237,7 @@ export default function SideNavs() {
                                     <div className="rbt-sidebar-banner">
                                         <div className="rbt-banner-img">
                                             <img src="/assets/images/product-img/sidebar-category/product-banner.webp"
-                                                alt="Banner Image" />
+                                                alt="Banner Image" loading="lazy" />
                                         </div>
                                         <div className="rbt-sidebar-banner-content">
                                             <p className="rbt-sidebar-banner-text">Starting From <span
@@ -1549,7 +1549,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-1.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1591,7 +1591,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-2.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1633,7 +1633,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-3.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1676,7 +1676,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-4.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1718,7 +1718,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-5.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1761,7 +1761,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-6.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1804,7 +1804,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-7.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1846,7 +1846,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-8.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">
@@ -1889,7 +1889,7 @@ export default function SideNavs() {
                                         <div className="rbt-card-img">
                                             <a href="shop-by-categories.html">
                                                 <img src="/assets/images/offer-list/offer-card-image-9.webp"
-                                                    alt="Offer Thumbnail" />
+                                                    alt="Offer Thumbnail" loading="lazy" />
                                             </a>
                                         </div>
                                         <div className="rbt-card-body">

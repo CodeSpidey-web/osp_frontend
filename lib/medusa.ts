@@ -1,42 +1,188 @@
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000'
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || 'pk_abd8e27126ac664d0d8042bea1fc954747cfdc4ad40a24974833f10a727a1211'
 
+// Memory cache for client-side API requests
+const clientCache = new Map<string, { data: any; timestamp: number }>();
+const clientInFlight = new Map<string, Promise<any>>();
+
+const CACHE_TTLS: Record<string, number> = {
+  '/store/product-categories': 5 * 60 * 1000, // 5 min
+  '/store/category-product-counts': 5 * 60 * 1000, // 5 min
+  '/store/client-settings': 5 * 60 * 1000, // 5 min
+  '/store/regions': 10 * 60 * 1000, // 10 min
+  '/store/reviews': 10 * 60 * 1000, // 10 min
+};
+
+function getCacheKey(path: string, options?: RequestInit): string {
+  const method = options?.method || 'GET';
+  const headers = options?.headers as Record<string, string> || {};
+  
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('medusa_auth_token') || '' : '';
+  const cartId = typeof window !== 'undefined' ? localStorage.getItem('medusa_cart_id') || '' : '';
+  
+  const publishableKey = headers['x-publishable-api-key'] || '';
+  const authorization = headers['Authorization'] || '';
+  
+  const body = options?.body ? `|body:${options.body}` : '';
+  
+  return `${method}:${path}|auth:${authToken}|cart:${cartId}|pubKey:${publishableKey}|authHeader:${authorization}${body}`;
+}
+
+function isCacheable(path: string, options?: RequestInit): boolean {
+  const method = options?.method || 'GET';
+  if (method !== 'GET') return false;
+
+  // STRICT RULE: Never cache authenticated, cart, checkout, or user-specific data
+  if (path.includes('/store/customers/') || 
+      path.includes('/store/carts') || 
+      path.includes('/store/orders') || 
+      path.includes('/auth/')) {
+    return false;
+  }
+
+  // Do not cache products or collections on client (prevent stale pricing/pricing context issues)
+  if (path.includes('/store/products') || path.includes('/store/collections')) {
+    return false;
+  }
+
+  return Object.keys(CACHE_TTLS).some(prefix => path.startsWith(prefix));
+}
+
+function isDeduplicatable(path: string, options?: RequestInit): boolean {
+  const method = options?.method || 'GET';
+  if (method !== 'GET') return false;
+
+  // Never deduplicate mutations or user-sensitive actions (auth, cart changes, etc.)
+  if (path.includes('/auth/') || 
+      path.includes('/store/customers/me/cart') ||
+      path.includes('/store/carts/') ||
+      path.includes('/store/customers/me/addresses') ||
+      path.includes('/auth/customer/emailpass/update') ||
+      path.includes('/auth/customer/emailpass/reset-password')) {
+    return false;
+  }
+
+  return true;
+}
+
 export async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('medusa_auth_token') : null
+  const isServer = typeof window === 'undefined';
+  const token = !isServer ? localStorage.getItem('medusa_auth_token') : null;
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'x-publishable-api-key': PUBLISHABLE_API_KEY,
     'ngrok-skip-browser-warning': 'true',
-  }
+  };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   if (options?.headers) {
-    // Merge extra headers safely
-    const extraHeaders = options.headers as Record<string, string>
+    const extraHeaders = options.headers as Record<string, string>;
     Object.keys(extraHeaders).forEach((key) => {
-      headers[key] = extraHeaders[key]
-    })
+      headers[key] = extraHeaders[key];
+    });
   }
 
+  const fetchOptions: RequestInit = { ...options, headers };
+
+  if (isServer) {
+    // Server-side environment: Next.js revalidation for static public data
+    const cacheablePrefixes = [
+      '/store/product-categories',
+      '/store/category-product-counts',
+      '/store/client-settings',
+      '/store/regions',
+      '/store/reviews'
+    ];
+    const isServerCacheable = cacheablePrefixes.some(prefix => path.startsWith(prefix));
+
+    if (isServerCacheable) {
+      // 5 minutes (300 seconds) server-side revalidation
+      fetchOptions.next = { revalidate: 300 };
+      delete fetchOptions.cache;
+    } else {
+      fetchOptions.cache = 'no-store';
+    }
+
+    const res = await fetch(`${BACKEND_URL}${path}`, fetchOptions);
+    if (!res.ok) {
+      let errorMsg = '';
+      try {
+        const errJson = await res.json();
+        errorMsg = errJson.message || JSON.stringify(errJson);
+      } catch (_) {}
+      throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
+    }
+    const json = await res.json();
+    return json as T;
+  }
+
+  // Client-side environment: Memory cache + in-flight deduplication
+  const key = getCacheKey(path, options);
+
+  // 1. Check client-side persistent cache for static config/data
+  if (isCacheable(path, options)) {
+    const cached = clientCache.get(key);
+    const now = Date.now();
+    const prefix = Object.keys(CACHE_TTLS).find(p => path.startsWith(p)) || '';
+    const ttl = CACHE_TTLS[prefix] || 300000;
+    if (cached && now - cached.timestamp < ttl) {
+      return Promise.resolve(cached.data as T);
+    }
+  }
+
+  // 2. Check if there is already an in-flight promise for the same key (deduplication)
+  if (isDeduplicatable(path, options)) {
+    let promise = clientInFlight.get(key);
+    if (!promise) {
+      promise = (async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}${path}`, {
+            cache: 'no-store',
+            ...options,
+            headers,
+          });
+          if (!res.ok) {
+            let errorMsg = '';
+            try {
+              const errJson = await res.json();
+              errorMsg = errJson.message || JSON.stringify(errJson);
+            } catch (_) {}
+            throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
+          }
+          const data = await res.json();
+          if (isCacheable(path, options)) {
+            clientCache.set(key, { data, timestamp: Date.now() });
+          }
+          return data;
+        } finally {
+          clientInFlight.delete(key);
+        }
+      })();
+      clientInFlight.set(key, promise);
+    }
+    return promise as Promise<T>;
+  }
+
+  // 3. Un-cacheable & non-deduplicatable request (mutations, user state sessions)
   const res = await fetch(`${BACKEND_URL}${path}`, {
     cache: 'no-store',
     ...options,
     headers,
-  })
+  });
   if (!res.ok) {
-    let errorMsg = ''
+    let errorMsg = '';
     try {
-      const errJson = await res.json()
-      errorMsg = errJson.message || JSON.stringify(errJson)
+      const errJson = await res.json();
+      errorMsg = errJson.message || JSON.stringify(errJson);
     } catch (_) {}
-    throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`)
+    throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
   }
-  const json = await res.json()
-  return json as T
+  const json = await res.json();
+  return json as T;
 }
 
 export function getValidImageUrl(url?: string | null, fallback: string = '/assets/images/product-img/electronics/electro-c-01.webp', productHandle?: string): string {
@@ -318,7 +464,7 @@ export async function getCategories(): Promise<MedusaCategory[]> {
     return res.product_categories || []
   } catch (err) {
     console.warn("Using fallback categories due to API fetch error:", err)
-    return []
+    return DEFAULT_8_CATEGORIES
   }
 }
 

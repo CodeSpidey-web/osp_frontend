@@ -31,6 +31,7 @@ export default function Brand() {
                     src={`/assets/images/brand-logos/${logo}`}
                     alt="Brand Logo"
                     className="osp-brand-logo"
+                    loading="lazy"
                   />
                 </div>
               ))}
@@ -46,6 +47,7 @@ export default function Brand() {
                     src={`/assets/images/brand-logos/${logo}`}
                     alt="Brand Logo"
                     className="osp-brand-logo"
+                    loading="lazy"
                   />
                 </div>
               ))}

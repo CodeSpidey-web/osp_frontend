@@ -86,7 +86,7 @@ export default function MainContent({
     async function fetchData() {
       try {
         const [productsData, categoriesData] = await Promise.all([
-          getProducts({ limit: 100 }),
+          getProducts({ limit: 24 }),
           getCategories(),
         ]);
         const allProducts = productsData.products || [];
@@ -478,81 +478,7 @@ export default function MainContent({
               <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
                 {parentCategories.map((cat, i) => {
 
-                  if (i === 3) {
-                    return (
-                      <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
-                        <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
-                          <div className="inner">
-                            <div className="rbt-image-portion">
-                              <a href={`/shop?category_id=${cat.id}`}>
-                                <img 
-                                  src={categoryImages[cat.id] || "/assets/images/catagory-img/cat-bg-electro-c-lg-01.webp"} 
-                                  alt={cat.name} 
-                                  style={{ objectFit: 'contain', height: '150px', width: '100%', background: '#fff', borderRadius: '4px', padding: '10px' }} 
-                                />
-                              </a>
-                            </div>
-                            <div className="content">
-                              <div className="top-content">
-                                <h2 className="title h5" style={{ maxWidth: '280px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
-                              </div>
-                              <div className="bottom-content">
-                                <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
-                                  See Collection
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="rbt-right-corner-portion">
-                            <div className="rbt-corner-portion-wrapper">
-                              <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
-                                <i className="fa-solid fa-arrow-up-right"></i>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
 
-                  if (i === 5) {
-                    return (
-                      <div key={cat.id} className="col-lg-2-5 col-lg-8 col-md-8 col-sm-12 col-6 mt--24 reveal">
-                        <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated wider-coloumn">
-                          <div className="inner">
-                            <div className="rbt-image-portion">
-                              <a href={`/shop?category_id=${cat.id}`}>
-                                <img 
-                                  src={categoryImages[cat.id] || "/assets/images/catagory-img/cat-bg-electro-c-lg-02.webp"} 
-                                  alt={cat.name} 
-                                  style={{ objectFit: 'contain', height: '150px', width: '100%', background: '#fff', borderRadius: '4px', padding: '10px' }} 
-                                />
-                              </a>
-                            </div>
-                            <div className="content">
-                              <div className="top-content">
-                                <h2 className="title h5" style={{ maxWidth: '240px', whiteSpace: 'normal' }}><span className="rbt-bold--text">{cat.name}</span></h2>
-                              </div>
-                              <div className="bottom-content">
-                                <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-marquee-btn marquee-auto rbt-btn-white rbt-btn-md">
-                                  <span data-text="View All The Trending Collection">
-                                    View All The Trending Collection
-                                  </span>
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="rbt-right-corner-portion">
-                            <div className="rbt-corner-portion-wrapper">
-                              <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
-                                <i className="fa-solid fa-arrow-up-right"></i>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
 
                   return (
                     <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
@@ -564,6 +490,7 @@ export default function MainContent({
                                 src={categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} 
                                 alt={cat.name} 
                                 style={{ objectFit: 'contain', height: '130px', width: '100%', background: '#fff', borderRadius: '6px', padding: '5px' }} 
+                                loading="lazy"
                               />
                             </a>
                           </div>
@@ -629,6 +556,7 @@ export default function MainContent({
                                   <img
                                     src="/assets/images/product-banner/product-banner-electro-c-01.webp"
                                     alt="Ecommerce Product Banner Image"
+                                    loading="lazy"
                                   />
                                 </div>
                                 <div className="rbt-product-banner-content w-100">
@@ -682,6 +610,7 @@ export default function MainContent({
                                         src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
                                         alt={product.title}
                                         style={{ maxHeight: '280px', objectFit: 'contain' }}
+                                        loading="lazy"
                                         onError={(e) => {
                                           e.currentTarget.onerror = null;
                                           e.currentTarget.src = fallbackImg;
@@ -780,6 +709,7 @@ export default function MainContent({
                                     <img
                                       src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
                                       alt={product.title}
+                                      loading="lazy"
                                       onError={(e) => {
                                         e.currentTarget.onerror = null;
                                         e.currentTarget.src = fallbackImg;

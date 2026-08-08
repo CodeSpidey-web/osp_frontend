@@ -280,7 +280,7 @@ export default function PromoBanner() {
                 {BANNER_SLIDES.map((slide) => (
                   <div key={slide.id} className="banner-slide-item">
                     <div className={`custom-banner-bg-image ${slide.bgClass}`}>
-                      <img src={slide.bgImage} alt={slide.title} />
+                      <img src={slide.bgImage} alt={slide.title} loading="lazy" />
                     </div>
                     <div className="content">
                       <span

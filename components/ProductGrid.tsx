@@ -137,6 +137,7 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
                         src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, '/assets/images/product-img/electronics/electro-c-01.webp', product.handle)}
                         alt={product.title}
                         style={{ maxHeight: '220px', objectFit: 'contain' }}
+                        loading="lazy"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = '/assets/images/product-img/electronics/electro-c-01.webp';
