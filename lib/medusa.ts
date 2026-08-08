@@ -99,7 +99,11 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
     ];
     const isServerCacheable = cacheablePrefixes.some(prefix => path.startsWith(prefix));
 
-    if (isServerCacheable) {
+    if (options?.next) {
+      // Respect explicit Next.js cache options if provided
+      fetchOptions.next = options.next;
+      delete fetchOptions.cache;
+    } else if (isServerCacheable) {
       // 5 minutes (300 seconds) server-side revalidation
       fetchOptions.next = { revalidate: 300 };
       delete fetchOptions.cache;
@@ -367,14 +371,18 @@ function calculateRelevance(product: MedusaProduct, query: string): number {
   return totalScore;
 }
 
-export async function getProducts(params?: {
-  q?: string
-  category_id?: string[]
-  collection_id?: string[]
-  offset?: number
-  limit?: number
-  order?: string
-}): Promise<{ products: MedusaProduct[]; count: number }> {
+export async function getProducts(
+  params?: {
+    q?: string
+    category_id?: string[]
+    collection_id?: string[]
+    offset?: number
+    limit?: number
+    order?: string
+    fields?: string
+  },
+  fetchOptions?: RequestInit
+): Promise<{ products: MedusaProduct[]; count: number }> {
   try {
     const q = new URLSearchParams()
     
@@ -388,9 +396,12 @@ export async function getProducts(params?: {
     q.set('offset', apiOffset)
     q.set('limit', apiLimit)
     if (params?.order && !isSearching) q.set('order', params.order)
-    q.set('fields', '*variants.prices,*categories')
+    q.set('fields', params?.fields || '*variants.prices,*categories')
     
-    const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(`/store/products?${q.toString()}`)
+    const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(
+      `/store/products?${q.toString()}`,
+      fetchOptions
+    )
     let productsList = res.products || [];
     let totalCount = res.count || 0;
     

@@ -3,15 +3,18 @@ import MainContent from "@/components/MainContent";
 import { getProducts, getCategories, getValidImageUrl } from "@/lib/medusa";
 
 export default async function Home() {
+  console.time("[Server] Home Page Render");
   let initialProducts: any[] = [];
   let initialCategories: any[] = [];
   const initialCategoryImages: Record<string, string> = {};
 
   try {
+    console.time("[Server] Main Data Prefetch (getProducts(24) & getCategories)");
     const [productsData, categoriesData] = await Promise.all([
       getProducts({ limit: 24 }),
       getCategories(),
     ]);
+    console.timeEnd("[Server] Main Data Prefetch (getProducts(24) & getCategories)");
     initialProducts = productsData?.products || [];
     
     // Shuffle the products on the server side to maintain the current logic
@@ -44,41 +47,72 @@ export default async function Home() {
       return ids;
     };
 
-    // Try to resolve the image from preloaded products in memory first to avoid hitting Medusa API repeatedly.
-    await Promise.all(
-      parentCats.map(async (cat) => {
-        const descendantIds = getDescendantIds(cat);
+    console.time("[Server] Category Thumbnail Resolution");
 
-        // Find a matching product in the preloaded initialProducts array
-        const match = initialProducts.find((prod: any) => 
-          prod.categories?.some((pc: any) => descendantIds.includes(pc.id))
-        );
+    const missingCats: { cat: any; descendantIds: string[] }[] = [];
+    const missingDescendantIds: string[] = [];
 
-        if (match) {
-          const img = getValidImageUrl(match.thumbnail || match.images?.[0]?.url, '', match.handle);
-          if (img) {
-            initialCategoryImages[cat.id] = img;
-            return; // Skip network fetch
-          }
+    parentCats.forEach((cat) => {
+      const descendantIds = getDescendantIds(cat);
+
+      // Try to resolve the image from preloaded products in memory first to avoid hitting Medusa API
+      const match = initialProducts.find((prod: any) => 
+        prod.categories?.some((pc: any) => descendantIds.includes(pc.id))
+      );
+
+      if (match) {
+        const img = getValidImageUrl(match.thumbnail || match.images?.[0]?.url, '', match.handle);
+        if (img) {
+          initialCategoryImages[cat.id] = img;
+          return;
         }
+      }
 
-        // Fallback: Query API if no product found in initialProducts
-        try {
-          const res = await getProducts({ category_id: descendantIds, limit: 1 });
-          if (res.products && res.products.length > 0) {
-            const prod = res.products[0];
-            const img = getValidImageUrl(prod.thumbnail || prod.images?.[0]?.url, '', prod.handle);
+      // Add to missing list for batch resolve
+      missingCats.push({ cat, descendantIds });
+      missingDescendantIds.push(...descendantIds);
+    });
+
+    if (missingCats.length > 0) {
+      console.log(`[Server] Resolving ${missingCats.length} category thumbnails via cached batch query...`);
+      try {
+        console.time("[Server] Fallback Batch Query");
+        const res = await getProducts(
+          {
+            category_id: missingDescendantIds,
+            limit: 50,
+            fields: 'id,thumbnail,handle,categories'
+          },
+          {
+            next: { revalidate: 86400 } // Cache for 24 hours on the server
+          }
+        );
+        console.timeEnd("[Server] Fallback Batch Query");
+
+        const productsList = res.products || [];
+
+        missingCats.forEach(({ cat, descendantIds }) => {
+          // Find the first product that has at least one category in descendantIds
+          const match = productsList.find((prod: any) =>
+            prod.categories?.some((pc: any) => descendantIds.includes(pc.id))
+          );
+          if (match) {
+            const img = getValidImageUrl(match.thumbnail || match.images?.[0]?.url, '', match.handle);
             if (img) {
               initialCategoryImages[cat.id] = img;
             }
           }
-        } catch (err) {
-          console.warn(`Failed to resolve server-side image fallback for category ${cat.id}:`, err);
-        }
-      })
-    );
+        });
+      } catch (err) {
+        console.warn("[Server] Failed to resolve batch category images fallback:", err);
+      }
+    }
+
+    console.timeEnd("[Server] Category Thumbnail Resolution");
   } catch (error) {
     console.error("Failed server-side prefetch:", error);
+  } finally {
+    console.timeEnd("[Server] Home Page Render");
   }
 
   return (
