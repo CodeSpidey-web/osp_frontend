@@ -1529,9 +1529,9 @@ export default function AboutContent() {
                 </a>
               </div>
               <div className="cta-contact-row">
-                <a href="tel:+917338975699">
+                <a href="tel:+919042686793">
                   <i className="fa-solid fa-phone"></i>
-                  +91-7338975699
+                  +91-9042686793
                 </a>
                 <a href="mailto:oceanstudentprojects@gmail.com">
                   <i className="fa-regular fa-envelope"></i>

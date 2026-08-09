@@ -208,7 +208,7 @@ export default function ContactContent() {
               <div className="contact-item">
                 <h3 className="contact-item-title">Phone Contact</h3>
                 <div className="contact-item-detail">
-                  +91-7338975699
+                  +91-9042686793
                 </div>
               </div>
               
@@ -289,7 +289,7 @@ export default function ContactContent() {
                         id="user_phone" 
                         required
                         className="minimal-input"
-                        placeholder="e.g. +91 73389 75699"
+                        placeholder="e.g. +91 90426 86793"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       />
