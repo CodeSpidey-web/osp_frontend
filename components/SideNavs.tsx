@@ -60,7 +60,8 @@ export default function SideNavs() {
                                             src="/assets/images/logo/bitmap_cropped.png"
                                             alt="Ocean Student Projects Logo"
                                             style={{
-                                                height: '48px',
+                                                height: '86px',
+                                                maxHeight: 'none',
                                                 width: 'auto',
                                                 objectFit: 'contain',
                                                 display: 'block'
