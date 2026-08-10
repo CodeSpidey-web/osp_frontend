@@ -1,9 +1,11 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
 import { useCategories } from '@/lib/hooks';
 import { useAuth } from '@/lib/AuthContext';
+import { fetchApi } from '@/lib/medusa';
+import Link from 'next/link';
 
 function formatPrice(amount: number, currencyCode: string = 'inr') {
   if (!amount) return '₹0.00';
@@ -24,10 +26,60 @@ function ShopHeaderContent() {
   const [searchVal, setSearchVal] = React.useState('');
   const [selectedCatId, setSelectedCatId] = React.useState('');
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  // Live search suggestions state
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
   
   const cartCount = cart?.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
   const cartTotal = cart?.total || 0;
   const currencyCode = cart?.currency_code || 'inr';
+
+  // Debounced search query when 3 or more characters are entered
+  useEffect(() => {
+    const query = searchVal.trim();
+    if (query.length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timeoutId = setTimeout(async () => {
+      try {
+        const res = await fetchApi<{ products: any[] }>(
+          `/store/products?q=${encodeURIComponent(query)}&limit=6&fields=id,title,handle,thumbnail,categories,variants.prices`
+        );
+        setSuggestions(res.products || []);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error('Failed to fetch search suggestions:', err);
+        setSuggestions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 150);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchVal]);
+
+  // Close suggestions dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node) &&
+        mobileSearchRef.current && !mobileSearchRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -173,6 +225,346 @@ function ShopHeaderContent() {
       }, 500);
     }
   }, []);
+  // Helper to highlight matching substring
+  const highlightMatch = (text: string, query: string) => {
+    if (!query || !text) return text;
+    const index = text.toLowerCase().indexOf(query.toLowerCase());
+    if (index === -1) return text;
+    const before = text.substring(0, index);
+    const match = text.substring(index, index + query.length);
+    const after = text.substring(index + query.length);
+    return (
+      <span>
+        {before}
+        <strong style={{ color: '#0f172a', fontWeight: '800' }}>{match}</strong>
+        <span style={{ color: '#334155', fontWeight: '500' }}>{after}</span>
+      </span>
+    );
+  };
+
+  // Extract smart keyword queries like Amazon/Flipkart
+  const getKeywordSuggestions = () => {
+    const q = searchVal.toLowerCase().trim();
+    if (!q) return [];
+    const keywordsSet = new Set<string>();
+    
+    suggestions.forEach(p => {
+      const title = p.title || '';
+      const words = title.split(/[\s-]+/);
+      if (words.length >= 2) {
+        const phrase2 = words.slice(0, 2).join(' ');
+        if (phrase2.toLowerCase().includes(q)) keywordsSet.add(phrase2);
+      }
+      if (words.length >= 3) {
+        const phrase3 = words.slice(0, 3).join(' ');
+        if (phrase3.toLowerCase().includes(q)) keywordsSet.add(phrase3);
+      }
+      if (title.toLowerCase().includes(q) && title.length <= 35) {
+        keywordsSet.add(title);
+      }
+    });
+
+    return Array.from(keywordsSet).slice(0, 4);
+  };
+
+  // Get matching category predictions
+  const getMatchingCategories = () => {
+    const q = searchVal.toLowerCase().trim();
+    if (!q) return [];
+    return categories
+      .filter(c => c.name?.toLowerCase().includes(q) && c.name?.toLowerCase() !== 'uncategorized')
+      .slice(0, 2);
+  };
+
+  const TRENDING_SEARCHES = [
+    'Arduino Boards',
+    'Sensors',
+    'LiPo Battery',
+    'BLDC Motors',
+    'Raspberry Pi',
+    'Drone Kits',
+    'ESP32 Wi-Fi',
+    'Relay Modules'
+  ];
+
+  const handleKeywordClick = (keyword: string) => {
+    setSearchVal(keyword);
+    setShowSuggestions(false);
+    setIsSearchOpen(false);
+    router.push(`/shop?q=${encodeURIComponent(keyword)}`);
+  };
+
+  const handleCategorySearchClick = (catId: string, catName: string) => {
+    setShowSuggestions(false);
+    setIsSearchOpen(false);
+    const params = new URLSearchParams();
+    if (searchVal.trim()) params.set('q', searchVal.trim());
+    params.set('category_id', catId);
+    router.push(`/shop?${params.toString()}`);
+  };
+
+  const renderSuggestionsDropdown = (isMobile: boolean = false) => {
+    if (!showSuggestions) return null;
+    const query = searchVal.trim();
+    const isUnderThreshold = query.length < 3;
+
+    // Amazon/Flipkart Initial State: Show Trending Searches when clicking empty/short input
+    if (isUnderThreshold) {
+      return (
+        <div 
+          className="live-search-suggestions-dropdown"
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 8px)',
+            left: 0,
+            right: 0,
+            background: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: '0 20px 45px -8px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+            zIndex: 999999,
+            overflow: 'hidden',
+            padding: '12px 16px 16px',
+            textAlign: 'left'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <i className="fa-solid fa-fire" style={{ color: '#ea580c' }}></i>
+            <span>Popular & Trending Searches</span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {TRENDING_SEARCHES.map((term) => (
+              <button
+                key={term}
+                type="button"
+                onClick={() => handleKeywordClick(term)}
+                style={{
+                  background: '#f1f5f9',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '20px',
+                  padding: '6px 14px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e2e8f0';
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f1f5f9';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+              >
+                <i className="fa-regular fa-magnifying-glass" style={{ fontSize: '10px', color: '#64748b' }}></i>
+                <span>{term}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    const keywordSuggestions = getKeywordSuggestions();
+    const matchingCats = getMatchingCategories();
+
+    return (
+      <div 
+        className="live-search-suggestions-dropdown"
+        style={{
+          position: 'absolute',
+          top: 'calc(100% + 8px)',
+          left: 0,
+          right: 0,
+          background: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+          zIndex: 999999,
+          overflow: 'hidden',
+          maxHeight: '520px',
+          overflowY: 'auto',
+          textAlign: 'left'
+        }}
+      >
+        {/* Amazon/Flipkart Top Header */}
+        <div style={{ padding: '8px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b' }}>
+            {isSearching ? 'Searching catalog...' : `Suggestions for "${query}"`}
+          </span>
+          {isSearching && (
+            <span className="spinner-border spinner-border-sm text-success" style={{ width: '13px', height: '13px' }}></span>
+          )}
+        </div>
+
+        {/* Section 1: Category Scope Predictions (Like Amazon "search in...") */}
+        {matchingCats.length > 0 && (
+          <div style={{ borderBottom: '1px solid #f1f5f9', padding: '4px 0', background: '#f8fafc' }}>
+            {matchingCats.map(cat => (
+              <div
+                key={cat.id}
+                onClick={() => handleCategorySearchClick(cat.id, cat.name)}
+                style={{
+                  padding: '8px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: '#1e293b',
+                  transition: 'background 0.15s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <i className="fa-solid fa-layer-group" style={{ fontSize: '12px', color: '#136c39' }}></i>
+                <span>
+                  Search &ldquo;<strong>{query}</strong>&rdquo; in <strong style={{ color: '#136c39' }}>{cat.name}</strong>
+                </span>
+                <i className="fa-solid fa-arrow-up-right-from-square ms-auto" style={{ fontSize: '10px', color: '#94a3b8' }}></i>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Section 2: Predictive Keyword Autocompletions */}
+        {keywordSuggestions.length > 0 && (
+          <div style={{ borderBottom: '1px solid #f1f5f9', padding: '4px 0' }}>
+            {keywordSuggestions.map((kw, i) => (
+              <div
+                key={i}
+                onClick={() => handleKeywordClick(kw)}
+                style={{
+                  padding: '8px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: '#334155',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f0fdf4';
+                  e.currentTarget.style.paddingLeft = '20px';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.paddingLeft = '16px';
+                }}
+              >
+                <i className="fa-regular fa-magnifying-glass" style={{ fontSize: '12px', color: '#94a3b8' }}></i>
+                <div style={{ flex: 1 }}>
+                  {highlightMatch(kw, query)}
+                </div>
+                <i className="fa-solid fa-arrow-left" style={{ fontSize: '11px', color: '#cbd5e1', transform: 'rotate(45deg)' }}></i>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Section 3: Exact Matching Products with Images and Real Price */}
+        {suggestions.length > 0 ? (
+          <div>
+            <div style={{ padding: '8px 16px 4px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8' }}>
+              Matching Products
+            </div>
+            <div className="suggestion-items-list" style={{ padding: '2px 0' }}>
+              {suggestions.map((p) => {
+                const variant = p.variants?.[0];
+                const priceObj = variant?.prices?.find((pr: any) => pr.currency_code === 'inr') || variant?.prices?.[0];
+                const priceVal = priceObj?.amount || 0;
+                const categoryName = p.categories?.[0]?.name;
+
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/product/${p.id}`}
+                    onClick={() => {
+                      setShowSuggestions(false);
+                      setIsSearchOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '10px 16px',
+                      gap: '12px',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s ease',
+                      borderBottom: '1px solid #f8fafc'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f0fdf4';
+                      e.currentTarget.style.paddingLeft = '20px';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.paddingLeft = '16px';
+                    }}
+                  >
+                    <div style={{ width: '46px', height: '46px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {p.thumbnail ? (
+                        <img src={p.thumbnail} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <i className="fa-solid fa-cube" style={{ color: '#94a3b8', fontSize: '18px' }}></i>
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {highlightMatch(p.title, query)}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '700', color: '#136c39' }}>
+                          {formatPrice(priceVal)}
+                        </span>
+                        {categoryName && (
+                          <span style={{ fontSize: '10px', background: '#f1f5f9', color: '#475569', padding: '1px 7px', borderRadius: '4px', fontWeight: '600' }}>
+                            {categoryName}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-chevron-right" style={{ fontSize: '11px', color: '#94a3b8' }}></i>
+                  </Link>
+                );
+              })}
+
+              <div style={{ padding: '10px 16px 8px', borderTop: '1px solid #f1f5f9', textAlign: 'center', background: '#fafafa' }}>
+                <button
+                  type="button"
+                  onClick={(e) => handleSearchSubmit(e)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#136c39',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>See all {suggestions.length}+ results for &ldquo;{searchVal}&rdquo;</span>
+                  <i className="fa-solid fa-arrow-right" style={{ fontSize: '10px' }}></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          !isSearching && (
+            <div style={{ padding: '28px 16px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+              <i className="fa-regular fa-face-frown mb-2 d-block" style={{ fontSize: '24px', color: '#94a3b8' }}></i>
+              No products found matching &ldquo;<strong>{searchVal}</strong>&rdquo;
+            </div>
+          )
+        )}
+      </div>
+    );
+  };
 
   const renderSearchDropdown = () => (
     <div className={`rbt-search-dropdown rbt-search-dropdown-activation rbt-common-search-dropdown-activation ${isSearchOpen ? 'active' : ''}`}>
@@ -212,7 +604,7 @@ function ShopHeaderContent() {
             <div className="row">
                 <div className="col-lg-12">
                     <form className="rbt-search-form" onSubmit={handleSearchSubmit}>
-                        <div className="input-sectition position-relative w-100 mr--12 mr_sm--4">
+                        <div ref={mobileSearchRef} className="input-sectition position-relative w-100 mr--12 mr_sm--4">
                             <input 
                                 className="search-input" 
                                 type="text" 
@@ -223,8 +615,14 @@ function ShopHeaderContent() {
                                     setSearchVal(val);
                                     window.dispatchEvent(new CustomEvent('sync-search-shop', { detail: val }));
                                 }}
+                                onFocus={() => {
+                                  if (searchVal.trim().length >= 3 && suggestions.length > 0) {
+                                    setShowSuggestions(true);
+                                  }
+                                }}
                             />
                             <i className="fa-sharp fa-regular inner-search-icon fa-magnifying-glass"></i>
+                            {renderSuggestionsDropdown(true)}
                         </div>
                         <div className="submit-btn">
                             <button type="submit" className="rbt-btn btn-md">Search</button>
@@ -298,6 +696,7 @@ function ShopHeaderContent() {
                     <div className="header-info w-100">
                         <form onSubmit={handleSearchSubmit} className="w-100">
                             <div 
+                                ref={searchContainerRef}
                                 className="premium-nav-search-bar"
                                 style={{ 
                                     position: 'relative',
@@ -314,6 +713,9 @@ function ShopHeaderContent() {
                                     e.currentTarget.style.background = '#ffffff';
                                     e.currentTarget.style.borderColor = '#136c39';
                                     e.currentTarget.style.boxShadow = '0 8px 20px rgba(19, 108, 57, 0.08), 0 2px 6px rgba(19, 108, 57, 0.04)';
+                                    if (searchVal.trim().length >= 3 && suggestions.length > 0) {
+                                      setShowSuggestions(true);
+                                    }
                                 }}
                                 onBlur={(e) => {
                                     e.currentTarget.style.background = '#f3f4f6';
@@ -374,6 +776,7 @@ function ShopHeaderContent() {
                                         outline: 'none'
                                     }}
                                 />
+                                {renderSuggestionsDropdown(false)}
                             </div>
                         </form>
                     </div>

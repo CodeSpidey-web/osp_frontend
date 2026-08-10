@@ -153,9 +153,9 @@ export default function Brand() {
           background-color: #FDFDFD;
           border: 1px solid #f1f5f9;
           border-radius: 100px;
-          padding: 8px 20px;
-          min-width: 175px;
-          height: 72px;
+          padding: 14px 32px;
+          min-width: 260px;
+          height: 120px;
           flex-shrink: 0;
           box-shadow: 0 3px 10px rgba(0, 0, 0, 0.015);
           transition: all 0.25s ease;
@@ -167,19 +167,18 @@ export default function Brand() {
         }
 
         .osp-brand-logo {
-          max-height: 44px;
-          max-width: 135px;
-          object-contain: fit;
+          max-height: 84px;
+          max-width: 240px;
+          object-fit: contain;
           filter: grayscale(10%);
           opacity: 0.95;
           transition: all 0.25s ease;
-          transform: scale(1.05);
         }
 
         .osp-brand-card:hover .osp-brand-logo {
           filter: grayscale(0%);
           opacity: 1;
-          transform: scale(1.10);
+          transform: scale(1.05);
         }
 
         @keyframes marqueeLeft {

@@ -1382,11 +1382,13 @@ export default function SideNavs() {
                     </div>
 
                     <div className="rbt-minicart-bottom mt--24">
-                        <div className="checkout-btn mt--20">
-                            <a className="rbt-btn w-100 text-center" href="/checkout">
-                                <span className="btn-text">Checkout</span>
-                            </a>
-                        </div>
+                        {items.length > 0 && (
+                            <div className="checkout-btn mt--20">
+                                <a className="rbt-btn w-100 text-center" href="/checkout">
+                                    <span className="btn-text">Checkout</span>
+                                </a>
+                            </div>
+                        )}
 
                     </div>
 

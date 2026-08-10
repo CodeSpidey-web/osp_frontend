@@ -65,6 +65,18 @@ function isDeduplicatable(path: string, options?: RequestInit): boolean {
   return true;
 }
 
+// Some Medusa endpoints (e.g. reset-password) return a 2xx status with an empty body.
+// Parse the body safely so these don't throw when the caller only cares about success.
+async function parseJsonSafe(res: Response): Promise<any> {
+  const text = await res.text();
+  if (!text) return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
 export async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const isServer = typeof window === 'undefined';
   const token = !isServer ? localStorage.getItem('medusa_auth_token') : null;
@@ -120,7 +132,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
       } catch (_) {}
       throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
     }
-    const json = await res.json();
+    const json = await parseJsonSafe(res);
     return json as T;
   }
 
@@ -157,7 +169,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
             } catch (_) {}
             throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
           }
-          const data = await res.json();
+          const data = await parseJsonSafe(res);
           if (isCacheable(path, options)) {
             clientCache.set(key, { data, timestamp: Date.now() });
           }
@@ -185,7 +197,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
     } catch (_) {}
     throw new Error(`Medusa API error: ${res.status} ${res.statusText}${errorMsg ? ` - ${errorMsg}` : ''}`);
   }
-  const json = await res.json();
+  const json = await parseJsonSafe(res);
   return json as T;
 }
 

@@ -3,18 +3,15 @@ import MainContent from "@/components/MainContent";
 import { getProducts, getCategories, getValidImageUrl } from "@/lib/medusa";
 
 export default async function Home() {
-  console.time("[Server] Home Page Render");
   let initialProducts: any[] = [];
   let initialCategories: any[] = [];
   const initialCategoryImages: Record<string, string> = {};
 
   try {
-    console.time("[Server] Main Data Prefetch (getProducts(24) & getCategories)");
     const [productsData, categoriesData] = await Promise.all([
       getProducts({ limit: 24 }),
       getCategories(),
     ]);
-    console.timeEnd("[Server] Main Data Prefetch (getProducts(24) & getCategories)");
     initialProducts = productsData?.products || [];
     
     // Shuffle the products on the server side to maintain the current logic
@@ -47,8 +44,6 @@ export default async function Home() {
       return ids;
     };
 
-    console.time("[Server] Category Thumbnail Resolution");
-
     const missingCats: { cat: any; descendantIds: string[] }[] = [];
     const missingDescendantIds: string[] = [];
 
@@ -76,7 +71,6 @@ export default async function Home() {
     if (missingCats.length > 0) {
       console.log(`[Server] Resolving ${missingCats.length} category thumbnails via cached batch query...`);
       try {
-        console.time("[Server] Fallback Batch Query");
         const res = await getProducts(
           {
             category_id: missingDescendantIds,
@@ -87,8 +81,6 @@ export default async function Home() {
             next: { revalidate: 86400 } // Cache for 24 hours on the server
           }
         );
-        console.timeEnd("[Server] Fallback Batch Query");
-
         const productsList = res.products || [];
 
         missingCats.forEach(({ cat, descendantIds }) => {
@@ -108,11 +100,8 @@ export default async function Home() {
       }
     }
 
-    console.timeEnd("[Server] Category Thumbnail Resolution");
   } catch (error) {
     console.error("Failed server-side prefetch:", error);
-  } finally {
-    console.timeEnd("[Server] Home Page Render");
   }
 
   return (

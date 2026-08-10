@@ -37,6 +37,7 @@ const CheckoutPage = () => {
   const { customer } = useAuth();
   
   const [submitting, setSubmitting] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
   
   // Shipping and tax settings loaded from public store endpoint
   const DEFAULT_DELIVERY_ESTIMATE = "Within 3-5 working days";
@@ -197,6 +198,7 @@ const CheckoutPage = () => {
         order_id: razorpayOrderId,
         handler: async function (response: any) {
           try {
+            setProcessingPayment(true);
             // Verify signature on backend via fetchApi (sends publishable API key header)
             await fetchApi<any>(`/store/razorpay/callback`, {
               method: 'POST',
@@ -612,6 +614,46 @@ const CheckoutPage = () => {
       </main>
       <Modals />
       <Footer />
+
+      {/* Payment success loader overlay */}
+      {processingPayment && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: '#ffffff',
+            zIndex: 2147483647,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '18px',
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              border: '4px solid #e9ecef',
+              borderTopColor: '#10b981',
+              animation: 'ospSpin 0.8s linear infinite',
+            }}
+          ></div>
+          <div className="text-center">
+            <div className="fw-bold" style={{ color: '#0b2545', fontSize: '17px' }}>
+              Payment Successful!
+            </div>
+            <div className="text-muted" style={{ fontSize: '13px', marginTop: '4px' }}>
+              Confirming your order, please wait...
+            </div>
+          </div>
+          <style>{`@keyframes ospSpin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
     </>
   );
 };

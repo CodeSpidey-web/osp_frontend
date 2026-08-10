@@ -73,10 +73,10 @@ const Footer = () => {
                                 <div className="footer-widget rbt-link-hover">
                                     <h3 className="ft-title">Let Us Help You</h3>
                                     <ul className="ft-link p-0 list-unstyled">
-                                        <li><a href="#">Returns Policies</a></li>
-                                        <li><a href="#">Refund and Returns</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">Terms and Conditions</a></li>
+                                        <li><a href="/privacy-policy">Privacy Policy</a></li>
+                                        <li><a href="/terms-and-conditions">Terms &amp; Conditions</a></li>
+                                        <li><a href="/shipping-policy">Shipping Policy</a></li>
+                                        <li><a href="/return-and-refund-policy">Return &amp; Refund Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -107,12 +107,6 @@ const Footer = () => {
                             <div className="col-lg-4 col-md-12 col-12 mt--24">
                                 <p className="rbt-link-hover mb-0">Copyright <span className="copyright-year">2026</span> © <a className="rbt-text-bold rbt-text-color-heading" href="/">Ocean Student Projects</a></p>
                             </div>
-                             <div className="col-lg-4 col-md-12 col-12 mt--24 text-lg-end">
-                                 <div className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 border" style={{ borderColor: 'rgba(239, 68, 68, 0.25)', backgroundColor: 'rgba(239, 68, 68, 0.06)', color: '#ef4444' }}>
-                                     <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '13px' }}></i>
-                                     <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase' }}>No Returns / Replacements</span>
-                                 </div>
-                             </div>
                         </div>
                     </div>
                 </div>

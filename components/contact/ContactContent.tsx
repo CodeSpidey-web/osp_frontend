@@ -76,7 +76,7 @@ export default function ContactContent() {
     <>
       <style>{`
         .contact-container {
-          background-color: #ffffff;
+          background: linear-gradient(135deg, #e6f7ec 0%, #d7eedf 50%, #ebf5ee 100%) !important;
           padding: 80px 0;
           color: #2b303a;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -172,7 +172,7 @@ export default function ContactContent() {
           transform: translateY(-1px);
         }
         .map-section {
-          border-top: 1px solid #eef0f2;
+          border-top: 1px solid #cfead6;
           padding-top: 50px;
         }
         @media (max-width: 768px) {
@@ -198,17 +198,21 @@ export default function ContactContent() {
               <div className="contact-item">
                 <h3 className="contact-item-title">Registered Office</h3>
                 <div className="contact-item-detail">
-                  Ocean Student Projects<br />
-                  No.10 Kareem Mohideen sahib St,<br />
-                  Chintadripet, Chennai - 600002,<br />
-                  Tamil Nadu, India.
+                  OCEAN STUDENT PROJECTS<br />
+                  No. 12, Shop No. 7,<br />
+                  Narasingapuram Street,<br />
+                  (Jothi Lodge Building),<br />
+                  Mount Road,<br />
+                  Chennai – 600 002, Tamil Nadu, India.
                 </div>
               </div>
               
               <div className="contact-item">
                 <h3 className="contact-item-title">Phone Contact</h3>
                 <div className="contact-item-detail">
-                  +91-9042686793
+                  <a href="tel:+919042686793">+91-90426 86793</a>
+                  <br />
+                  <a href="tel:+917338975699">+91-733 897 5699</a>
                 </div>
               </div>
               
@@ -380,7 +384,7 @@ export default function ContactContent() {
               }}
             >
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.4776323142755!2d80.26828627588819!3d13.068887512736245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5267b09d5ff91b%3A0xc1a5a013b7da86fa!2sOcean%20Student%20Projects!5e0!3m2!1sen!2sin!4v1785832554350!5m2!1sen!2sin" 
+                src="https://maps.google.com/maps?q=No.%2012%2C%20Narasingapuram%20Street%2C%20Mount%20Road%2C%20Chennai%20600002%2C%20Tamil%20Nadu%2C%20India&t=&z=16&ie=UTF8&iwloc=&output=embed" 
                 width="100%" 
                 height="450" 
                 style={{ border: 0, display: 'block' }} 

@@ -377,7 +377,7 @@ function LoginFormInner() {
               forgotSent ? (
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '16px', borderRadius: '8px', fontSize: '14px', marginBottom: '20px' }}>
-                    Password reset link generated! In development, check the file <strong>password_resets.log</strong> in the project artifacts folder to retrieve your token.
+                    We have sent you an email to <strong>{resetEmail}</strong>. Please check your inbox (and spam folder) — the password reset link has been sent there.
                   </div>
                   <button
                     type="button"
@@ -584,6 +584,16 @@ function LoginFormInner() {
                   </div>
                 </div>
 
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setIsForgotPassword(true); setResetToken(''); clearError(); setLocalError(null); }}
+                    style={{ background: 'none', border: 'none', color: '#136c39', fontSize: '13px', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -754,6 +764,42 @@ function LoginFormInner() {
           </>
         )}
       </div>
+
+      {/* Full-screen loader while authenticating / redirecting */}
+      {isSubmitting && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(11, 37, 69, 0.75)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            zIndex: 2147483647,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '18px',
+          }}
+        >
+          <div
+            className="spinner-border text-light"
+            role="status"
+            style={{ width: '3.5rem', height: '3.5rem', borderWidth: '0.3rem' }}
+          ></div>
+          <div className="text-center">
+            <div className="fw-bold" style={{ color: '#ffffff', fontSize: '16px' }}>
+              {isLoginTab ? 'Signing you in...' : 'Creating your account...'}
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', marginTop: '4px' }}>
+              Please wait, we are taking you to your account.
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

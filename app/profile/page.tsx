@@ -27,6 +27,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'password'>('profile')
   const [orders, setOrders] = useState<any[]>([])
   const [ordersLoading, setOrdersLoading] = useState(false)
+  const [trackingMap, setTrackingMap] = useState<Record<string, { courier_name: string | null; tracking_number: string | null; tracking_url: string | null }>>({})
 
   // Profile Form States
   const [firstName, setFirstName] = useState('')
@@ -81,7 +82,33 @@ export default function ProfilePage() {
         setOrdersLoading(true)
         try {
           const res = await fetchApi<{ orders: any[] }>('/store/orders')
-          setOrders(res.orders || [])
+          const orderList = res.orders || []
+          setOrders(orderList)
+
+          const shippedIds = orderList
+            .filter((o: any) => o.fulfillment_status === 'fulfilled' || o.fulfillment_status === 'shipped')
+            .map((o: any) => o.id)
+            .filter(Boolean)
+
+          if (shippedIds.length > 0) {
+            const results = await Promise.allSettled(
+              shippedIds.map(async (orderId: string) => {
+                const endpoint = '/store/orders/' + orderId + '/tracking'
+                const data = await fetchApi<{ tracking: any }>(endpoint)
+                return { orderId, tracking: data.tracking }
+              })
+            )
+
+            const nextMap: Record<string, any> = {}
+            for (const result of results) {
+              if (result.status === 'fulfilled' && result.value.tracking) {
+                nextMap[result.value.orderId] = result.value.tracking
+              }
+            }
+            setTrackingMap(nextMap)
+          } else {
+            setTrackingMap({})
+          }
         } catch (err) {
           console.error("Failed to fetch customer orders:", err)
         } finally {
@@ -1245,6 +1272,41 @@ export default function ProfilePage() {
                                       From here you will receive product status from the courier service
                                     </span>
                                   )}
+                                  {(() => {
+                                    const tracking = trackingMap[order.id]
+                                    if (!tracking) return null
+                                    return (
+                                      <span style={{
+                                        display: 'block',
+                                        marginTop: '8px',
+                                        padding: '10px 12px',
+                                        borderRadius: '10px',
+                                        backgroundColor: '#f0fdf4',
+                                        border: '1px solid #bbf7d0',
+                                        textAlign: 'left',
+                                        maxWidth: '280px'
+                                      }}>
+                                        <span style={{ display: 'block', fontSize: '10px', fontWeight: '700', color: '#136c39', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
+                                          Shipment Tracking
+                                        </span>
+                                        {(tracking.courier_name || tracking.tracking_number) && (
+                                          <span style={{ display: 'block', fontSize: '11px', color: '#1f2937', fontFamily: 'monospace', fontWeight: '600', marginBottom: '4px' }}>
+                                            {tracking.courier_name ? tracking.courier_name + ' · ' : ''}{tracking.tracking_number || ''}
+                                          </span>
+                                        )}
+                                        {tracking.tracking_url && tracking.tracking_url !== '#' && (
+                                          <a
+                                            href={tracking.tracking_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            style={{ display: 'inline-block', fontSize: '12px', fontWeight: '700', color: '#136c39', textDecoration: 'underline' }}
+                                          >
+                                            Open tracking →
+                                          </a>
+                                        )}
+                                      </span>
+                                    )
+                                  })()}
                                 </div>
                               </div>
                             </div>

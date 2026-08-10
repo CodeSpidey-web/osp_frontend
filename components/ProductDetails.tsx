@@ -341,23 +341,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   )}
                 </div>
 
-                {/* Return/Replacement Policy Notice */}
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '10px', 
-                  backgroundColor: '#fffbeb', 
-                  border: '1px solid #fde68a', 
-                  borderRadius: '8px', 
-                  padding: '12px 16px', 
-                  marginBottom: '20px'
-                }}>
-                  <i className="fa-solid fa-circle-exclamation" style={{ color: '#d97706', fontSize: '16px', flexShrink: 0 }}></i>
-                  <div style={{ fontSize: '12px', color: '#92400e', fontWeight: '600', lineHeight: '1.4' }}>
-                    Non-Returnable & Non-Replaceable: This item is sold as final sale and cannot be returned or replaced.
-                  </div>
-                </div>
-
                 {/* Metadata */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: '#6c757d', borderTop: '1px solid #e9ecef', paddingTop: '16px' }}>
                   <div>
