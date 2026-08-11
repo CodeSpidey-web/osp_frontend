@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi, getVariantPrice } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
@@ -82,6 +82,16 @@ export default function MainContent({
   const [loading, setLoading] = useState(initialProducts.length === 0);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
+
+  const popularCategoriesScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollPopularCategories = (direction: "left" | "right") => {
+    if (popularCategoriesScrollRef.current) {
+      const { scrollLeft } = popularCategoriesScrollRef.current;
+      const scrollTo = direction === "left" ? scrollLeft - 300 : scrollLeft + 300;
+      popularCategoriesScrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     if (initialProducts.length > 0) {
@@ -501,7 +511,7 @@ export default function MainContent({
         </div>
       </div>
       
-      {/* Categories Grid */}
+      {/* Categories Carousel */}
       {(() => {
         const displayCategories = popularCategories.length > 0 ? popularCategories : categories.filter(
           cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
@@ -521,39 +531,251 @@ export default function MainContent({
                   </div>
                 </div>
               </div>
-              <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
-                {displayCategories.map((cat, i) => {
-                  const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
 
-                  return (
-                    <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
-                      <div className="rbt-cat-box rbt-cat-box-5 rbt-card-has-animated text-center">
-                        <div className="inner">
-                          <div className="rbt-image-portion">
-                            <a href={`/shop?category_id=${cat.id}`}>
-                              <img 
-                                src={imgUrl} 
-                                alt={cat.name} 
-                                style={{ objectFit: 'contain', height: '130px', width: '100%', background: '#fff', borderRadius: '6px', padding: '5px' }} 
-                                loading="lazy"
-                              />
-                            </a>
-                          </div>
-                          <a href={`/shop?category_id=${cat.id}`} className="rbt-btn rbt-btn-white rbt-btn-md">
-                            {cat.name}
-                          </a>
+              {/* Custom CSS Style Injection for the premium pill categories bar */}
+              <style dangerouslySetInnerHTML={{ __html: `
+                .osp-popular-categories-bar-wrapper {
+                  position: relative;
+                  background-color: #136c39;
+                  border-radius: 9999px;
+                  height: 90px;
+                  margin-top: 100px;
+                  display: flex;
+                  align-items: center;
+                  box-shadow: 0 10px 25px -5px rgba(19, 108, 57, 0.3);
+                }
+                
+                @media (max-width: 991px) {
+                  .osp-popular-categories-bar-wrapper {
+                    border-radius: 24px;
+                    height: 80px;
+                  }
+                }
+
+                .osp-scroll-container {
+                  display: flex;
+                  gap: 32px;
+                  overflow-x: auto;
+                  overflow-y: visible;
+                  scroll-behavior: smooth;
+                  width: 100%;
+                  scrollbar-width: none;
+                  -ms-overflow-style: none;
+                  height: 180px;
+                  margin-top: -120px;
+                  padding: 0 70px;
+                }
+
+                .osp-scroll-container::-webkit-scrollbar {
+                  display: none;
+                }
+
+                .osp-cat-item {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: flex-end;
+                  flex-shrink: 0;
+                  width: calc((100% - 128px) / 5);
+                  height: 170px;
+                  text-decoration: none !important;
+                  position: relative;
+                }
+
+                @media (max-width: 991px) {
+                  .osp-scroll-container {
+                    gap: 24px;
+                    padding: 0 48px;
+                    height: 160px;
+                    margin-top: -110px;
+                  }
+                  .osp-cat-item {
+                    width: calc((100% - 48px) / 3);
+                    height: 150px;
+                  }
+                }
+
+                @media (max-width: 767px) {
+                  .osp-scroll-container {
+                    gap: 16px;
+                    padding: 0 40px;
+                    height: 135px;
+                    margin-top: -95px;
+                  }
+                  .osp-cat-item {
+                    width: calc((100% - 16px) / 2);
+                    height: 125px;
+                  }
+                }
+
+                .osp-cat-img-box {
+                  width: 120px;
+                  height: 120px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+                  margin-bottom: 8px;
+                  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+
+                @media (max-width: 991px) {
+                  .osp-cat-img-box {
+                    width: 95px;
+                    height: 95px;
+                  }
+                }
+
+                @media (max-width: 767px) {
+                  .osp-cat-img-box {
+                    width: 75px;
+                    height: 75px;
+                  }
+                }
+
+                .osp-cat-img-box img {
+                  max-width: 95%;
+                  max-height: 95%;
+                  object-fit: contain;
+                  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+
+                .osp-cat-item:hover .osp-cat-img-box img {
+                  transform: translateY(-16px) scale(1.15);
+                }
+
+                /* Glowing pedestal ring underneath the image inside the img box */
+                .osp-cat-img-box::after {
+                  content: '';
+                  position: absolute;
+                  bottom: -2px;
+                  left: 50%;
+                  transform: translateX(-50%) scale(0.6);
+                  width: 90px;
+                  height: 16px;
+                  border: 1.5px solid #22c55e;
+                  border-radius: 50%;
+                  box-shadow: 0 0 8px #22c55e, inset 0 0 8px #22c55e;
+                  opacity: 0;
+                  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                  pointer-events: none;
+                }
+
+                .osp-cat-img-box::before {
+                  content: '';
+                  position: absolute;
+                  bottom: -8px;
+                  left: 50%;
+                  transform: translateX(-50%) scale(0.6);
+                  width: 104px;
+                  height: 19px;
+                  border: 1px solid #4ade80;
+                  border-radius: 50%;
+                  box-shadow: 0 0 6px #4ade80, inset 0 0 6px #4ade80;
+                  opacity: 0;
+                  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s;
+                  pointer-events: none;
+                }
+
+                .osp-cat-item:hover .osp-cat-img-box::after,
+                .osp-cat-item:hover .osp-cat-img-box::before {
+                  opacity: 1;
+                  transform: translateX(-50%) scale(1);
+                }
+
+                .osp-cat-name {
+                  color: #ffffff;
+                  font-size: 13px;
+                  font-weight: 600;
+                  margin-bottom: 12px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  width: 100%;
+                  text-align: center;
+                  transition: color 0.2s ease;
+                }
+
+                .osp-cat-item:hover .osp-cat-name {
+                  color: #4ade80;
+                }
+
+                .osp-scroll-btn {
+                  position: absolute;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  width: 44px;
+                  height: 44px;
+                  border-radius: 50%;
+                  background-color: #ffffff;
+                  border: none;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                  z-index: 10;
+                  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .osp-scroll-btn:hover {
+                  transform: translateY(-50%) scale(1.1);
+                  box-shadow: 0 6px 14px rgba(0,0,0,0.22);
+                  background-color: #f8fafc;
+                }
+
+                .osp-scroll-btn-left {
+                  left: 15px;
+                }
+
+                .osp-scroll-btn-right {
+                  right: 15px;
+                }
+
+                .osp-scroll-btn i {
+                  color: #136c39;
+                  font-size: 16px;
+                  font-weight: bold;
+                }
+              ` }} />
+
+              <div className="osp-popular-categories-bar-wrapper">
+                <button 
+                  type="button" 
+                  className="osp-scroll-btn osp-scroll-btn-left" 
+                  onClick={() => scrollPopularCategories('left')}
+                  aria-label="Scroll left"
+                >
+                  <i className="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <div className="osp-scroll-container" ref={popularCategoriesScrollRef}>
+                  {displayCategories.map((cat, i) => {
+                    const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+
+                    return (
+                      <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
+                        <div className="osp-cat-img-box">
+                          <img 
+                            src={imgUrl} 
+                            alt={cat.name} 
+                            loading="lazy"
+                          />
                         </div>
-                        <div className="rbt-right-corner-portion">
-                          <div className="rbt-corner-portion-wrapper">
-                            <a href={`/shop?category_id=${cat.id}`} className="rbt-card-link-btn">
-                              <i className="fa-solid fa-arrow-up-right"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                        <span className="osp-cat-name">{cat.name}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+
+                <button 
+                  type="button" 
+                  className="osp-scroll-btn osp-scroll-btn-right" 
+                  onClick={() => scrollPopularCategories('right')}
+                  aria-label="Scroll right"
+                >
+                  <i className="fa-solid fa-chevron-right"></i>
+                </button>
               </div>
 
             </div>
@@ -563,7 +785,10 @@ export default function MainContent({
 
       {/* Latest Products Section */}
       {latestProducts.length > 0 && (
-        <div className="rbt-component-area rbt-products-area rbt-bg-color-gray-light py-5 reveal">
+        <div 
+          className="rbt-component-area rbt-products-area py-5 reveal"
+          style={{ backgroundColor: "#eaf4ed" }}
+        >
           <div className="container">
             <div className="row mb--32">
               <div className="col-lg-12 d-flex justify-content-center flex-row align-items-center flex-wrap rbt-gap--16">

@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Ocean Student Projects - Electronics Store",
   description: "Your one-stop shop for electronic components, Arduino, Raspberry Pi, and student project essentials in India",
+  icons: {
+    icon: "/assets/images/logo/Untitled design.jpg.jpeg",
+  },
 };
 
 import { AuthProvider } from "@/lib/AuthContext";
