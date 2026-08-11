@@ -210,7 +210,7 @@ export default function ContactContent() {
               <div className="contact-item">
                 <h3 className="contact-item-title">Phone Contact</h3>
                 <div className="contact-item-detail">
-                  <a href="tel:+91733897569">+91-733 897 569</a>
+                  <a href="tel:+91733897569">+91-733 897 5699</a>
                   <br />
                   <a href="tel:04442131795">044-4213 1795</a>
                 </div>
