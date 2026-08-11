@@ -293,7 +293,7 @@ const Footer = () => {
 
                                 {/* Highly useful WhatsApp Support shortcut */}
                                 <li className="rbt-access-box">
-                                    <a className="rbt-round-btn has-rbt-md-fsize" href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#e8f7f0', color: '#136c39' }}>
+                                    <a className="rbt-round-btn has-rbt-md-fsize" href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#e8f7f0', color: '#136c39' }}>
                                         <i className="fa-brands fa-whatsapp" style={{ fontSize: '1.2rem' }}></i>
                                         <span className="rbt-toolbar-label" style={{ color: '#136c39', fontWeight: 'bold' }}> WhatsApp</span>
                                     </a>

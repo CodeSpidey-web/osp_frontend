@@ -934,7 +934,7 @@ function ShopHeaderContent() {
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/' ? 'active' : ''} href="/">Home</a></li>
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/shop' && !selectedCatId ? 'active' : ''} href="/shop">Educational Kits</a></li>
                                 <li style={{ margin: '0 15px' }}><a href="/contact">Project Enquiry</a></li>
-                                <li style={{ margin: '0 15px' }}><a href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
+                                <li style={{ margin: '0 15px' }}><a href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/about' ? 'active' : ''} href="/about">About Us</a></li>
                                 <li style={{ margin: '0 15px' }}><a className={pathname === '/contact' ? 'active' : ''} href="/contact">Contact Us</a></li>
                             </ul>
@@ -962,7 +962,7 @@ function ShopHeaderContent() {
                                 </a>
                                 <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>|</span>
                                 <a 
-                                    href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects." 
+                                    href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects." 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="nav-header-contact-link"

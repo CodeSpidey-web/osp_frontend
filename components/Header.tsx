@@ -152,7 +152,7 @@ export default function Header() {
                                     <li><a className={`nav-link-custom ${pathname === '/' ? 'active' : ''}`} href="/">Home</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/shop' && !selectedCatId ? 'active' : ''}`} href="/shop">Educational Kits</a></li>
                                     <li><a className="nav-link-custom" href="/contact">Project Enquiry</a></li>
-                                    <li><a className="nav-link-custom" href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
+                                    <li><a className="nav-link-custom" href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/about' ? 'active' : ''}`} href="/about">About Us</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/contact' ? 'active' : ''}`} href="/contact">Contact Us</a></li>
                                 </ul>
@@ -393,7 +393,7 @@ export default function Header() {
                                     <li><a className={`nav-link-custom ${pathname === '/' ? 'active' : ''}`} href="/">Home</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/shop' && !selectedCatId ? 'active' : ''}`} href="/shop">Educational Kits</a></li>
                                     <li><a className="nav-link-custom" href="/contact">Project Enquiry</a></li>
-                                    <li><a className="nav-link-custom" href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
+                                    <li><a className="nav-link-custom" href="https://wa.me/917338975699?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer">Bulk purchase</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/about' ? 'active' : ''}`} href="/about">About Us</a></li>
                                     <li><a className={`nav-link-custom ${pathname === '/contact' ? 'active' : ''}`} href="/contact">Contact Us</a></li>
                                 </ul>
