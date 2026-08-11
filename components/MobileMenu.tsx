@@ -101,7 +101,7 @@ export default function MobileMenu() {
                                             <li><a href="/" onClick={handleCloseMenu}>Home</a></li>
                                             <li><a href="/shop" onClick={handleCloseMenu}>Educational Kits</a></li>
                                             <li><a href="/contact" onClick={handleCloseMenu}>Project Enquiry</a></li>
-                                            <li><a href="https://wa.me/919042686793?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer" onClick={handleCloseMenu}>Bulk purchase</a></li>
+                                            <li><a href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20making%20a%20bulk%20purchase%20with%20Ocean%20Student%20Projects." target="_blank" rel="noopener noreferrer" onClick={handleCloseMenu}>Bulk purchase</a></li>
                                             <li><a href="/about" onClick={handleCloseMenu}>About Us</a></li>
                                             <li><a href="/contact" onClick={handleCloseMenu}>Contact Us</a></li>
                                             {customer ? (
@@ -228,7 +228,7 @@ export default function MobileMenu() {
                         </a>
                         <span style={{ color: 'var(--color-gray-300)', fontSize: '12px' }}>|</span>
                         <a 
-                            href="https://wa.me/919042686793?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects."
+                            href="https://wa.me/91733897569?text=Hi,%20I%20am%20interested%20in%20buying%20electronics%20components%20from%20Ocean%20Student%20Projects."
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{

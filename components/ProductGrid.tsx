@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { MedusaProduct, getValidImageUrl, fetchApi } from '@/lib/medusa';
+import { MedusaProduct, getValidImageUrl, fetchApi, getVariantPrice } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 
 interface ProductGridProps {
@@ -12,9 +12,7 @@ interface ProductGridProps {
 }
 
 function getPricing(product: MedusaProduct): { display: string; min: number; max: number } {
-  const amounts = product.variants?.flatMap(v =>
-    v.prices?.map(p => p.amount) || []
-  ) || []
+  const amounts = product.variants?.map(v => getVariantPrice(v)).filter(a => a > 0) || []
   if (amounts.length === 0) return { display: '', min: 0, max: 0 }
   const min = Math.min(...amounts)
   const max = Math.max(...amounts)

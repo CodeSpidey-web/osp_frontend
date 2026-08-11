@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/lib/CartContext';
-import { getProducts, MedusaProduct, fetchApi } from '@/lib/medusa';
+import { getProducts, MedusaProduct, fetchApi, getValidImageUrl } from '@/lib/medusa';
 import { useAuth } from '@/lib/AuthContext';
 
 function formatPrice(amount: number, currencyCode: string = 'inr') {
@@ -1301,7 +1301,7 @@ export default function SideNavs() {
                                         <li className="minicart-item" key={item.id}>
                                             <div className="thumbnail">
                                                 <a href={`/product/${item.product_id}`}>
-                                                    <img src={item.thumbnail || '/assets/images/product-img/electronics/electro-c-01.webp'}
+                                                    <img src={getValidImageUrl(item.thumbnail, '/assets/images/product-img/electronics/electro-c-01.webp')}
                                                         alt={item.title} />
                                                 </a>
                                             </div>

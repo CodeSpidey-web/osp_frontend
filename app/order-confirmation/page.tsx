@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from 'next/navigation';
 import ShopHeader from '@/components/ShopHeader';
 import Footer from '@/components/Footer';
-import { getOrder, MedusaOrder } from '@/lib/medusa';
+import { getOrder, MedusaOrder, getValidImageUrl } from '@/lib/medusa';
 
 const MobileMenu = dynamic(() => import("@/components/MobileMenu"), { ssr: false });
 const SideNavs = dynamic(() => import("@/components/SideNavs"), { ssr: false });
@@ -158,7 +158,7 @@ function OrderConfirmationPageInner() {
                                   <div className="d-flex align-items-center">
                                     <div className="rounded-2 border overflow-hidden me-3 flex-shrink-0" style={{ width: '60px', height: '60px' }}>
                                       <img 
-                                        src={item.thumbnail || '/assets/images/wishlist/wishlist-prd-1.webp'} 
+                                        src={getValidImageUrl(item.thumbnail, '/assets/images/wishlist/wishlist-prd-1.webp')} 
                                         alt={item.title} 
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                       />

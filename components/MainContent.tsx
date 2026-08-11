@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi } from "@/lib/medusa";
+import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi, getVariantPrice } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
@@ -18,9 +18,7 @@ function formatPrice(amount: number, currencyCode: string = "inr") {
 }
 
 function getPricing(product: MedusaProduct): { display: string; min: number; max: number } {
-  const amounts = product.variants?.flatMap(v =>
-    v.prices?.map(p => p.amount) || []
-  ) || []
+  const amounts = product.variants?.map(v => getVariantPrice(v)).filter(a => a > 0) || []
   if (amounts.length === 0) return { display: '', min: 0, max: 0 }
   const min = Math.min(...amounts)
   const max = Math.max(...amounts)
@@ -64,17 +62,23 @@ interface MainContentProps {
   initialProducts?: MedusaProduct[];
   initialCategories?: MedusaCategory[];
   initialCategoryImages?: Record<string, string>;
+  initialLatestProducts?: MedusaProduct[];
+  initialPopularCategories?: any[];
 }
 
 export default function MainContent({
   initialProducts = [],
   initialCategories = [],
   initialCategoryImages = {},
+  initialLatestProducts = [],
+  initialPopularCategories = [],
 }: MainContentProps) {
   const { addToCart } = useCart();
   const [products, setProducts] = useState<MedusaProduct[]>(initialProducts);
   const [categories, setCategories] = useState<MedusaCategory[]>(initialCategories);
   const [categoryImages, setCategoryImages] = useState<Record<string, string>>(initialCategoryImages);
+  const [latestProducts, setLatestProducts] = useState<MedusaProduct[]>(initialLatestProducts);
+  const [popularCategories, setPopularCategories] = useState<any[]>(initialPopularCategories);
   const [loading, setLoading] = useState(initialProducts.length === 0);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
@@ -85,9 +89,11 @@ export default function MainContent({
     }
     async function fetchData() {
       try {
-        const [productsData, categoriesData] = await Promise.all([
+        const [productsData, categoriesData, latestProductsData, popularCategoriesData] = await Promise.all([
           getProducts({ limit: 24 }),
           getCategories(),
+          fetchApi<{ products: MedusaProduct[] }>("/store/latest-products").catch(() => ({ products: [] })),
+          fetchApi<{ popular_categories: any[] }>("/store/popular-categories").catch(() => ({ popular_categories: [] })),
         ]);
         const allProducts = productsData.products || [];
         const shuffled = [...allProducts];
@@ -96,6 +102,8 @@ export default function MainContent({
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         setProducts(shuffled);
+        setLatestProducts(latestProductsData.products || []);
+        setPopularCategories(popularCategoriesData.popular_categories || []);
         const cats = categoriesData || [];
         setCategories(cats);
 
@@ -147,8 +155,9 @@ export default function MainContent({
 
   // Fetch live inventory for products on home page
   useEffect(() => {
-    if (products.length === 0) return;
-    const variantIds = products.map(p => p.variants?.[0]?.id).filter(Boolean);
+    const allHomeProducts = [...products, ...latestProducts];
+    if (allHomeProducts.length === 0) return;
+    const variantIds = allHomeProducts.map(p => p.variants?.[0]?.id).filter(Boolean);
     if (variantIds.length === 0) return;
 
     const mockVariantIds = ['variant_rpi4', 'variant_ard_kit', 'variant_uno', 'variant_sr04', 'variant_esp32', 'variant_bb'];
@@ -166,7 +175,7 @@ export default function MainContent({
       .catch(err => {
         console.error("Failed to load inventory for homepage:", err);
       });
-  }, [products]);
+  }, [products, latestProducts]);
 
   useEffect(() => {
     const handleReveal = () => {
@@ -223,6 +232,43 @@ export default function MainContent({
   return (
     <>
       <style>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .latest-products-marquee-container {
+          overflow: hidden;
+          width: 100%;
+          position: relative;
+          padding: 10px 0;
+        }
+        .latest-products-marquee-content {
+          display: flex;
+          gap: 24px;
+          width: max-content;
+          animation: marquee 35s linear infinite;
+        }
+        .latest-products-marquee-content:hover {
+          animation-play-state: paused;
+        }
+        .latest-product-marquee-card {
+          width: 290px;
+          flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+          .latest-products-marquee-content {
+            gap: 12px;
+            animation: marquee 20s linear infinite;
+          }
+          .latest-product-marquee-card {
+            width: calc(50vw - 18px) !important;
+          }
+        }
+
         .premium-hero {
           background: linear-gradient(135deg, #051f0f 0%, #0c331a 50%, #124b27 100%);
           position: relative;
@@ -457,10 +503,10 @@ export default function MainContent({
       
       {/* Categories Grid */}
       {(() => {
-        const parentCategories = categories.filter(
+        const displayCategories = popularCategories.length > 0 ? popularCategories : categories.filter(
           cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
         );
-        return parentCategories.length > 0 && (
+        return displayCategories.length > 0 && (
           <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
             <div className="container">
               <div className="row">
@@ -476,9 +522,8 @@ export default function MainContent({
                 </div>
               </div>
               <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
-                {parentCategories.map((cat, i) => {
-
-
+                {displayCategories.map((cat, i) => {
+                  const imgUrl = cat.image_url || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
 
                   return (
                     <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>
@@ -487,7 +532,7 @@ export default function MainContent({
                           <div className="rbt-image-portion">
                             <a href={`/shop?category_id=${cat.id}`}>
                               <img 
-                                src={categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`} 
+                                src={imgUrl} 
                                 alt={cat.name} 
                                 style={{ objectFit: 'contain', height: '130px', width: '100%', background: '#fff', borderRadius: '6px', padding: '5px' }} 
                                 loading="lazy"
@@ -515,6 +560,132 @@ export default function MainContent({
           </div>
         );
       })()}
+
+      {/* Latest Products Section */}
+      {latestProducts.length > 0 && (
+        <div className="rbt-component-area rbt-products-area rbt-bg-color-gray-light py-5 reveal">
+          <div className="container">
+            <div className="row mb--32">
+              <div className="col-lg-12 d-flex justify-content-center flex-row align-items-center flex-wrap rbt-gap--16">
+                <div className="rbt-component-section-title rbt-gap--4 p-0 mb--0 border-0 text-center">
+                  <div>
+                    <span className="osp-brand-chip mb-1">NEW ARRIVALS</span>
+                  </div>
+                  <h2 className="rbt-title">
+                    Latest <span className="rbt-bold--text text-success">Products</span>
+                  </h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="latest-products-marquee-container">
+              <div className="latest-products-marquee-content">
+                {(() => {
+                  let list = [...latestProducts];
+                  while (list.length < 10) {
+                    list = [...list, ...latestProducts];
+                  }
+                  const marqueeItems = [...list, ...list];
+
+                  return marqueeItems.map((product, pi) => {
+                    const variant = product.variants?.[0];
+                    const pricing = getPricing(product);
+                    const fallbackImg = `/assets/images/product-img/electronics/electro-c-0${(pi % 6) + 1}.webp`;
+                    const stock = variant ? (inventoryMap[variant.id] ?? 10) : 0;
+
+                    return (
+                      <div key={`${product.id}-${pi}`} className="latest-product-marquee-card">
+                        <div className="rbt-card rbt-product-card w-100 h-100 d-flex flex-column justify-content-between">
+                          <div className="rbt-card-img rbt-rounded--12 rbt-scroll-trigger zoom_in flex-grow-1 d-flex align-items-center justify-content-center position-relative" style={{ minHeight: '280px', background: '#ffffff' }}>
+                            <a href={`/product/${product.handle || product.id}`} className="w-100 h-100 d-flex align-items-center justify-content-center">
+                              {stock === 0 && (
+                                <span style={{
+                                  position: 'absolute',
+                                  top: '16px',
+                                  left: '16px',
+                                  backgroundColor: '#ef4444',
+                                  color: '#ffffff',
+                                  fontSize: '10px',
+                                  fontWeight: '700',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.05em',
+                                  zIndex: 2
+                                }}>
+                                  Out of stock
+                                </span>
+                              )}
+                              <img
+                                src={getValidImageUrl(product.thumbnail || product.images?.[0]?.url, fallbackImg, product.handle)}
+                                alt={product.title}
+                                style={{ maxHeight: '240px', objectFit: 'contain' }}
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = fallbackImg;
+                                }}
+                              />
+                            </a>
+                            {variant && (
+                              stock === 0 ? (
+                                <a
+                                  className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                  href={`/product/${product.handle || product.id}`}
+                                  style={{
+                                    border: "none",
+                                    left: "16px",
+                                    right: "16px",
+                                    width: "calc(100% - 32px)",
+                                    borderRadius: "50px",
+                                    margin: "0 auto",
+                                    backgroundColor: "#1b2a47",
+                                    color: "#ffffff"
+                                  }}
+                                >
+                                  READ MORE
+                                </a>
+                              ) : (
+                                <button
+                                  className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block has-left-icon rbt-cart-sidenav-activation"
+                                  onClick={() => handleAddToCart(variant.id, product.id)}
+                                  disabled={addingId === product.id}
+                                  style={{
+                                    border: "none",
+                                    left: "16px",
+                                    right: "16px",
+                                    width: "calc(100% - 32px)",
+                                    borderRadius: "50px",
+                                    cursor: "pointer",
+                                    margin: "0 auto",
+                                  }}
+                                >
+                                  <i className="fa-regular fa-cart-shopping"></i> {addingId === product.id ? "Adding..." : "Add To Cart"}
+                                </button>
+                              )
+                            )}
+                          </div>
+                          <div className="rbt-card-body rbt-card-body-center-align">
+                            <a href="/shop" className="rbt-card-subtitle rbt-card-catagories-text">
+                              {getParentCategoryName(product.categories || [], categories)}
+                            </a>
+                            <h2 className="rbt-card-title product-title-clamp">
+                              <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
+                            </h2>
+                            <div className="pricing-part">
+                              <span className="price-text">{pricing.display}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popular Products Area */}
       <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gapTop reveal">

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { MedusaProduct, MedusaProductVariant, getValidImageUrl, fetchApi } from '@/lib/medusa';
+import { MedusaProduct, MedusaProductVariant, getValidImageUrl, fetchApi, getVariantPrice, getVariantOriginalPrice } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -96,8 +96,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       })) 
     : [{ id: 'default', url: initialMainImage }];
 
-  const price = selectedVariant?.prices?.find(p => p.currency_code === 'inr') || selectedVariant?.prices?.[0];
-  const priceAmount = price ? price.amount : 0;
+  const priceAmount = getVariantPrice(selectedVariant);
+  const originalPriceAmount = getVariantOriginalPrice(selectedVariant);
 
   const getBreadcrumbs = () => {
     const crumbs = ['HOME'];
@@ -209,6 +209,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
                 {/* Price */}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0' }}>
+                  {originalPriceAmount > 0 && (
+                    <del style={{ fontSize: '16px', fontWeight: '600', color: '#94a3b8' }}>
+                      ₹{originalPriceAmount.toFixed(2)}
+                    </del>
+                  )}
                   <span style={{ fontSize: '24px', fontWeight: '700', color: 'var(--color-heading)' }}>
                     ₹{priceAmount.toFixed(2)}
                   </span>
@@ -221,7 +226,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 <div style={{ 
                   color: loadingStock 
                     ? '#a1a1aa' 
-                    : stockQuantity === 0 
+                    : (!stockQuantity || stockQuantity <= 0)
                       ? '#ef4444' 
                       : '#2ec4b6', 
                   fontSize: '13px', 
@@ -230,9 +235,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 }}>
                   {loadingStock 
                     ? 'Checking stock...' 
-                    : stockQuantity === 0 
+                    : (!stockQuantity || stockQuantity <= 0)
                       ? 'Out of stock' 
-                      : stockQuantity !== null && stockQuantity < 10 
+                      : stockQuantity < 10 
                         ? `Only ${stockQuantity} left in stock - order soon` 
                         : 'In stock'
                   }
@@ -241,7 +246,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 {/* Quantity and Actions Bar */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0', flexWrap: 'wrap' }}>
                   {/* Quantity selector */}
-                  {stockQuantity !== 0 && (
+                  {stockQuantity !== null && stockQuantity > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ced4da', borderRadius: '6px', height: '40px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
                       <button 
                         type="button"
@@ -263,7 +268,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          setQuantity(prev => prev + 1);
+                          setQuantity(prev => Math.min(stockQuantity || 99, prev + 1));
                         }}
                         style={{ background: 'none', border: 'none', width: '36px', height: '100%', cursor: 'pointer', fontSize: '12px', color: '#495057', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       >
@@ -284,9 +289,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                       await addToCart(selectedVariant.id, quantity);
                       setIsAdding(false);
                     }}
-                    disabled={isAdding || !selectedVariant || stockQuantity === 0}
+                    disabled={isAdding || !selectedVariant || !stockQuantity || stockQuantity <= 0}
                     style={{
-                      backgroundColor: stockQuantity === 0 ? '#71717a' : '#c85a17',
+                      backgroundColor: (!stockQuantity || stockQuantity <= 0) ? '#71717a' : '#c85a17',
                       color: '#ffffff',
                       border: 'none',
                       borderRadius: '20px',
@@ -295,18 +300,18 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                       fontWeight: '700',
                       fontSize: '12px',
                       letterSpacing: '0.05em',
-                      cursor: stockQuantity === 0 ? 'not-allowed' : 'pointer',
+                      cursor: (!stockQuantity || stockQuantity <= 0) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       transition: 'background-color 0.2s'
                     }}
                   >
-                    {isAdding ? 'ADDING...' : stockQuantity === 0 ? 'OUT OF STOCK' : 'ADD TO CART'}
+                    {isAdding ? 'ADDING...' : (!stockQuantity || stockQuantity <= 0) ? 'OUT OF STOCK' : 'ADD TO CART'}
                   </button>
 
                   {/* Buy Now */}
-                  {stockQuantity !== 0 && (
+                  {stockQuantity !== null && stockQuantity > 0 && (
                     <button
                       onClick={async () => {
                         if (!selectedVariant) return;

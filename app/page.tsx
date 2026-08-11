@@ -1,18 +1,24 @@
 import HomeLayout from "@/components/HomeLayout";
 import MainContent from "@/components/MainContent";
-import { getProducts, getCategories, getValidImageUrl } from "@/lib/medusa";
+import { getProducts, getCategories, getValidImageUrl, fetchApi } from "@/lib/medusa";
 
 export default async function Home() {
   let initialProducts: any[] = [];
   let initialCategories: any[] = [];
+  let initialLatestProducts: any[] = [];
+  let initialPopularCategories: any[] = [];
   const initialCategoryImages: Record<string, string> = {};
 
   try {
-    const [productsData, categoriesData] = await Promise.all([
+    const [productsData, categoriesData, latestProductsData, popularCategoriesData] = await Promise.all([
       getProducts({ limit: 24 }),
       getCategories(),
+      fetchApi<{ products: any[] }>("/store/latest-products").catch(() => ({ products: [] })),
+      fetchApi<{ popular_categories: any[] }>("/store/popular-categories").catch(() => ({ popular_categories: [] })),
     ]);
     initialProducts = productsData?.products || [];
+    initialLatestProducts = latestProductsData?.products || [];
+    initialPopularCategories = popularCategoriesData?.popular_categories || [];
     
     // Shuffle the products on the server side to maintain the current logic
     initialProducts = [...initialProducts];
@@ -111,6 +117,8 @@ export default async function Home() {
           initialProducts={initialProducts} 
           initialCategories={initialCategories}
           initialCategoryImages={initialCategoryImages}
+          initialLatestProducts={initialLatestProducts}
+          initialPopularCategories={initialPopularCategories}
         />
       </main>
     </HomeLayout>

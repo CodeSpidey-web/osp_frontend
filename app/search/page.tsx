@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import ShopHeader from '@/components/ShopHeader';
 import Footer from '@/components/Footer';
 import { useProducts, useCategories } from '@/lib/hooks';
+import { getProductPriceRange, getValidImageUrl } from '@/lib/medusa';
 
 const MobileMenu = dynamic(() => import("@/components/MobileMenu"), { ssr: false });
 const SideNavs = dynamic(() => import("@/components/SideNavs"), { ssr: false });
@@ -1133,12 +1134,7 @@ const SearchPage = () => {
                                         </div>
                                     ) : (
                                         products.map((product, index) => {
-                                            const minPrice = product.variants?.length
-                                                ? Math.min(...product.variants.map(v => v.prices?.[0]?.amount || 0))
-                                                : 0;
-                                            const maxPrice = product.variants?.length
-                                                ? Math.max(...product.variants.map(v => v.prices?.[0]?.amount || 0))
-                                                : 0;
+                                            const { min: minPrice, max: maxPrice } = getProductPriceRange(product);
                                             const order = (index % 6) + 1;
                                             const catName = product.categories?.[0]?.name || 'Category';
                                             return (
@@ -1150,10 +1146,10 @@ const SearchPage = () => {
                                                                     {product.thumbnail ? (
                                                                         <>
                                                                             <img className="rbt-prd-img"
-                                                                                src={product.thumbnail}
+                                                                                src={getValidImageUrl(product.thumbnail, '/assets/images/product-img/electronics/electro-c-01.webp', product.handle)}
                                                                                 alt={product.title} />
                                                                             <img className="rbt-hover-img"
-                                                                                src={product.thumbnail}
+                                                                                src={getValidImageUrl(product.thumbnail, '/assets/images/product-img/electronics/electro-c-01.webp', product.handle)}
                                                                                 alt={product.title} />
                                                                         </>
                                                                     ) : (

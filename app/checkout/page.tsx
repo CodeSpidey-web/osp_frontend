@@ -15,7 +15,8 @@ import {
   initializePaymentSession,
   completeCart, 
   MedusaCart,
-  fetchApi
+  fetchApi,
+  getValidImageUrl
 } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -544,7 +545,7 @@ const CheckoutPage = () => {
                         <div key={item.id} style={{ display: 'flex', gap: '12px', paddingBottom: '14px', borderBottom: '1px solid #f1f3f5', alignItems: 'center' }}>
                           <div style={{ width: '56px', height: '56px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e9ecef', background: '#ffffff', flexShrink: 0, padding: '4px' }}>
                             <img 
-                              src={item.thumbnail || '/assets/images/catagory-img/cat-transp-img-07.webp'} 
+                              src={getValidImageUrl(item.thumbnail, '/assets/images/catagory-img/cat-transp-img-07.webp')} 
                               alt={item.title} 
                               style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />

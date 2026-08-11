@@ -8,6 +8,7 @@ import ShopSidebar from '@/components/ShopSidebar';
 import ProductGrid from '@/components/ProductGrid';
 import ShopBannerAndCategories from '@/components/ShopBannerAndCategories';
 import { useProducts, useCategories } from '@/lib/hooks';
+import { getVariantPrice } from '@/lib/medusa';
 
 import ShopHeader from '@/components/ShopHeader';
 import Footer from '@/components/Footer';
@@ -19,9 +20,12 @@ const Modals = dynamic(() => import("@/components/Modals"), { ssr: false });
 const ShopContent = () => {
     const searchParams = useSearchParams();
     const initialQ = searchParams.get('q') || searchParams.get('query') || '';
+    const initialCatId = searchParams.get('category_id') || searchParams.get('category');
     
     // States for sorting, filtering, searching and pagination
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(
+        initialCatId ? [initialCatId] : []
+    );
     const [searchQuery, setSearchQuery] = useState(initialQ);
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialQ);
     const [sortOrder, setSortOrder] = useState('');
@@ -148,9 +152,7 @@ const ShopContent = () => {
 
     // Filter products by price range client-side
     const getProductMinMaxPrice = (product: any) => {
-        const amounts = product.variants?.flatMap((v: any) =>
-            v.prices?.map((p: any) => p.amount) || []
-        ) || [];
+        const amounts = product.variants?.map((v: any) => getVariantPrice(v)).filter((a: number) => a > 0) || [];
         if (amounts.length === 0) return { min: 0, max: 0 };
         return { min: Math.min(...amounts), max: Math.max(...amounts) };
     };

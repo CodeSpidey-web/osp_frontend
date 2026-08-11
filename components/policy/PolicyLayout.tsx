@@ -523,7 +523,7 @@ export default function PolicyLayout({
                       Call +91 90426 86793
                     </a>
                     <a
-                      href="https://wa.me/919042686793?text=Hi,%20I%20have%20a%20question%20regarding%20Ocean%20Student%20Projects%20policies."
+                      href="https://wa.me/91733897569?text=Hi,%20I%20have%20a%20question%20regarding%20Ocean%20Student%20Projects%20policies."
                       target="_blank"
                       rel="noopener noreferrer"
                       className="policy-contact-btn"

@@ -1,21 +1,27 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getProducts, getProduct, getCategories, getCategoryProductCounts, MedusaProduct, MedusaCategory } from './medusa'
 
 export function useProducts(params?: { q?: string; category_id?: string[]; limit?: number; offset?: number; order?: string }) {
   const [products, setProducts] = useState<MedusaProduct[]>([])
   const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const requestIdRef = useRef(0)
 
   useEffect(() => {
+    const thisRequestId = ++requestIdRef.current
     setLoading(true)
     getProducts(params)
       .then((res) => {
+        if (thisRequestId !== requestIdRef.current) return
         setProducts(res.products)
         setCount(res.count)
       })
       .catch(console.error)
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (thisRequestId !== requestIdRef.current) return
+        setLoading(false)
+      })
   }, [params?.q, params?.category_id?.join(','), params?.limit, params?.offset, params?.order])
 
   return { products, count, loading }

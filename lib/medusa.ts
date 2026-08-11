@@ -216,14 +216,30 @@ export function getValidImageUrl(url?: string | null, fallback: string = '/asset
       return handleMap[productHandle];
     }
   }
-  if (!url || typeof url !== 'string') {
+  if (!url || typeof url !== 'string' || url.trim() === '') {
     return fallback;
   }
   
-  let cleanUrl = url;
-  if (cleanUrl.includes('/images/')) {
+  let cleanUrl = url.trim();
+  
+  // If path points to static frontend assets like /images/ or /assets/ (excluding Medusa backend /static/ uploads)
+  if (cleanUrl.includes('/images/') && !cleanUrl.includes('/static/')) {
     const idx = cleanUrl.indexOf('/images/');
     cleanUrl = cleanUrl.substring(idx);
+    return cleanUrl;
+  }
+  
+  // If stored as relative Medusa static upload path (e.g. /static/123.png)
+  if (cleanUrl.startsWith('/static/')) {
+    const backendBase = BACKEND_URL.replace(/\/$/, '');
+    return `${backendBase}${cleanUrl}`;
+  }
+  
+  // If stored with localhost:9000/static or localhost:8000/static in database
+  if (/^http:\/\/localhost:\d+\/static\//.test(cleanUrl)) {
+    const path = cleanUrl.replace(/^http:\/\/localhost:\d+/, '');
+    const backendBase = BACKEND_URL.replace(/\/$/, '');
+    return `${backendBase}${path}`;
   }
   
   if (cleanUrl.includes('localhost:8000')) {
@@ -253,6 +269,32 @@ export interface MedusaProductVariant {
   sku?: string
   prices?: { amount: number; currency_code: string }[]
   calculated_price?: { calculated_amount: number; original_amount: number; currency_code: string }
+}
+
+export function getVariantPrice(variant?: MedusaProductVariant | null, currencyCode: string = 'inr'): number {
+  if (!variant) return 0;
+  const calc = variant.calculated_price;
+  if (calc) {
+    const amount = calc.calculated_amount ?? calc.original_amount;
+    if (typeof amount === 'number' && amount > 0) return amount;
+  }
+  const price = variant.prices?.find(p => p.currency_code === currencyCode) || variant.prices?.[0];
+  return price?.amount ?? 0;
+}
+
+export function getVariantOriginalPrice(variant?: MedusaProductVariant | null): number {
+  if (!variant) return 0;
+  const calc = variant.calculated_price;
+  if (!calc) return 0;
+  const original = typeof calc.original_amount === 'number' && calc.original_amount > 0 ? calc.original_amount : 0;
+  const calculated = typeof calc.calculated_amount === 'number' && calc.calculated_amount > 0 ? calc.calculated_amount : 0;
+  return original > calculated ? original : 0;
+}
+
+export function getProductPriceRange(product: MedusaProduct): { min: number; max: number } {
+  const amounts = (product.variants || []).map(v => getVariantPrice(v)).filter(a => a > 0);
+  if (amounts.length === 0) return { min: 0, max: 0 };
+  return { min: Math.min(...amounts), max: Math.max(...amounts) };
 }
 
 export interface MedusaCategory {
@@ -408,7 +450,7 @@ export async function getProducts(
     q.set('offset', apiOffset)
     q.set('limit', apiLimit)
     if (params?.order && !isSearching) q.set('order', params.order)
-    q.set('fields', params?.fields || '*variants.prices,*categories')
+    q.set('fields', params?.fields || '*variants.prices,*variants.calculated_price,*categories')
     
     const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(
       `/store/products?${q.toString()}`,
@@ -449,10 +491,10 @@ export async function getProducts(
 export async function getProduct(handleOrId: string): Promise<MedusaProduct> {
   try {
     if (handleOrId.startsWith('prod_')) {
-      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices,*categories`)
+      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices,*variants.calculated_price,*categories`)
       return res.product
     } else {
-      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices,*categories`)
+      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices,*variants.calculated_price,*categories`)
       if (!res.products || res.products.length === 0) {
         const found = FALLBACK_PRODUCTS.find(p => p.handle === handleOrId)
         if (found) return found
