@@ -243,8 +243,9 @@ export function getValidImageUrl(url?: string | null, fallback: string = '/asset
     resultUrl = fallback;
   }
 
-  // MIXED CONTENT RESOLUTION: If resultUrl is HTTP and current window is HTTPS, proxy the request
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && resultUrl.startsWith('http://')) {
+  // MIXED CONTENT RESOLUTION: If backend is remote (not localhost) and URL is insecure HTTP, proxy the request (both SSR and client)
+  const isRemoteBackend = !BACKEND_URL.includes('localhost') && !BACKEND_URL.includes('127.0.0.1');
+  if (isRemoteBackend && resultUrl.startsWith('http://')) {
     return `/api/image-proxy?url=${encodeURIComponent(resultUrl)}`;
   }
   
