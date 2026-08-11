@@ -69,6 +69,16 @@ export default function ProfilePage() {
   }, [customer, authLoading, router])
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get('tab')
+      if (tab === 'orders' || tab === 'addresses' || tab === 'password' || tab === 'profile') {
+        setActiveTab(tab as any)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     if (customer) {
       setFirstName(customer.first_name || '')
       setLastName(customer.last_name || '')

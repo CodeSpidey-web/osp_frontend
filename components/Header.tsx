@@ -300,6 +300,19 @@ export default function Header() {
                                     </div>
                                 </a>
                             </li>
+                            {customer && (
+                                <li className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover d-none d-lg-flex">
+                                    <a href="/profile?tab=orders" className="rbt-access-box-wrapper">
+                                        <div className="rbt-round-btn rbt-bg-static-gray">
+                                            <i className="fa-regular fa-clipboard-list"></i>
+                                        </div>
+                                        <div className="content">
+                                            <p>My Orders</p>
+                                            <span>Order History</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            )}
                             <li
                                 className="rbt-access-box rbt-scroll-trigger fade_in animation-order-5 rbt-access-box-has-bg-hover d-none d-lg-flex">
                                 <a href={customer ? "/profile" : "/login"} className="rbt-access-box-wrapper">
