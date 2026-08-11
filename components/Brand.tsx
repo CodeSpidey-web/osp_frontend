@@ -67,13 +67,18 @@ export default function Brand() {
 
         .osp-brand-header {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 24px;
-          margin-bottom: 36px;
+          justify-content: center;
+          text-align: center;
+          margin-bottom: 48px;
         }
 
         .osp-brand-title-wrap {
-          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
         }
 
         .osp-brand-chip {
@@ -103,9 +108,7 @@ export default function Brand() {
         }
 
         .osp-brand-line {
-          height: 1px;
-          background: linear-gradient(90deg, #e2e8f0 0%, transparent 100%);
-          flex: 1;
+          display: none;
         }
 
         .osp-brand-marquee-container {

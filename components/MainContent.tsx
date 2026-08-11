@@ -520,13 +520,13 @@ export default function MainContent({
           <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
             <div className="container">
               <div className="row">
-                <div className="col-lg-12 mb--10">
+                <div className="col-lg-12 mb--24">
                   <div className="rbt-component-section-title text-center border-0 p-0">
                     <div>
                       <span className="osp-brand-chip">POPULAR CATEGORIES</span>
                     </div>
                     <h2 className="rbt-title mt--4">
-                      Browse By <span className="rbt-bold--text text-success">Engineering Component</span>
+                      Shop By <span className="rbt-bold--text text-success">Category</span>
                     </h2>
                   </div>
                 </div>
@@ -538,8 +538,8 @@ export default function MainContent({
                   position: relative;
                   background-color: #136c39;
                   border-radius: 9999px;
-                  height: 90px;
-                  margin-top: 100px;
+                  height: 120px;
+                  margin-top: 180px;
                   display: flex;
                   align-items: center;
                   box-shadow: 0 10px 25px -5px rgba(19, 108, 57, 0.3);
@@ -548,7 +548,8 @@ export default function MainContent({
                 @media (max-width: 991px) {
                   .osp-popular-categories-bar-wrapper {
                     border-radius: 24px;
-                    height: 80px;
+                    height: 100px;
+                    margin-top: 130px;
                   }
                 }
 
@@ -558,11 +559,12 @@ export default function MainContent({
                   overflow-x: auto;
                   overflow-y: visible;
                   scroll-behavior: smooth;
-                  width: 100%;
+                  flex: 1;
+                  min-width: 0;
                   scrollbar-width: none;
                   -ms-overflow-style: none;
-                  height: 180px;
-                  margin-top: -120px;
+                  height: 320px;
+                  margin-top: -200px;
                   padding: 0 70px;
                 }
 
@@ -574,10 +576,10 @@ export default function MainContent({
                   display: flex;
                   flex-direction: column;
                   align-items: center;
-                  justify-content: flex-end;
+                  justify-content: space-between;
                   flex-shrink: 0;
-                  width: calc((100% - 128px) / 5);
-                  height: 170px;
+                  width: calc((100% - 96px) / 4);
+                  height: 280px;
                   text-decoration: none !important;
                   position: relative;
                 }
@@ -586,12 +588,12 @@ export default function MainContent({
                   .osp-scroll-container {
                     gap: 24px;
                     padding: 0 48px;
-                    height: 160px;
-                    margin-top: -110px;
+                    height: 220px;
+                    margin-top: -135px;
                   }
                   .osp-cat-item {
                     width: calc((100% - 48px) / 3);
-                    height: 150px;
+                    height: 190px;
                   }
                 }
 
@@ -599,37 +601,37 @@ export default function MainContent({
                   .osp-scroll-container {
                     gap: 16px;
                     padding: 0 40px;
-                    height: 135px;
-                    margin-top: -95px;
+                    height: 170px;
+                    margin-top: -100px;
                   }
                   .osp-cat-item {
                     width: calc((100% - 16px) / 2);
-                    height: 125px;
+                    height: 145px;
                   }
                 }
 
                 .osp-cat-img-box {
-                  width: 120px;
-                  height: 120px;
+                  width: 200px;
+                  height: 200px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
                   position: relative;
-                  margin-bottom: 8px;
+                  margin-top: 10px;
                   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 }
 
                 @media (max-width: 991px) {
                   .osp-cat-img-box {
-                    width: 95px;
-                    height: 95px;
+                    width: 140px;
+                    height: 140px;
                   }
                 }
 
                 @media (max-width: 767px) {
                   .osp-cat-img-box {
-                    width: 75px;
-                    height: 75px;
+                    width: 100px;
+                    height: 100px;
                   }
                 }
 
@@ -637,22 +639,24 @@ export default function MainContent({
                   max-width: 95%;
                   max-height: 95%;
                   object-fit: contain;
+                  transform: scale(1.1);
                   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                  mix-blend-mode: multiply;
                 }
 
                 .osp-cat-item:hover .osp-cat-img-box img {
-                  transform: translateY(-16px) scale(1.15);
+                  transform: translateY(-30px) scale(1.2);
                 }
 
                 /* Glowing pedestal ring underneath the image inside the img box */
                 .osp-cat-img-box::after {
                   content: '';
                   position: absolute;
-                  bottom: -2px;
+                  bottom: 4px;
                   left: 50%;
                   transform: translateX(-50%) scale(0.6);
-                  width: 90px;
-                  height: 16px;
+                  width: 160px;
+                  height: 28px;
                   border: 1.5px solid #22c55e;
                   border-radius: 50%;
                   box-shadow: 0 0 8px #22c55e, inset 0 0 8px #22c55e;
@@ -664,11 +668,11 @@ export default function MainContent({
                 .osp-cat-img-box::before {
                   content: '';
                   position: absolute;
-                  bottom: -8px;
+                  bottom: -6px;
                   left: 50%;
                   transform: translateX(-50%) scale(0.6);
-                  width: 104px;
-                  height: 19px;
+                  width: 180px;
+                  height: 32px;
                   border: 1px solid #4ade80;
                   border-radius: 50%;
                   box-shadow: 0 0 6px #4ade80, inset 0 0 6px #4ade80;
@@ -685,14 +689,16 @@ export default function MainContent({
 
                 .osp-cat-name {
                   color: #ffffff;
-                  font-size: 13px;
-                  font-weight: 600;
-                  margin-bottom: 12px;
+                  font-size: 16px;
+                  font-weight: 700;
+                  margin-bottom: 24px;
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
                   width: 100%;
                   text-align: center;
+                  z-index: 5;
+                  position: relative;
                   transition: color 0.2s ease;
                 }
 
@@ -736,6 +742,66 @@ export default function MainContent({
                   color: #136c39;
                   font-size: 16px;
                   font-weight: bold;
+                }
+
+                /* Premium highlighted headers styling */
+                .rbt-component-section-title h2.rbt-title,
+                .osp-brand-title,
+                .osp-reviews-title {
+                  position: relative;
+                  display: inline-block;
+                  padding-bottom: 24px;
+                  margin-bottom: 0 !important;
+                  font-weight: 800 !important;
+                }
+
+                .rbt-component-section-title h2.rbt-title::after,
+                .osp-brand-title::after,
+                .osp-reviews-title::after {
+                  content: '';
+                  position: absolute;
+                  bottom: 0;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 120px;
+                  height: 3px;
+                  background: linear-gradient(90deg, transparent, #136c39 20%, #22c55e 50%, #136c39 80%, transparent);
+                  border-radius: 99px;
+                }
+
+                .rbt-component-section-title h2.rbt-title::before,
+                .osp-brand-title::before,
+                .osp-reviews-title::before {
+                  content: '';
+                  position: absolute;
+                  bottom: -3.5px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 10px;
+                  height: 10px;
+                  background-color: #136c39;
+                  border: 2px solid #ffffff;
+                  border-radius: 50%;
+                  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+                  z-index: 1;
+                }
+
+
+
+
+
+                /* Custom styling overrides for osp-brand-chip */
+                .osp-brand-chip {
+                  background-color: #eaf4ed !important;
+                  color: #136c39 !important;
+                  border: 1px solid #c2e2cc !important;
+                  padding: 4px 14px !important;
+                  border-radius: 50px !important;
+                  font-size: 11px !important;
+                  font-weight: 700 !important;
+                  letter-spacing: 1.5px !important;
+                  display: inline-block !important;
+                  box-shadow: 0 2px 4px rgba(19, 108, 57, 0.05) !important;
                 }
               ` }} />
 

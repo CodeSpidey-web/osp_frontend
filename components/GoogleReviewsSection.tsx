@@ -42,6 +42,12 @@ export default function GoogleReviewsSection() {
   return (
     <section ref={sectionRef} className="py-12 bg-slate-50/70 text-slate-800 font-sans min-h-[300px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* TESTIMONIALS chip placed right above the widget title */}
+        <div className="text-center mb--12" style={{ position: "relative", zIndex: 10 }}>
+          <span className="osp-brand-chip">TESTIMONIALS</span>
+        </div>
+
         {/* Elfsight Google Reviews Widget */}
         {isInView ? (
           <div 
