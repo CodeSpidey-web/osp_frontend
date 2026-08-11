@@ -56,7 +56,7 @@ export default function MobileMenu() {
                                 <div className="logo" style={{ width: 'auto', maxWidth: '220px', flexGrow: 1 }}>
                                     <a href="/" onClick={handleCloseMenu} style={{ display: 'block', width: '100%' }}>
                                         <img
-                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            src="/assets/images/logo/LOGO.png"
                                             alt="Ocean Student Projects Logo"
                                             style={{
                                                 width: '100%',

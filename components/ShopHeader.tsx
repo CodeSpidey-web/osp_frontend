@@ -863,7 +863,7 @@ function ShopHeaderContent() {
                     <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <a href="/" style={{ display: 'inline-block' }}>
                             <img
-                                src="/assets/images/logo/bitmap_cropped.png"
+                                src="/assets/images/logo/LOGO.png"
                                 alt="Ocean Student Projects Logo"
                                 style={{
                                     height: 'clamp(62px, 6vw, 84px)',

@@ -204,7 +204,7 @@ export default function Header() {
                                 <div className="logo">
                                     <a href="/">
                                         <img
-                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            src="/assets/images/logo/LOGO.png"
                                             alt="Ocean Student Projects Logo"
                                             style={{
                                                 height: '86px',
@@ -273,7 +273,7 @@ export default function Header() {
                             <div className="logo">
                                 <a href="/">
                                     <img
-                                        src="/assets/images/logo/bitmap_cropped.png"
+                                        src="/assets/images/logo/LOGO.png"
                                         alt="Ocean Student Projects Logo"
                                         style={{
                                             height: '86px',
@@ -355,7 +355,7 @@ export default function Header() {
                                 <div className="logo rbt-logo-height-sm">
                                     <a href="/">
                                         <img
-                                            src="/assets/images/logo/bitmap_cropped.png"
+                                            src="/assets/images/logo/LOGO.png"
                                             alt="Ocean Student Projects Logo"
                                             style={{
                                                 height: '86px',
@@ -384,7 +384,7 @@ export default function Header() {
                         <div className="logo">
                             <a href="/">
                                 <img
-                                    src="/assets/images/logo/bitmap_cropped.png"
+                                    src="/assets/images/logo/LOGO.png"
                                     alt="Ocean Student Projects Logo"
                                     style={{
                                         height: '86px',
