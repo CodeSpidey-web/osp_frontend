@@ -168,25 +168,28 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 {/* Horizontal Thumbnails */}
                 {images.length > 1 && (
                   <div className="d-flex gap-2 flex-wrap mt--8">
-                    {images.map((img) => (
-                      <button 
-                        key={img.id} 
-                        onClick={() => setActiveImage(img.url)}
-                        style={{ 
-                          width: '76px', 
-                          height: '76px', 
-                          border: activeImage === img.url ? '2px solid var(--color-primary)' : '1px solid var(--color-gray-300)',
-                          borderRadius: '4px',
-                          overflow: 'hidden',
-                          padding: '4px',
-                          background: '#ffffff',
-                          cursor: 'pointer',
-                          transition: 'border-color 0.2s ease-in-out'
-                        }}
-                      >
-                        <img alt={product.title} src={img.url} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                      </button>
-                    ))}
+                    {images.map((img) => {
+                      const validImgUrl = getValidImageUrl(img.url, '', product.handle);
+                      return (
+                        <button 
+                          key={img.id} 
+                          onClick={() => setActiveImage(validImgUrl)}
+                          style={{ 
+                            width: '76px', 
+                            height: '76px', 
+                            border: activeImage === validImgUrl ? '2px solid var(--color-primary)' : '1px solid var(--color-gray-300)',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            padding: '4px',
+                            background: '#ffffff',
+                            cursor: 'pointer',
+                            transition: 'border-color 0.2s ease-in-out'
+                          }}
+                        >
+                          <img alt={product.title} src={validImgUrl} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

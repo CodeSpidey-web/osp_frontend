@@ -523,7 +523,7 @@ export default function MainContent({
               </div>
               <div className="row row--12 mt_dec--24 justify-content-center rbt-mobile-row">
                 {displayCategories.map((cat, i) => {
-                  const imgUrl = cat.image_url || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+                  const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
 
                   return (
                     <div key={cat.id} className={`col-lg-1-5 col-lg-4 col-md-4 col-sm-12 col-6 mt--24 reveal reveal-delay-${(i % 4) + 1}`}>

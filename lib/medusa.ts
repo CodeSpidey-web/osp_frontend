@@ -221,31 +221,34 @@ export function getValidImageUrl(url?: string | null, fallback: string = '/asset
   }
   
   let cleanUrl = url.trim();
+  let resultUrl = cleanUrl;
   
   // If path points to static frontend assets like /images/ or /assets/ (excluding Medusa backend /static/ uploads)
   if (cleanUrl.includes('/images/') && !cleanUrl.includes('/static/')) {
     const idx = cleanUrl.indexOf('/images/');
-    cleanUrl = cleanUrl.substring(idx);
-    return cleanUrl;
+    resultUrl = cleanUrl.substring(idx);
   }
-  
   // If stored as relative Medusa static upload path (e.g. /static/123.png)
-  if (cleanUrl.startsWith('/static/')) {
+  else if (cleanUrl.startsWith('/static/')) {
     const backendBase = BACKEND_URL.replace(/\/$/, '');
-    return `${backendBase}${cleanUrl}`;
+    resultUrl = `${backendBase}${cleanUrl}`;
   }
-  
   // If stored with localhost:9000/static or localhost:8000/static in database
-  if (/^http:\/\/localhost:\d+\/static\//.test(cleanUrl)) {
+  else if (/^http:\/\/localhost:\d+\/static\//.test(cleanUrl)) {
     const path = cleanUrl.replace(/^http:\/\/localhost:\d+/, '');
     const backendBase = BACKEND_URL.replace(/\/$/, '');
-    return `${backendBase}${path}`;
+    resultUrl = `${backendBase}${path}`;
+  }
+  else if (cleanUrl.includes('localhost:8000')) {
+    resultUrl = fallback;
+  }
+
+  // MIXED CONTENT RESOLUTION: If resultUrl is HTTP and current window is HTTPS, proxy the request
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && resultUrl.startsWith('http://')) {
+    return `/api/image-proxy?url=${encodeURIComponent(resultUrl)}`;
   }
   
-  if (cleanUrl.includes('localhost:8000')) {
-    return fallback;
-  }
-  return cleanUrl;
+  return resultUrl;
 }
 
 export interface MedusaProduct {
