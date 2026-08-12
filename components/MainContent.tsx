@@ -745,6 +745,23 @@ export default function MainContent({
                   font-weight: bold;
                 }
 
+                @media (max-width: 767px) {
+                  .osp-scroll-btn {
+                    width: 32px;
+                    height: 32px;
+                    top: 60%;
+                  }
+                  .osp-scroll-btn i {
+                    font-size: 12px;
+                  }
+                  .osp-scroll-btn-left {
+                    left: 10px;
+                  }
+                  .osp-scroll-btn-right {
+                    right: 10px;
+                  }
+                }
+
                 /* Premium highlighted headers styling */
                 .rbt-component-section-title h2.rbt-title,
                 .osp-brand-title,
