@@ -9,7 +9,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(imageUrl);
+    const res = await fetch(imageUrl, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
     if (!res.ok) {
       return new NextResponse("Failed to fetch image", { status: res.status });
     }

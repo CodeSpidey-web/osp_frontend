@@ -243,10 +243,16 @@ export function getValidImageUrl(url?: string | null, fallback: string = '/asset
     resultUrl = fallback;
   }
 
-  // MIXED CONTENT RESOLUTION: If backend is remote (not localhost) and URL is insecure HTTP, proxy the request (both SSR and client)
+  // MIXED CONTENT RESOLUTION & REMOTE BACKEND BYPASS (e.g. ngrok):
   const isRemoteBackend = !BACKEND_URL.includes('localhost') && !BACKEND_URL.includes('127.0.0.1');
-  if (isRemoteBackend && resultUrl.startsWith('http://')) {
-    return `/api/image-proxy?url=${encodeURIComponent(resultUrl)}`;
+  if (isRemoteBackend) {
+    const backendHost = BACKEND_URL.replace(/^https?:\/\//, '').split('/')[0];
+    const imageHost = resultUrl.replace(/^https?:\/\//, '').split('/')[0];
+    const isBackendImage = backendHost === imageHost;
+
+    if (resultUrl.startsWith('http://') || (isBackendImage && resultUrl.startsWith('https://'))) {
+      return `/api/image-proxy?url=${encodeURIComponent(resultUrl)}`;
+    }
   }
   
   return resultUrl;

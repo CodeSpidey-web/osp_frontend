@@ -32,8 +32,8 @@ function getParentCategoryName(productCategories: any[], allCategories: MedusaCa
   }
 
   const findParentInTree = (
-    targetId: string, 
-    nodes: MedusaCategory[], 
+    targetId: string,
+    nodes: MedusaCategory[],
     parent: MedusaCategory | null
   ): MedusaCategory | null => {
     for (const node of nodes) {
@@ -120,7 +120,7 @@ export default function MainContent({
         // Fetch first product image for parent categories
         const parentCats = cats.filter((cat: any) => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized');
         const categoryImageMap: Record<string, string> = {};
-        
+
         await Promise.all(
           parentCats.map(async (cat) => {
             try {
@@ -510,7 +510,7 @@ export default function MainContent({
           </div>
         </div>
       </div>
-      
+
       {/* Categories Carousel */}
       {(() => {
         const displayCategories = popularCategories.length > 0 ? popularCategories : categories.filter(
@@ -533,7 +533,8 @@ export default function MainContent({
               </div>
 
               {/* Custom CSS Style Injection for the premium pill categories bar */}
-              <style dangerouslySetInnerHTML={{ __html: `
+              <style dangerouslySetInnerHTML={{
+                __html: `
                 .osp-popular-categories-bar-wrapper {
                   position: relative;
                   background-color: #136c39;
@@ -601,12 +602,12 @@ export default function MainContent({
                   .osp-scroll-container {
                     gap: 16px;
                     padding: 0 40px;
-                    height: 170px;
-                    margin-top: -100px;
+                    height: 250px;
+                    margin-top: -150px;
                   }
                   .osp-cat-item {
                     width: calc((100% - 16px) / 2);
-                    height: 145px;
+                    height: 210px;
                   }
                 }
 
@@ -630,8 +631,8 @@ export default function MainContent({
 
                 @media (max-width: 767px) {
                   .osp-cat-img-box {
-                    width: 100px;
-                    height: 100px;
+                    width: 130px;
+                    height: 130px;
                   }
                 }
 
@@ -806,15 +807,15 @@ export default function MainContent({
               ` }} />
 
               <div className="osp-popular-categories-bar-wrapper">
-                <button 
-                  type="button" 
-                  className="osp-scroll-btn osp-scroll-btn-left" 
+                <button
+                  type="button"
+                  className="osp-scroll-btn osp-scroll-btn-left"
                   onClick={() => scrollPopularCategories('left')}
                   aria-label="Scroll left"
                 >
                   <i className="fa-solid fa-chevron-left"></i>
                 </button>
-                
+
                 <div className="osp-scroll-container" ref={popularCategoriesScrollRef}>
                   {displayCategories.map((cat, i) => {
                     const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
@@ -822,9 +823,9 @@ export default function MainContent({
                     return (
                       <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
                         <div className="osp-cat-img-box">
-                          <img 
-                            src={imgUrl} 
-                            alt={cat.name} 
+                          <img
+                            src={imgUrl}
+                            alt={cat.name}
                             loading="lazy"
                           />
                         </div>
@@ -834,9 +835,9 @@ export default function MainContent({
                   })}
                 </div>
 
-                <button 
-                  type="button" 
-                  className="osp-scroll-btn osp-scroll-btn-right" 
+                <button
+                  type="button"
+                  className="osp-scroll-btn osp-scroll-btn-right"
                   onClick={() => scrollPopularCategories('right')}
                   aria-label="Scroll right"
                 >
@@ -851,7 +852,7 @@ export default function MainContent({
 
       {/* Latest Products Section */}
       {latestProducts.length > 0 && (
-        <div 
+        <div
           className="rbt-component-area rbt-products-area py-5 reveal"
           style={{ backgroundColor: "#eaf4ed" }}
         >
