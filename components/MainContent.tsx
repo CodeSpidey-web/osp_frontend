@@ -623,7 +623,6 @@ export default function MainContent({
                   -ms-overflow-style: none;
                   scroll-snap-type: x mandatory;
                   scroll-padding: 0;
-                  align-items: flex-end;
                 }
 
                 .osp-scroll-container::-webkit-scrollbar {
@@ -679,6 +678,20 @@ export default function MainContent({
                     width: calc((100% - 16px) / 2);
                     min-width: 0;
                     height: 180px;
+                  }
+                  .osp-cat-img-box {
+                    width: 100px;
+                    height: 100px;
+                  }
+                  .osp-cat-img-box::after {
+                    width: 80px;
+                    height: 18px;
+                    bottom: 2px;
+                  }
+                  .osp-cat-img-box::before {
+                    width: 90px;
+                    height: 20px;
+                    bottom: -3px;
                   }
                 }
 
@@ -852,11 +865,15 @@ export default function MainContent({
                   .osp-cat-name {
                     font-size: 13px;
                     font-weight: 700;
-                    margin-bottom: 8px;
+                    margin-bottom: 5px;
                     white-space: normal;
                     overflow: visible;
                     text-overflow: clip;
                     line-height: 1.2;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 40px;
                   }
                 }
 
