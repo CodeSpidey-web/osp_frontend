@@ -623,6 +623,7 @@ export default function MainContent({
                   -ms-overflow-style: none;
                   scroll-snap-type: x mandatory;
                   scroll-padding: 0;
+                  align-items: flex-end;
                 }
 
                 .osp-scroll-container::-webkit-scrollbar {
