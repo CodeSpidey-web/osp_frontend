@@ -534,12 +534,12 @@ export default function MainContent({
             <div className="col-3">
               <div className="feature-item">
                 <div className="feature-icon">
-                  <i className="fa-solid fa-rotate-left"></i>
+                  <i className="fa-solid fa-award"></i>
                 </div>
                 <div className="text-start">
-                  <h6 className="feature-title d-none d-sm-block">Easy Returns</h6>
-                  <h6 className="feature-title d-block d-sm-none">Easy Returns</h6>
-                  <p className="feature-subtitle">Hassle-free replacement policy</p>
+                  <h6 className="feature-title d-none d-sm-block">Premium Quality</h6>
+                  <h6 className="feature-title d-block d-sm-none">High Quality</h6>
+                  <p className="feature-subtitle">Premium grade components</p>
                 </div>
               </div>
             </div>
@@ -1120,6 +1120,30 @@ export default function MainContent({
           </div>
         </div>
       )}
+
+      {/* Three Promo Banners Section */}
+      <div className="osp-promo-banners-section py-4" style={{ backgroundColor: "#f8fafc" }}>
+        <div className="container">
+          <div className="row g-2 g-md-3">
+            <div className="col-4">
+              <a href="/contact" className="osp-promo-banner-link" style={{ display: 'block', transition: 'transform 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+                <img 
+                  src="/assets/images/catagory-img/Untitled design.svg" 
+                  alt="Project Enquiry Banner" 
+                  className="img-fluid rounded-3"
+                  style={{ width: '100%', height: 'auto', objectFit: 'cover', display: 'block', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}
+                />
+              </a>
+            </div>
+            <div className="col-4">
+              {/* Second banner (will be sent later) */}
+            </div>
+            <div className="col-4">
+              {/* Third banner (will be sent later) */}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Popular Products Area */}
       <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gapTop reveal">

@@ -177,7 +177,7 @@ export default function ContactContent() {
         }
         @media (max-width: 768px) {
           .contact-grid {
-            flex-direction: column;
+            flex-direction: column-reverse;
             gap: 40px;
           }
         }
@@ -235,6 +235,18 @@ export default function ContactContent() {
                   boxShadow: '0 10px 30px rgba(0, 0, 0, 0.02)'
                 }}
               >
+                <h2 
+                  style={{ 
+                    fontSize: '22px', 
+                    fontWeight: '700', 
+                    color: '#0b2545', 
+                    marginBottom: '24px', 
+                    borderBottom: '2px solid #eef7f2', 
+                    paddingBottom: '12px' 
+                  }}
+                >
+                  Project Enquiry
+                </h2>
                 {submitted ? (
                   <div className="text-center py-4" style={{ animation: 'fadeIn 0.5s ease-in-out' }}>
                     <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#d1e7dd', color: '#0f5132', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', marginBottom: '16px' }}>
