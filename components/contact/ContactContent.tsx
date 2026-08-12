@@ -175,10 +175,23 @@ export default function ContactContent() {
           border-top: 1px solid #cfead6;
           padding-top: 50px;
         }
+        .osp-contact-form-card {
+          background: #ffffff;
+          border: 1px solid #eef0f2;
+          border-radius: 16px;
+          padding: 40px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        }
         @media (max-width: 768px) {
+          .contact-container {
+            padding: 30px 0 60px 0 !important;
+          }
           .contact-grid {
             flex-direction: column-reverse;
             gap: 40px;
+          }
+          .osp-contact-form-card {
+            padding: 24px 20px;
           }
         }
       `}</style>
@@ -226,15 +239,7 @@ export default function ContactContent() {
             
             {/* Right Form Column */}
             <div className="contact-form-col">
-              <div 
-                style={{ 
-                  background: '#ffffff', 
-                  border: '1px solid #eef0f2', 
-                  borderRadius: '16px', 
-                  padding: '40px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.02)'
-                }}
-              >
+              <div className="osp-contact-form-card">
                 <h2 
                   style={{ 
                     fontSize: '22px', 
