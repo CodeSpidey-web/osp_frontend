@@ -677,7 +677,7 @@ export default function MainContent({
                     flex: 0 0 calc((100% - 16px) / 2);
                     width: calc((100% - 16px) / 2);
                     min-width: 0;
-                    height: 180px;
+                    height: 100%;
                   }
                   .osp-cat-img-box {
                     width: 100px;
