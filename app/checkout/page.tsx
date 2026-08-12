@@ -305,354 +305,884 @@ const CheckoutPage = () => {
       <ShopHeader />
       <MobileMenu />
       <SideNavs />
-      <main className="rbt-main-wrapper">
-        <div className="rbt-wrapper rbt-section-gapTop" style={{ background: 'transparent', padding: '40px 0 80px' }}>
-          <div className="container">
-            {/* Page header */}
-            <div className="text-center mb-5">
-              <p style={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: '12px', fontWeight: '600', color: '#10b981', marginBottom: '8px' }}>Secure Checkout</p>
-              <h2 className="h3 fw-bold mb-2" style={{ fontSize: '30px', color: '#0b2545', letterSpacing: '-0.5px' }}>Confirm Your Details</h2>
-              <p className="text-muted small mb-0" style={{ fontSize: '14px' }}>A few details and your order is on its way</p>
-            </div>
+      
+      {/* Premium Injected Styles */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .osp-checkout-wrapper {
+          background: linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%);
+          padding: 60px 0 100px;
+          min-height: 100vh;
+        }
 
-            <div className="row g-4 g-lg-5">
-              <div className="col-12 col-lg-8">
-                <form onSubmit={handleContinue}>
-                  {/* Contact + Shipping card */}
-                  <div className="bg-white rounded-4 shadow-sm border mb-4 p-4 p-md-5">
-                    <div className="d-flex align-items-center gap-3 mb-4">
-                      <div className="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold" style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg, #0b2545 0%, #136c39 100%)' }}>1</div>
-                      <div>
-                        <h3 className="h5 fw-bold mb-0" style={{ color: '#0b2545' }}>Contact &amp; Delivery</h3>
-                        <span className="text-muted small">Where should we send it?</span>
-                      </div>
-                    </div>
+        .osp-checkout-header {
+          text-align: center;
+          margin-bottom: 50px;
+        }
 
-                    {/* Saved address selection */}
-                    {savedAddresses.length > 0 && (
-                      <div style={{ marginBottom: '22px' }}>
-                        <label className="form-label small fw-semibold mb-2" style={{ color: '#111827' }}>Choose a saved address</label>
-                        <div className="row g-2">
-                          {savedAddresses.map((addr: any) => {
-                            const isActive = selectedAddressId === addr.id;
-                            return (
-                              <div className="col-12 col-md-6" key={addr.id}>
-                                <button
-                                  type="button"
-                                  onClick={() => applyAddress(addr)}
-                                  style={{
-                                    width: '100%',
-                                    textAlign: 'left',
-                                    padding: '12px 14px',
-                                    border: isActive ? '2px solid #10b981' : '1px solid #e5e7eb',
-                                    background: isActive ? '#ecfdf5' : '#ffffff',
-                                    color: '#111827',
-                                    borderRadius: '10px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s ease',
-                                    fontFamily: 'inherit',
-                                  }}
-                                >
-                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                                    <span style={{ color: isActive ? '#10b981' : '#9ca3af', fontSize: '13px', paddingTop: '1px' }}>
-                                      <i className={isActive ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle'}></i>
-                                    </span>
-                                    <div>
-                                      <div style={{ fontWeight: '700', fontSize: '13px', marginBottom: '2px' }}>
-                                        {addr.first_name} {addr.last_name}
-                                        {addr.is_default_shipping && (
-                                          <span style={{ background: '#10b981', color: '#fff', fontSize: '10px', fontWeight: '700', padding: '1px 6px', borderRadius: '99px', marginLeft: '8px' }}>Default</span>
-                                        )}
-                                      </div>
-                                      <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                                        {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ''}, {addr.city}, {addr.province} - {addr.postal_code}
-                                      </div>
-                                      {addr.phone && (
-                                        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
-                                          <i className="fa-solid fa-phone" style={{ marginRight: '5px' }}></i>{addr.phone}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div className="text-end mt-2">
-                          <button
-                            type="button"
-                            onClick={() => { setSelectedAddressId(null); setAddress1(''); setCity(''); setProvince(''); setPostalCode(''); }}
-                            style={{ background: 'none', border: 'none', color: '#10b981', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}
-                          >
-                            + Enter a new address
-                          </button>
-                        </div>
-                      </div>
-                    )}
+        .osp-checkout-badge {
+          display: inline-block;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #10b981;
+          background-color: rgba(16, 185, 129, 0.1);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          padding: 6px 16px;
+          border-radius: 50px;
+          margin-bottom: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
 
-                    <div className="row g-3 g-md-4">
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-email" className="form-label small fw-semibold mb-1">Email address *</label>
-                        <input type="email" className="form-control" id="shipping-email" required value={email}
-                          onChange={(e) => setEmail(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-mobile" className="form-label small fw-semibold mb-1">Phone number (+91) *</label>
-                        <input type="text" className="form-control" id="shipping-mobile" required value={phone}
-                          onChange={(e) => setPhone(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12">
-                        <div className="border-bottom w-100 my-1"></div>
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-fn" className="form-label small fw-semibold mb-1">First name *</label>
-                        <input type="text" className="form-control" id="shipping-fn" required value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-ln" className="form-label small fw-semibold mb-1">Last name *</label>
-                        <input type="text" className="form-control" id="shipping-ln" required value={lastName}
-                          onChange={(e) => setLastName(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12">
-                        <label htmlFor="shipping-address" className="form-label small fw-semibold mb-1">Street address / apartment *</label>
-                        <input type="text" className="form-control" id="shipping-address" required value={address1}
-                          onChange={(e) => setAddress1(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-city" className="form-label small fw-semibold mb-1">City *</label>
-                        <input type="text" className="form-control" id="shipping-city" required value={city}
-                          onChange={(e) => setCity(e.target.value)} placeholder="Enter city" style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-prov" className="form-label small fw-semibold mb-1">State / Province *</label>
-                        <input type="text" className="form-control" id="shipping-prov" required value={province}
-                          onChange={(e) => setProvince(e.target.value)} placeholder="Enter state" style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label htmlFor="shipping-postcode" className="form-label small fw-semibold mb-1">Pincode *</label>
-                        <input type="text" className="form-control" id="shipping-postcode" required value={postalCode}
-                          onChange={(e) => setPostalCode(e.target.value)} style={{ padding: '11px 14px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#111827' }} />
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label className="form-label small fw-semibold mb-1">Delivery estimate</label>
-                        <table style={{ width: '100%', border: 'none', borderCollapse: 'separate', borderSpacing: 0, tableLayout: 'fixed', margin: 0, padding: 0 }} cellPadding="0" cellSpacing="0">
-                          <tbody>
-                            <tr>
-                              <td style={{
-                                width: '100%',
-                                height: '44px',
-                                minHeight: '44px',
-                                padding: '0',
-                                margin: 0,
-                                boxSizing: 'border-box',
-                                borderRadius: '8px',
-                                border: '2px solid #d1d5db',
-                                background: 'linear-gradient(135deg, #ffffff, #f3f4f6)',
-                                verticalAlign: 'middle',
-                              }}>
-                                <div style={{
-                                  display: 'block',
-                                  width: '100%',
-                                  height: '44px',
-                                  boxSizing: 'border-box',
-                                  padding: '0 12px',
-                                  margin: 0,
-                                  lineHeight: '40px',
-                                  fontSize: '14px',
-                                  fontWeight: 600,
-                                  color: '#0b2545',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  textAlign: 'left',
-                                  verticalAlign: 'middle',
-                                  borderRadius: '8px',
-                                }}>
-                                  {(
-                                    (deliveryEstimateDisplay && typeof deliveryEstimateDisplay === 'string' && deliveryEstimateDisplay.trim().length > 0)
-                                      ? deliveryEstimateDisplay
-                                      : DEFAULT_DELIVERY_ESTIMATE
-                                  ) + ''}
-                                  <span style={{
-                                    display: 'inline-block',
-                                    float: 'right',
-                                    marginTop: '10px',
-                                    marginLeft: '10px',
-                                    fontSize: '11px',
-                                    color: '#136c39',
-                                    fontWeight: 700,
-                                    padding: '2px 9px',
-                                    lineHeight: '18px',
-                                    height: '22px',
-                                    borderRadius: '999px',
-                                    background: 'linear-gradient(135deg, rgba(19,108,57,0.1), rgba(254,208,0,0.14))',
-                                    border: '1px solid rgba(19,108,57,0.2)',
-                                  }}>
-                                    INFO
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
+        .osp-checkout-title {
+          font-size: 32px;
+          font-weight: 800;
+          color: #ffffff;
+          letter-spacing: -0.75px;
+          margin-bottom: 24px;
+        }
 
-                  {/* Payment card */}
-                  <div className="bg-white rounded-4 border p-md-5 p-4" style={{ background: 'transparent', border: 'none' }}>
-                    <div className="bg-white rounded-4 border p-4 p-md-5">
-                      <div className="d-flex align-items-center gap-3 mb-4">
-                        <div className="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold" style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg, #0b2545, #136c39 100%)' }}>2</div>
-                        <div>
-                          <h3 className="h5 fw-bold mb-0" style={{ color: '#0b2545' }}>Payment</h3>
-                          <span className="text-muted small">Pay securely with Razorpay</span>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center gap-2 text-muted small mb-2">
-                        <i className="fa-solid fa-lock" style={{ color: '#10b981' }}></i>
-                        <span>Your payment details are encrypted and processed securely via Razorpay.</span>
-                      </div>
-<div className="d-flex flex-wrap align-items-center gap-2 mt-2">
-                      <span className="badge border px-3 py-2" style={{ background: '#f3f4f6', color: '#111827', fontWeight: '600' }}>UPI</span>
-                      <span className="badge border px-3 py-2" style={{ background: '#f3f4f6', color: '#111827', fontWeight: '600' }}>Cards</span>
-                      <span className="badge border px-3 py-2" style={{ background: '#f3f4f6', color: '#111827', fontWeight: '600' }}>Net Banking</span>
-                      <span className="badge border px-3 py-2" style={{ background: '#f3f4f6', color: '#111827', fontWeight: '600' }}>Wallet</span>
-                    </div>
-                      <button type="submit"
-                        disabled={submitting || itemCount === 0}
-                        className="w-100 btn border-0 text-white fw-bold mt-4"
-                        style={{ padding: '15px', borderRadius: '10px', background: 'linear-gradient(135deg, #0b2545 0%, #136c39 50%, #0b2545 100%)', letterSpacing: '0.3px' }}>
-                        <span>{submitting ? 'Completing Order...' : 'Place Order'}</span>
-                        <i className="fa-regular fa-arrow-right ms-2"></i>
-                      </button>
-                    </div>
-                  </div>
-                </form>
+        /* Stepper progress */
+        .osp-checkout-stepper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          max-width: 500px;
+          margin: 0 auto;
+        }
+
+        .osp-step {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #64748b;
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .osp-step.active {
+          color: #4ade80;
+        }
+
+        .osp-step.completed {
+          color: #10b981;
+        }
+
+        .osp-step-num {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          border: 2px solid #334155;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 700;
+          background-color: #1e293b;
+          color: #64748b;
+        }
+
+        .osp-step.active .osp-step-num {
+          border-color: #4ade80;
+          background-color: #4ade80;
+          color: #0b1f13;
+        }
+
+        .osp-step.completed .osp-step-num {
+          border-color: #10b981;
+          background-color: #eafdf5;
+          color: #10b981;
+        }
+
+        .osp-step-line {
+          flex: 1;
+          height: 2px;
+          background-color: #334155;
+          min-width: 30px;
+        }
+
+        .osp-step-line.completed {
+          background-color: #10b981;
+        }
+
+        /* Cards styles */
+        .osp-checkout-card {
+          background-color: #ffffff;
+          border-radius: 16px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+          padding: 32px;
+          margin-bottom: 30px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .osp-checkout-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 20px -3px rgba(19, 108, 57, 0.04), 0 4px 6px -2px rgba(19, 108, 57, 0.02);
+          border-color: #c2e2cc;
+        }
+
+        .osp-card-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        .osp-card-badge {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 14px;
+          color: #ffffff;
+          background: linear-gradient(135deg, #136c39 0%, #10b981 100%);
+          box-shadow: 0 4px 10px rgba(19, 108, 57, 0.15);
+        }
+
+        .osp-card-header-details {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .osp-card-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #0f172a;
+          margin: 0;
+        }
+
+        .osp-card-subtitle {
+          font-size: 12px;
+          color: #64748b;
+          margin-top: 1px;
+        }
+
+        /* Saved addresses */
+        .osp-address-section {
+          margin-bottom: 28px;
+          background-color: #f8fafc;
+          border-radius: 12px;
+          padding: 20px;
+          border: 1px dashed #e2e8f0;
+        }
+
+        .osp-address-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+          margin-top: 8px;
+        }
+
+        @media (min-width: 768px) {
+          .osp-address-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        .osp-address-card {
+          width: 100%;
+          text-align: left;
+          padding: 16px;
+          border: 1px solid #e2e8f0;
+          background-color: #ffffff;
+          color: #1f2937;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+        }
+
+        .osp-address-card.active {
+          border: 2px solid #136c39;
+          background-color: #f0fdf4;
+          box-shadow: 0 4px 12px rgba(19, 108, 57, 0.04);
+        }
+
+        .osp-address-card:hover:not(.active) {
+          border-color: #10b981;
+          background-color: #f8fafc;
+          transform: translateY(-1px);
+        }
+
+        /* Form elements */
+        .osp-input-group {
+          margin-bottom: 20px;
+        }
+
+        .osp-form-label {
+          font-size: 13px;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 6px;
+          display: block;
+        }
+
+        .osp-form-control {
+          width: 100%;
+          padding: 11px 16px;
+          border-radius: 10px;
+          border: 1px solid #cbd5e1;
+          color: #0f172a;
+          background-color: #ffffff;
+          font-size: 14px;
+          transition: all 0.2s ease;
+        }
+
+        .osp-form-control:focus {
+          outline: none;
+          border-color: #10b981;
+          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .osp-divider {
+          border-bottom: 1px solid #f1f5f9;
+          width: 100%;
+          margin: 16px 0 24px;
+        }
+
+        /* Delivery Card */
+        .osp-estimate-card {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 14px 18px;
+          border-radius: 10px;
+          border: 1px solid #cbd5e1;
+          background: linear-gradient(135deg, #ffffff, #f8fafc);
+          height: 48px;
+        }
+
+        .osp-estimate-icon {
+          font-size: 16px;
+          color: #136c39;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .osp-estimate-details {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-grow: 1;
+        }
+
+        .osp-estimate-value {
+          font-size: 14px;
+          color: #0f172a;
+          font-weight: 700;
+        }
+
+        .osp-estimate-badge {
+          font-size: 10px;
+          font-weight: 700;
+          color: #136c39;
+          background-color: #eaf4ed;
+          border: 1px solid #c2e2cc;
+          padding: 2px 8px;
+          border-radius: 99px;
+        }
+
+        /* Summary Sidebar */
+        .osp-summary-card {
+          background-color: #ffffff;
+          border-radius: 16px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+          padding: 28px;
+          position: sticky;
+          top: 20px;
+        }
+
+        .osp-summary-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 20px;
+          border-bottom: 1px solid #f1f5f9;
+          padding-bottom: 12px;
+        }
+
+        .osp-summary-items {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-bottom: 24px;
+          max-height: 320px;
+          overflow-y: auto;
+          padding-right: 6px;
+        }
+
+        /* custom scrollbar */
+        .osp-summary-items::-webkit-scrollbar {
+          width: 4px;
+        }
+        .osp-summary-items::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 99px;
+        }
+        .osp-summary-items::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 99px;
+        }
+
+        .osp-summary-item {
+          display: flex;
+          gap: 12px;
+          padding-bottom: 14px;
+          border-bottom: 1px solid #f1f5f9;
+          align-items: center;
+        }
+
+        .osp-item-thumb {
+          width: 56px;
+          height: 56px;
+          border-radius: 8px;
+          overflow: hidden;
+          border: 1px solid #e2e8f0;
+          background-color: #ffffff;
+          flex-shrink: 0;
+          padding: 4px;
+        }
+
+        .osp-item-details {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .osp-item-title {
+          font-size: 13px;
+          font-weight: 700;
+          color: #1e293b;
+          margin: 0;
+          line-height: 1.35;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .osp-item-price {
+          font-size: 13px;
+          font-weight: 700;
+          color: #0f172a;
+          white-space: nowrap;
+        }
+
+        .osp-total-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+          color: #64748b;
+          margin-bottom: 8px;
+        }
+
+        .osp-total-final {
+          border-top: 1px solid #f1f5f9;
+          padding-top: 16px;
+          margin-top: 8px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .osp-shipping-progress {
+          margin-top: 20px;
+          background-color: #f8fafc;
+          border: 1px solid #f1f5f9;
+          border-radius: 12px;
+          padding: 16px;
+        }
+
+        .osp-progress-bar-container {
+          height: 6px;
+          border-radius: 6px;
+          background-color: #e2e8f0;
+          overflow: hidden;
+          margin-top: 8px;
+        }
+
+        .osp-progress-bar-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #136c39 0%, #10b981 100%);
+          transition: width 0.3s ease;
+        }
+
+        /* Buttons */
+        .osp-btn-primary {
+          width: 100%;
+          padding: 16px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #136c39 0%, #10b981 100%);
+          color: #ffffff;
+          font-weight: 700;
+          font-size: 15px;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          box-shadow: 0 4px 12px rgba(19, 108, 57, 0.15);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .osp-btn-primary:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 20px rgba(19, 108, 57, 0.25);
+          filter: brightness(1.05);
+        }
+
+        .osp-btn-primary:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        .osp-btn-primary:disabled {
+          background: #cbd5e1;
+          color: #94a3b8;
+          box-shadow: none;
+          cursor: not-allowed;
+        }
+
+        .osp-badge-sec {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          color: #10b981;
+          font-weight: 600;
+          background-color: #f0fdf4;
+          border: 1px solid #bbf7d0;
+          padding: 4px 12px;
+          border-radius: 6px;
+        }
+
+        .osp-badge-list {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 8px;
+          margin-top: 16px;
+        }
+
+        .osp-badge-pay {
+          background-color: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #475569;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 6px 12px;
+          border-radius: 6px;
+        }
+
+        /* Overlay loader */
+        .osp-loader-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(8px);
+          z-index: 2147483647;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+        }
+
+        .osp-spinner {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          border: 4px solid #f1f5f9;
+          border-top-color: #10b981;
+          animation: ospSpin 1s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite;
+          box-shadow: 0 4px 10px rgba(16, 185, 129, 0.1);
+        }
+
+        @keyframes ospSpin {
+          to { transform: rotate(360deg); }
+        }
+      ` }} />
+
+      <main className="osp-checkout-wrapper" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Ambient Glowing Blobs */}
+        <div style={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(254, 208, 0, 0.15) 0%, transparent 75%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 1
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-15%',
+          right: '-10%',
+          width: '700px',
+          height: '700px',
+          background: 'radial-gradient(circle, rgba(19, 108, 57, 0.3) 0%, transparent 75%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 1
+        }} />
+
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+          {/* Section Header */}
+          <div className="osp-checkout-header">
+            <span className="osp-checkout-badge">Secure Checkout</span>
+            <h2 className="osp-checkout-title">Confirm Your Details</h2>
+            
+            <div className="osp-checkout-stepper">
+              <div className="osp-step completed">
+                <span className="osp-step-num"><i className="fa-solid fa-check"></i></span>
+                <span className="osp-step-label">Cart</span>
               </div>
+              <div className="osp-step-line completed"></div>
+              <div className="osp-step active">
+                <span className="osp-step-num">2</span>
+                <span className="osp-step-label">Details &amp; Payment</span>
+              </div>
+              <div className="osp-step-line"></div>
+              <div className="osp-step">
+                <span className="osp-step-num">3</span>
+                <span className="osp-step-label">Confirmation</span>
+              </div>
+            </div>
+          </div>
 
-              {/* SIDEBAR: ORDER SUMMARY */}
-              <div className="col-12 col-lg-4">
-                <div className="sticky-top" style={{ top: '20px' }}>
-                  <div className="bg-white rounded-4 shadow-sm border p-4" style={{ opacity: cartLoading ? 0.8 : 1, transition: 'opacity 0.2s ease', pointerEvents: cartLoading ? 'none' : 'auto' }}>
-                    <h3 className="h5 fw-bold mb-4" style={{ color: '#0b2545' }}>Order Summary</h3>
+          <div className="row g-4 g-lg-5">
+            {/* LEFT SIDE: FORMS */}
+            <div className="col-12 col-lg-8">
+              <form onSubmit={handleContinue}>
+                
+                {/* 1. Contact & Delivery Card */}
+                <div className="osp-checkout-card">
+                  <div className="osp-card-header">
+                    <div className="osp-card-badge">1</div>
+                    <div className="osp-card-header-details">
+                      <h3 className="osp-card-title">Contact &amp; Shipping</h3>
+                      <span className="osp-card-subtitle">Where should we deliver your project components?</span>
+                    </div>
+                  </div>
 
-                    {/* Products List */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px', maxHeight: '340px', overflowY: 'auto', paddingRight: '4px' }}>
-                      {cart?.items?.map((item) => (
-                        <div key={item.id} style={{ display: 'flex', gap: '12px', paddingBottom: '14px', borderBottom: '1px solid #f1f3f5', alignItems: 'center' }}>
-                          <div style={{ width: '56px', height: '56px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e9ecef', background: '#ffffff', flexShrink: 0, padding: '4px' }}>
-                            <img 
-                              src={getValidImageUrl(item.thumbnail, '/assets/images/catagory-img/cat-transp-img-07.webp')} 
-                              alt={item.title} 
-                              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                            />
-                          </div>
-                          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <h4 style={{ fontSize: '13px', fontWeight: '700', color: '#1a1a1a', margin: 0, lineHeight: '1.3', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                              {item.title}
-                            </h4>
-                            <span className="text-muted small">Qty: {item.quantity}</span>
-                          </div>
-                          <span style={{ fontSize: '13px', fontWeight: '700', color: '#111827', whiteSpace: 'nowrap' }}>
-                            {formatPrice(item.unit_price * item.quantity, currency)}
+                  {/* Saved Address Selector */}
+                  {savedAddresses.length > 0 && (
+                    <div className="osp-address-section">
+                      <label className="osp-form-label mb-2">Select a Saved Address</label>
+                      <div className="osp-address-grid">
+                        {savedAddresses.map((addr: any) => {
+                          const isActive = selectedAddressId === addr.id;
+                          return (
+                            <button
+                              type="button"
+                              key={addr.id}
+                              className={`osp-address-card ${isActive ? 'active' : ''}`}
+                              onClick={() => applyAddress(addr)}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                <span style={{ color: isActive ? '#10b981' : '#94a3b8', fontSize: '13px', paddingTop: '2px' }}>
+                                  <i className={isActive ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle'}></i>
+                                </span>
+                                <div>
+                                  <div style={{ fontWeight: '700', fontSize: '13px', marginBottom: '2px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                                    {addr.first_name} {addr.last_name}
+                                    {addr.is_default_shipping && (
+                                      <span style={{ background: '#10b981', color: '#fff', fontSize: '9px', fontWeight: '800', padding: '1px 6px', borderRadius: '99px' }}>Default</span>
+                                    )}
+                                  </div>
+                                  <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.4' }}>
+                                    {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ''}, {addr.city}, {addr.province} - {addr.postal_code}
+                                  </div>
+                                  {addr.phone && (
+                                    <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', fontWeight: '500' }}>
+                                      <i className="fa-solid fa-phone me-1"></i> {addr.phone}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="text-end mt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedAddressId(null);
+                            setAddress1('');
+                            setCity('');
+                            setProvince('');
+                            setPostalCode('');
+                          }}
+                          style={{ background: 'none', border: 'none', color: '#136c39', fontSize: '12px', fontWeight: '700', cursor: 'pointer', outline: 'none' }}
+                        >
+                          <i className="fa-solid fa-plus me-1"></i> Add new address
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Form fields */}
+                  <div className="row g-3">
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-email" className="osp-form-label">Email address *</label>
+                      <input 
+                        type="email" 
+                        className="osp-form-control" 
+                        id="shipping-email" 
+                        required 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)} 
+                      />
+                    </div>
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-mobile" className="osp-form-label">Phone number (+91) *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-mobile" 
+                        required 
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)} 
+                      />
+                    </div>
+                    
+                    <div className="col-12">
+                      <div className="osp-divider"></div>
+                    </div>
+
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-fn" className="osp-form-label">First name *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-fn" 
+                        required 
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)} 
+                      />
+                    </div>
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-ln" className="osp-form-label">Last name *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-ln" 
+                        required 
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)} 
+                      />
+                    </div>
+                    
+                    <div className="col-12 osp-input-group">
+                      <label htmlFor="shipping-address" className="osp-form-label">Street address / apartment *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-address" 
+                        required 
+                        value={address1}
+                        onChange={(e) => setAddress1(e.target.value)} 
+                      />
+                    </div>
+                    
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-city" className="osp-form-label">City *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-city" 
+                        required 
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)} 
+                        placeholder="Enter city" 
+                      />
+                    </div>
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-prov" className="osp-form-label">State / Province *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-prov" 
+                        required 
+                        value={province}
+                        onChange={(e) => setProvince(e.target.value)} 
+                        placeholder="Enter state" 
+                      />
+                    </div>
+                    
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label htmlFor="shipping-postcode" className="osp-form-label">Pincode *</label>
+                      <input 
+                        type="text" 
+                        className="osp-form-control" 
+                        id="shipping-postcode" 
+                        required 
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)} 
+                      />
+                    </div>
+                    <div className="col-12 col-md-6 osp-input-group">
+                      <label className="osp-form-label">Delivery Estimate</label>
+                      <div className="osp-estimate-card">
+                        <span className="osp-estimate-icon">
+                          <i className="fa-solid fa-truck-fast"></i>
+                        </span>
+                        <div className="osp-estimate-details">
+                          <span className="osp-estimate-value">
+                            {deliveryEstimateDisplay}
                           </span>
                         </div>
-                      ))}
-                      {(!cart?.items || cart.items.length === 0) && (
-                        <div style={{ textAlign: 'center', padding: '20px 0', color: '#71717a', fontSize: '13px' }}>
-                          Your cart is empty.
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Totals */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px' }}>
-                      <div className="d-flex justify-content-between">
-                        <span className="text-muted">Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
-                        <span className="fw-semibold text-dark">{formatPrice(subtotal, currency)}</span>
-                      </div>
-                      <div className="d-flex justify-content-between">
-                        <span className="text-muted">Shipping</span>
-                        <span className="fw-semibold text-dark">{isFree ? 'Free' : formatPrice(displayShipping, currency)}</span>
-                      </div>
-                      {displayedTax > 0 && (
-                        <div className="d-flex justify-content-between">
-                          <span className="text-muted">Tax (incl.)</span>
-                          <span className="fw-semibold text-dark">{formatPrice(displayedTax, currency)}</span>
-                        </div>
-                      )}
-                      <div className="border-top pt-3 d-flex justify-content-between align-items-center mt-1">
-                        <span className="fw-bold" style={{ color: '#0b2545' }}>Total</span>
-                        <span className="fw-bold" style={{ color: '#10b981', fontSize: '20px' }}>{formatPrice(displayTotal, currency)}</span>
-                      </div>
-                    </div>
-
-                    {/* Free shipping progress */}
-                    <div style={{ marginTop: '20px', background: '#f9fafb', border: '1px solid #f1f3f5', borderRadius: '10px', padding: '14px' }}>
-                      {amountNeeded > 0 ? (
-                        <p className="small text-muted mb-2" style={{ margin: 0 }}>
-                          Add <strong style={{ color: '#0b2545' }}>₹{amountNeeded.toFixed(2)}</strong> more to get <strong style={{ color: '#10b981' }}>Free Shipping</strong>
-                        </p>
-                      ) : (
-                        <p className="small mb-2" style={{ margin: 0, color: '#10b981', fontWeight: '600' }}>
-                          <i className="fa-solid fa-truck-fast me-1"></i> You qualify for Free Shipping!
-                        </p>
-                      )}
-                      <div className="progress" style={{ height: '6px', borderRadius: '6px', background: '#e9ecef' }}>
-                        <div className="progress-bar" style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%`, background: 'linear-gradient(90deg, #0b2545, #10b981)' }}></div>
+                        <span className="osp-estimate-badge">
+                          Standard Shipping
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
+                {/* 2. Payment Card */}
+                <div className="osp-checkout-card">
+                  <div className="osp-card-header">
+                    <div className="osp-card-badge">2</div>
+                    <div className="osp-card-header-details">
+                      <h3 className="osp-card-title">Secure Payment</h3>
+                      <span className="osp-card-subtitle">Pay securely using Razorpay gateway</span>
+                    </div>
+                  </div>
+
+                  <div className="osp-badge-sec">
+                    <i className="fa-solid fa-shield-halved"></i>
+                    <span>Payment processed securely via Razorpay</span>
+                  </div>
+
+                  <div className="osp-badge-list">
+                    <span className="osp-badge-pay">UPI</span>
+                    <span className="osp-badge-pay">Credit / Debit Cards</span>
+                    <span className="osp-badge-pay">Net Banking</span>
+                    <span className="osp-badge-pay">Wallets</span>
+                  </div>
+
+                  <button 
+                    type="submit"
+                    disabled={submitting || itemCount === 0}
+                    className="osp-btn-primary mt-4"
+                  >
+                    <span>{submitting ? 'Completing Order...' : 'Place Order'}</span>
+                    <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* RIGHT SIDE: ORDER SUMMARY */}
+            <div className="col-12 col-lg-4">
+              <div className="osp-summary-card">
+                <h3 className="osp-summary-title">Order Summary</h3>
+
+                {/* Products List */}
+                <div className="osp-summary-items">
+                  {cart?.items?.map((item) => (
+                    <div className="osp-summary-item" key={item.id}>
+                      <div className="osp-item-thumb">
+                        <img 
+                          src={getValidImageUrl(item.thumbnail, '/assets/images/catagory-img/cat-transp-img-07.webp')} 
+                          alt={item.title} 
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        />
+                      </div>
+                      <div className="osp-item-details">
+                        <h4 className="osp-item-title">{item.title}</h4>
+                        <span className="text-muted small">Qty: {item.quantity}</span>
+                      </div>
+                      <span className="osp-item-price">
+                        {formatPrice(item.unit_price * item.quantity, currency)}
+                      </span>
+                    </div>
+                  ))}
+                  {(!cart?.items || cart.items.length === 0) && (
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#64748b', fontSize: '13px' }}>
+                      Your cart is empty.
+                    </div>
+                  )}
+                </div>
+
+                {/* Totals */}
+                <div>
+                  <div className="osp-total-row">
+                    <span>Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
+                    <span className="fw-semibold text-dark">{formatPrice(subtotal, currency)}</span>
+                  </div>
+                  <div className="osp-total-row">
+                    <span>Shipping</span>
+                    <span className="fw-semibold text-dark">{isFree ? 'Free' : formatPrice(displayShipping, currency)}</span>
+                  </div>
+                  {displayedTax > 0 && (
+                    <div className="osp-total-row">
+                      <span>Tax (incl.)</span>
+                      <span className="fw-semibold text-dark">{formatPrice(displayedTax, currency)}</span>
+                    </div>
+                  )}
+                  
+                  <div className="osp-total-final">
+                    <span className="fw-bold" style={{ color: '#0f172a', fontSize: '16px' }}>Total</span>
+                    <span className="fw-bold" style={{ color: '#136c39', fontSize: '22px' }}>{formatPrice(displayTotal, currency)}</span>
+                  </div>
+                </div>
+
+                {/* Free shipping progress */}
+                <div className="osp-shipping-progress">
+                  {amountNeeded > 0 ? (
+                    <p className="small text-muted mb-2" style={{ margin: 0 }}>
+                      Add <strong style={{ color: '#0f172a' }}>₹{amountNeeded.toFixed(2)}</strong> more to get <strong style={{ color: '#10b981' }}>Free Shipping</strong>
+                    </p>
+                  ) : (
+                    <p className="small mb-2" style={{ margin: 0, color: '#10b981', fontWeight: '700' }}>
+                      <i className="fa-solid fa-truck-fast me-1"></i> You qualify for Free Shipping!
+                    </p>
+                  )}
+                  <div className="osp-progress-bar-container">
+                    <div 
+                      className="osp-progress-bar-fill" 
+                      style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </main>
+
       <Modals />
       <Footer />
 
-      {/* Payment success loader overlay */}
+      {/* Payment Success Overlay Loader */}
       {processingPayment && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: '#ffffff',
-            zIndex: 2147483647,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '18px',
-          }}
-        >
-          <div
-            style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              border: '4px solid #e9ecef',
-              borderTopColor: '#10b981',
-              animation: 'ospSpin 0.8s linear infinite',
-            }}
-          ></div>
+        <div className="osp-loader-overlay">
+          <div className="osp-spinner"></div>
           <div className="text-center">
-            <div className="fw-bold" style={{ color: '#0b2545', fontSize: '17px' }}>
+            <div className="fw-bold" style={{ color: '#0f172a', fontSize: '18px' }}>
               Payment Successful!
             </div>
             <div className="text-muted" style={{ fontSize: '13px', marginTop: '4px' }}>
               Confirming your order, please wait...
             </div>
           </div>
-          <style>{`@keyframes ospSpin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
     </>

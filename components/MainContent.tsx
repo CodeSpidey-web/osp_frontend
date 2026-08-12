@@ -87,11 +87,59 @@ export default function MainContent({
 
   const scrollPopularCategories = (direction: "left" | "right") => {
     if (popularCategoriesScrollRef.current) {
-      const { scrollLeft } = popularCategoriesScrollRef.current;
-      const scrollTo = direction === "left" ? scrollLeft - 300 : scrollLeft + 300;
+      const { scrollLeft, clientWidth, scrollWidth } = popularCategoriesScrollRef.current;
+      const computedStyle = window.getComputedStyle(popularCategoriesScrollRef.current);
+      const gap = parseFloat(computedStyle.gap) || 0;
+      const scrollAmount = clientWidth > 0 ? clientWidth + gap : 300;
+      
+      let scrollTo = 0;
+      if (direction === "left") {
+        if (scrollLeft <= 10) {
+          scrollTo = scrollWidth - clientWidth;
+        } else {
+          scrollTo = scrollLeft - scrollAmount;
+        }
+      } else {
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollTo = 0;
+        } else {
+          scrollTo = scrollLeft + scrollAmount;
+        }
+      }
+      
       popularCategoriesScrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
   };
+
+  const isHoveredRef = useRef(false);
+
+  useEffect(() => {
+    const container = popularCategoriesScrollRef.current;
+    if (!container) return;
+
+    const intervalId = setInterval(() => {
+      if (isHoveredRef.current) return;
+
+      const { scrollLeft, clientWidth, scrollWidth } = container;
+      const computedStyle = window.getComputedStyle(container);
+      const gap = parseFloat(computedStyle.gap) || 0;
+      
+      const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
+      const itemWidth = firstItem ? firstItem.offsetWidth : 150;
+      const scrollAmount = itemWidth + gap;
+
+      let scrollTo = 0;
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        scrollTo = 0;
+      } else {
+        scrollTo = scrollLeft + scrollAmount;
+      }
+      
+      container.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [popularCategories]);
 
   useEffect(() => {
     if (initialProducts.length > 0) {
@@ -554,19 +602,27 @@ export default function MainContent({
                   }
                 }
 
+                .osp-scroll-wrapper {
+                  margin: 0 70px;
+                  overflow: hidden;
+                  height: 320px;
+                  margin-top: -200px;
+                  flex: 1;
+                  min-width: 0;
+                }
+
                 .osp-scroll-container {
                   display: flex;
                   gap: 32px;
                   overflow-x: auto;
                   overflow-y: visible;
                   scroll-behavior: smooth;
-                  flex: 1;
-                  min-width: 0;
+                  width: 100%;
+                  height: 100%;
                   scrollbar-width: none;
                   -ms-overflow-style: none;
-                  height: 320px;
-                  margin-top: -200px;
-                  padding: 0 70px;
+                  scroll-snap-type: x mandatory;
+                  scroll-padding: 0;
                 }
 
                 .osp-scroll-container::-webkit-scrollbar {
@@ -578,36 +634,50 @@ export default function MainContent({
                   flex-direction: column;
                   align-items: center;
                   justify-content: space-between;
-                  flex-shrink: 0;
+                  flex: 0 0 calc((100% - 96px) / 4);
                   width: calc((100% - 96px) / 4);
+                  min-width: 0;
                   height: 280px;
                   text-decoration: none !important;
                   position: relative;
+                  scroll-snap-align: start;
                 }
 
                 @media (max-width: 991px) {
-                  .osp-scroll-container {
-                    gap: 24px;
-                    padding: 0 48px;
+                  .osp-scroll-wrapper {
+                    margin: 0 48px;
                     height: 220px;
                     margin-top: -135px;
                   }
+                  .osp-scroll-container {
+                    gap: 24px;
+                  }
                   .osp-cat-item {
+                    flex: 0 0 calc((100% - 48px) / 3);
                     width: calc((100% - 48px) / 3);
+                    min-width: 0;
                     height: 190px;
                   }
                 }
 
                 @media (max-width: 767px) {
-                  .osp-scroll-container {
-                    gap: 16px;
-                    padding: 0 40px;
-                    height: 250px;
+                  .osp-popular-categories-bar-wrapper {
+                    height: 50px;
+                    margin-top: 130px;
+                  }
+                  .osp-scroll-wrapper {
+                    margin: 0 40px;
+                    height: 200px;
                     margin-top: -150px;
                   }
+                  .osp-scroll-container {
+                    gap: 16px;
+                  }
                   .osp-cat-item {
+                    flex: 0 0 calc((100% - 16px) / 2);
                     width: calc((100% - 16px) / 2);
-                    height: 210px;
+                    min-width: 0;
+                    height: 180px;
                   }
                 }
 
@@ -627,12 +697,30 @@ export default function MainContent({
                     width: 140px;
                     height: 140px;
                   }
+                  .osp-cat-img-box::after {
+                    width: 110px;
+                    height: 20px;
+                  }
+                  .osp-cat-img-box::before {
+                    width: 120px;
+                    height: 22px;
+                  }
                 }
 
                 @media (max-width: 767px) {
                   .osp-cat-img-box {
-                    width: 130px;
-                    height: 130px;
+                    width: 100%;
+                    max-width: 110px;
+                    height: auto;
+                    aspect-ratio: 1 / 1;
+                  }
+                  .osp-cat-img-box::after {
+                    width: 90px;
+                    height: 16px;
+                  }
+                  .osp-cat-img-box::before {
+                    width: 100px;
+                    height: 18px;
                   }
                 }
 
@@ -749,7 +837,7 @@ export default function MainContent({
                   .osp-scroll-btn {
                     width: 32px;
                     height: 32px;
-                    top: 60%;
+                    top: 50%;
                   }
                   .osp-scroll-btn i {
                     font-size: 12px;
@@ -759,6 +847,15 @@ export default function MainContent({
                   }
                   .osp-scroll-btn-right {
                     right: 10px;
+                  }
+                  .osp-cat-name {
+                    font-size: 13px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                    white-space: normal;
+                    overflow: visible;
+                    text-overflow: clip;
+                    line-height: 1.2;
                   }
                 }
 
@@ -833,23 +930,33 @@ export default function MainContent({
                   <i className="fa-solid fa-chevron-left"></i>
                 </button>
 
-                <div className="osp-scroll-container" ref={popularCategoriesScrollRef}>
-                  {displayCategories.map((cat, i) => {
-                    const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+                <div
+                  className="osp-scroll-wrapper"
+                  onMouseEnter={() => { isHoveredRef.current = true; }}
+                  onMouseLeave={() => { isHoveredRef.current = false; }}
+                  onTouchStart={() => { isHoveredRef.current = true; }}
+                  onTouchEnd={() => {
+                    setTimeout(() => { isHoveredRef.current = false; }, 1000);
+                  }}
+                >
+                  <div className="osp-scroll-container" ref={popularCategoriesScrollRef}>
+                    {displayCategories.map((cat, i) => {
+                      const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
 
-                    return (
-                      <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
-                        <div className="osp-cat-img-box">
-                          <img
-                            src={imgUrl}
-                            alt={cat.name}
-                            loading="lazy"
-                          />
-                        </div>
-                        <span className="osp-cat-name">{cat.name}</span>
-                      </a>
-                    );
-                  })}
+                      return (
+                        <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
+                          <div className="osp-cat-img-box">
+                            <img
+                              src={imgUrl}
+                              alt={cat.name}
+                              loading="lazy"
+                            />
+                          </div>
+                          <span className="osp-cat-name">{cat.name}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <button

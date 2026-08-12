@@ -735,6 +735,58 @@ function ShopHeaderContent() {
             transition: 'box-shadow 0.25s ease'
           }}
         >
+          {/* Custom Marquee Announcement Bar */}
+          <div className="osp-announcement-bar">
+            <div className="osp-announcement-marquee">
+              <div className="osp-announcement-track">
+                <span>Welcome to the Ocean Student Projects &nbsp;&nbsp;&bull;&nbsp;&nbsp; Free shipping for the orders above 999/-</span>
+                <span>Welcome to the Ocean Student Projects &nbsp;&nbsp;&bull;&nbsp;&nbsp; Free shipping for the orders above 999/-</span>
+                <span>Welcome to the Ocean Student Projects &nbsp;&nbsp;&bull;&nbsp;&nbsp; Free shipping for the orders above 999/-</span>
+                <span>Welcome to the Ocean Student Projects &nbsp;&nbsp;&bull;&nbsp;&nbsp; Free shipping for the orders above 999/-</span>
+              </div>
+            </div>
+          </div>
+
+          <style dangerouslySetInnerHTML={{ __html: `
+            .osp-announcement-bar {
+              background: linear-gradient(90deg, #136c39 0%, #10b981 100%);
+              color: #ffffff;
+              padding: 6px 0;
+              overflow: hidden;
+              font-family: 'Inter', sans-serif;
+              font-size: 11px;
+              font-weight: 700;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+              z-index: 10000;
+              position: relative;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .osp-announcement-marquee {
+              display: flex;
+              overflow: hidden;
+              white-space: nowrap;
+              width: 100%;
+            }
+            .osp-announcement-track {
+              display: inline-flex;
+              animation: ospMarquee 30s linear infinite;
+              gap: 80px;
+              padding-right: 80px;
+            }
+            .osp-announcement-track span {
+              display: inline-block;
+              flex-shrink: 0;
+            }
+            @keyframes ospMarquee {
+              0% {
+                transform: translate3d(0, 0, 0);
+              }
+              100% {
+                transform: translate3d(-50%, 0, 0);
+              }
+            }
+          ` }} />
 
     <div className="rbt-header-wrapper rbt-header-wrapper-one header-space-between rbt-bg-color-white header-not-transparent plr--0 position-relative z-5">
     <div className="rbt-separator-mid">
