@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { MedusaProduct, getValidImageUrl, fetchApi, getVariantPrice } from '@/lib/medusa';
+import { MedusaProduct, getValidImageUrl, fetchApi, getVariantPrice, isProjectProduct } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 
 interface ProductGridProps {
@@ -154,10 +154,16 @@ export default function ProductGrid({ products, loading, count, offset, limit }:
                     </div>
                     <div>
                       <div className="pricing-part mb--12">
-                        <span className="price-text">{pricing.display}</span>
+                        <span className="price-text">
+                          {isProjectProduct(product) ? 'Get a Quote' : pricing.display}
+                        </span>
                       </div>
                       <div className="prd-btn-grp">
-                        {stock === 0 ? (
+                        {isProjectProduct(product) ? (
+                          <a href={`/product/${product.handle || product.id}`} className="rbt-btn rbt-btn-sm text-center d-block w-100" style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.05em', borderRadius: '4px', border: '1px solid #c85a17', backgroundColor: '#c85a17', color: '#ffffff' }}>
+                            VIEW PROJECT
+                          </a>
+                        ) : stock === 0 ? (
                           <a href={`/product/${product.handle || product.id}`} className="rbt-btn rbt-btn-border rbt-btn-sm text-center d-block w-100" style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.05em', borderRadius: '4px', border: '1px solid #1b2a47', backgroundColor: '#1b2a47', color: '#ffffff' }}>
                             READ MORE
                           </a>

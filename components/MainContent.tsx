@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi, getVariantPrice } from "@/lib/medusa";
+import { getProducts, getCategories, MedusaProduct, MedusaCategory, getValidImageUrl, fetchApi, getVariantPrice, isProjectProduct } from "@/lib/medusa";
 import { useCart } from "@/lib/CartContext";
 import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import HeroSwiper from "@/components/HeroSwiper";
@@ -1123,7 +1123,24 @@ export default function MainContent({
                               />
                             </a>
                             {variant && (
-                              stock === 0 ? (
+                              isProjectProduct(product) ? (
+                                <a
+                                  className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                  href={`/product/${product.handle || product.id}`}
+                                  style={{
+                                    border: "none",
+                                    left: "16px",
+                                    right: "16px",
+                                    width: "calc(100% - 32px)",
+                                    borderRadius: "50px",
+                                    margin: "0 auto",
+                                    backgroundColor: "#c85a17",
+                                    color: "#ffffff"
+                                  }}
+                                >
+                                  VIEW PROJECT
+                                </a>
+                              ) : stock === 0 ? (
                                 <a
                                   className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
                                   href={`/product/${product.handle || product.id}`}
@@ -1168,7 +1185,9 @@ export default function MainContent({
                               <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
                             </h2>
                             <div className="pricing-part">
-                              <span className="price-text">{pricing.display}</span>
+                              <span className="price-text">
+                                {isProjectProduct(product) ? "Get a Quote" : pricing.display}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1357,7 +1376,24 @@ export default function MainContent({
                                       />
                                     </a>
                                     {variant && (
-                                      stock === 0 ? (
+                                      isProjectProduct(product) ? (
+                                        <a
+                                          className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                          href={`/product/${product.handle || product.id}`}
+                                          style={{
+                                            border: "none",
+                                            left: "16px",
+                                            right: "16px",
+                                            width: "calc(100% - 32px)",
+                                            borderRadius: "50px",
+                                            margin: "0 auto",
+                                            backgroundColor: "#c85a17",
+                                            color: "#ffffff"
+                                          }}
+                                        >
+                                          VIEW PROJECT
+                                        </a>
+                                      ) : stock === 0 ? (
                                         <a
                                           className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
                                           href={`/product/${product.handle || product.id}`}
@@ -1402,7 +1438,9 @@ export default function MainContent({
                                       <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
                                     </h2>
                                     <div className="pricing-part">
-                                      <span className="price-text">{pricing.display}</span>
+                                      <span className="price-text">
+                                        {isProjectProduct(product) ? "Get a Quote" : pricing.display}
+                                      </span>
 
                                     </div>
                                   </div>
@@ -1456,7 +1494,24 @@ export default function MainContent({
                                     />
                                   </a>
                                   {variant && (
-                                    stock === 0 ? (
+                                    isProjectProduct(product) ? (
+                                      <a
+                                        className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
+                                        href={`/product/${product.handle || product.id}`}
+                                        style={{
+                                          border: "none",
+                                          left: "16px",
+                                          right: "16px",
+                                          width: "calc(100% - 32px)",
+                                          borderRadius: "50px",
+                                          margin: "0 auto",
+                                          backgroundColor: "#c85a17",
+                                          color: "#ffffff"
+                                        }}
+                                      >
+                                        VIEW PROJECT
+                                      </a>
+                                    ) : stock === 0 ? (
                                       <a
                                         className="rbt-btn hover-appear-element bottom-position text-center rbt-btn-sm d-block"
                                         href={`/product/${product.handle || product.id}`}
@@ -1501,7 +1556,9 @@ export default function MainContent({
                                     <a href={`/product/${product.handle || product.id}`}>{product.title}</a>
                                   </h2>
                                   <div className="pricing-part">
-                                    <span className="price-text">{pricing.display}</span>
+                                    <span className="price-text">
+                                      {isProjectProduct(product) ? "Get a Quote" : pricing.display}
+                                    </span>
 
                                   </div>
                                 </div>

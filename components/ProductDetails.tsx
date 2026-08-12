@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { MedusaProduct, MedusaProductVariant, getValidImageUrl, fetchApi, getVariantPrice, getVariantOriginalPrice } from '@/lib/medusa';
+import { MedusaProduct, MedusaProductVariant, getValidImageUrl, fetchApi, getVariantPrice, getVariantOriginalPrice, isProjectProduct, getWhatsAppOrderUrl } from '@/lib/medusa';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,36 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   );
   const [stockQuantity, setStockQuantity] = useState<number | null>(null);
   const [loadingStock, setLoadingStock] = useState(false);
+
+  const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null);
+  const [whatsappError, setWhatsappError] = useState<string | null>(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  const isProject = isProjectProduct(product);
+
+  useEffect(() => {
+    if (!isProject) {
+      setLoadingSettings(false);
+      return;
+    }
+    
+    setLoadingSettings(true);
+    fetchApi<{ phone: string }>('/store/client-settings')
+      .then(res => {
+        if (res.phone) {
+          setWhatsappNumber(res.phone);
+        } else {
+          setWhatsappError("WhatsApp configuration is missing in client settings.");
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load client settings:", err);
+        setWhatsappError("Failed to fetch store settings from server.");
+      })
+      .finally(() => {
+        setLoadingSettings(false);
+      });
+  }, [product, isProject]);
 
   useEffect(() => {
     if (!selectedVariant) {
@@ -211,110 +241,149 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 <hr style={{ border: 'none', borderTop: '2px solid #1a1a1a', width: '40px', margin: '16px 0' }} />
 
                 {/* Price */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0' }}>
-                  {originalPriceAmount > 0 && (
-                    <del style={{ fontSize: '16px', fontWeight: '600', color: '#94a3b8' }}>
-                      ₹{originalPriceAmount.toFixed(2)}
-                    </del>
-                  )}
-                  <span style={{ fontSize: '24px', fontWeight: '700', color: 'var(--color-heading)' }}>
-                    ₹{priceAmount.toFixed(2)}
-                  </span>
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-body)' }}>
-                    (incl. GST)
-                  </span>
-                </div>
+                {isProject ? (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0' }}>
+                    <span style={{ fontSize: '24px', fontWeight: '700', color: '#c85a17' }}>
+                      Price: Contact us for quotation
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0' }}>
+                    {originalPriceAmount > 0 && (
+                      <del style={{ fontSize: '16px', fontWeight: '600', color: '#94a3b8' }}>
+                        ₹{originalPriceAmount.toFixed(2)}
+                      </del>
+                    )}
+                    <span style={{ fontSize: '24px', fontWeight: '700', color: 'var(--color-heading)' }}>
+                      ₹{priceAmount.toFixed(2)}
+                    </span>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-body)' }}>
+                      (incl. GST)
+                    </span>
+                  </div>
+                )}
 
                 {/* Stock Status */}
-                <div style={{ 
-                  color: loadingStock 
-                    ? '#a1a1aa' 
-                    : (!stockQuantity || stockQuantity <= 0)
-                      ? '#ef4444' 
-                      : '#2ec4b6', 
-                  fontSize: '13px', 
-                  fontWeight: '700', 
-                  marginBottom: '20px' 
-                }}>
-                  {loadingStock 
-                    ? 'Checking stock...' 
-                    : (!stockQuantity || stockQuantity <= 0)
-                      ? 'Out of stock' 
-                      : stockQuantity < 10 
-                        ? `Only ${stockQuantity} left in stock - order soon` 
-                        : 'In stock'
-                  }
-                </div>
+                {!isProject && (
+                  <div style={{ 
+                    color: loadingStock 
+                      ? '#a1a1aa' 
+                      : (!stockQuantity || stockQuantity <= 0)
+                        ? '#ef4444' 
+                        : '#2ec4b6', 
+                    fontSize: '13px', 
+                    fontWeight: '700', 
+                    marginBottom: '20px' 
+                  }}>
+                    {loadingStock 
+                      ? 'Checking stock...' 
+                      : (!stockQuantity || stockQuantity <= 0)
+                        ? 'Out of stock' 
+                        : stockQuantity < 10 
+                          ? `Only ${stockQuantity} left in stock - order soon` 
+                          : 'In stock'
+                    }
+                  </div>
+                )}
 
-                {/* Quantity and Actions Bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0', flexWrap: 'wrap' }}>
-                  {/* Quantity selector */}
-                  {stockQuantity !== null && stockQuantity > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ced4da', borderRadius: '6px', height: '40px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-                      <button 
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setQuantity(prev => Math.max(1, prev - 1));
-                        }}
-                        style={{ background: 'none', border: 'none', width: '36px', height: '100%', cursor: 'pointer', fontSize: '12px', color: '#495057', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        <i className="fa-solid fa-minus"></i>
-                      </button>
-                      <input 
-                        type="text" 
-                        readOnly
-                        value={quantity} 
-                        style={{ border: 'none', background: 'none', width: '40px', textAlign: 'center', fontWeight: '700', fontSize: '15px', outline: 'none', color: '#1c1b1f', padding: 0 }}
-                      />
-                      <button 
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setQuantity(prev => Math.min(stockQuantity || 99, prev + 1));
-                        }}
-                        style={{ background: 'none', border: 'none', width: '36px', height: '100%', cursor: 'pointer', fontSize: '12px', color: '#495057', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        <i className="fa-solid fa-plus"></i>
-                      </button>
+                {/* Actions Section */}
+                {isProject ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '24px 0' }}>
+                    {/* Store Pickup Notice */}
+                    <div style={{
+                      backgroundColor: '#fffbeb',
+                      border: '1px solid #fef3c7',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      color: '#b45309',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      maxWidth: '500px'
+                    }}>
+                      <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '14px' }}>
+                        <i className="fa-solid fa-store"></i> Store Pickup Only
+                      </div>
+                      This project is available for store pickup only. Delivery is not available. Please contact us through WhatsApp for pricing and ordering details.
                     </div>
-                  )}
 
-                   {/* Add To Cart */}
-                  <button
-                    onClick={async () => {
-                      if (!selectedVariant) return;
-                      if (!customer) {
-                        router.push('/login');
-                        return;
-                      }
-                      setIsAdding(true);
-                      await addToCart(selectedVariant.id, quantity);
-                      setIsAdding(false);
-                    }}
-                    disabled={isAdding || !selectedVariant || !stockQuantity || stockQuantity <= 0}
-                    style={{
-                      backgroundColor: (!stockQuantity || stockQuantity <= 0) ? '#71717a' : '#c85a17',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '20px',
-                      padding: '0 24px',
-                      height: '40px',
-                      fontWeight: '700',
-                      fontSize: '12px',
-                      letterSpacing: '0.05em',
-                      cursor: (!stockQuantity || stockQuantity <= 0) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'background-color 0.2s'
-                    }}
-                  >
-                    {isAdding ? 'ADDING...' : (!stockQuantity || stockQuantity <= 0) ? 'OUT OF STOCK' : 'ADD TO CART'}
-                  </button>
+                    {/* WhatsApp Button */}
+                    {loadingSettings ? (
+                      <button disabled style={{ backgroundColor: '#cbd5e1', color: '#64748b', border: 'none', borderRadius: '20px', padding: '0 32px', height: '44px', fontWeight: '700', fontSize: '14px', cursor: 'not-allowed', width: 'fit-content' }}>
+                        Loading settings...
+                      </button>
+                    ) : whatsappError ? (
+                      <div style={{ color: '#ef4444', fontSize: '13px', fontWeight: '600' }}>
+                        <i className="fa-solid fa-triangle-exclamation"></i> Ordering is currently unavailable: {whatsappError}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (whatsappNumber) {
+                            const url = getWhatsAppOrderUrl(product, selectedVariant, whatsappNumber);
+                            window.open(url, '_blank', 'noopener,noreferrer');
+                          }
+                        }}
+                        style={{
+                          backgroundColor: '#25d366',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '20px',
+                          padding: '0 32px',
+                          height: '44px',
+                          fontWeight: '700',
+                          fontSize: '14px',
+                          letterSpacing: '0.05em',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          transition: 'background-color 0.2s',
+                          boxShadow: '0 4px 10px rgba(37,211,102,0.2)',
+                          width: 'fit-content'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#128c7e'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#25d366'}
+                      >
+                        <i className="fa-brands fa-whatsapp" style={{ fontSize: '18px' }}></i> ORDER NOW
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0', flexWrap: 'wrap' }}>
+                    {/* Quantity selector */}
+                    {stockQuantity !== null && stockQuantity > 0 && (
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ced4da', borderRadius: '6px', height: '40px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setQuantity(prev => Math.max(1, prev - 1));
+                          }}
+                          style={{ background: 'none', border: 'none', width: '36px', height: '100%', cursor: 'pointer', fontSize: '12px', color: '#495057', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <i className="fa-solid fa-minus"></i>
+                        </button>
+                        <input 
+                          type="text" 
+                          readOnly
+                          value={quantity} 
+                          style={{ border: 'none', background: 'none', width: '40px', textAlign: 'center', fontWeight: '700', fontSize: '15px', outline: 'none', color: '#1c1b1f', padding: 0 }}
+                        />
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setQuantity(prev => Math.min(stockQuantity || 99, prev + 1));
+                          }}
+                          style={{ background: 'none', border: 'none', width: '36px', height: '100%', cursor: 'pointer', fontSize: '12px', color: '#495057', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <i className="fa-solid fa-plus"></i>
+                        </button>
+                      </div>
+                    )}
 
-                  {/* Buy Now */}
-                  {stockQuantity !== null && stockQuantity > 0 && (
+                    {/* Add To Cart */}
                     <button
                       onClick={async () => {
                         if (!selectedVariant) return;
@@ -325,29 +394,64 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         setIsAdding(true);
                         await addToCart(selectedVariant.id, quantity);
                         setIsAdding(false);
-                        router.push('/checkout');
                       }}
+                      disabled={isAdding || !selectedVariant || !stockQuantity || stockQuantity <= 0}
                       style={{
-                        backgroundColor: '#1b2a47',
+                        backgroundColor: (!stockQuantity || stockQuantity <= 0) ? '#71717a' : '#c85a17',
                         color: '#ffffff',
                         border: 'none',
                         borderRadius: '20px',
-                        padding: '0 28px',
+                        padding: '0 24px',
                         height: '40px',
                         fontWeight: '700',
                         fontSize: '12px',
                         letterSpacing: '0.05em',
-                        cursor: 'pointer',
+                        cursor: (!stockQuantity || stockQuantity <= 0) ? 'not-allowed' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         transition: 'background-color 0.2s'
                       }}
                     >
-                      BUY NOW
+                      {isAdding ? 'ADDING...' : (!stockQuantity || stockQuantity <= 0) ? 'OUT OF STOCK' : 'ADD TO CART'}
                     </button>
-                  )}
-                </div>
+
+                    {/* Buy Now */}
+                    {stockQuantity !== null && stockQuantity > 0 && (
+                      <button
+                        onClick={async () => {
+                          if (!selectedVariant) return;
+                          if (!customer) {
+                            router.push('/login');
+                            return;
+                          }
+                          setIsAdding(true);
+                          await addToCart(selectedVariant.id, quantity);
+                          setIsAdding(false);
+                          router.push('/checkout');
+                        }}
+                        style={{
+                          backgroundColor: '#1b2a47',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '20px',
+                          padding: '0 28px',
+                          height: '40px',
+                          fontWeight: '700',
+                          fontSize: '12px',
+                          letterSpacing: '0.05em',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background-color 0.2s'
+                        }}
+                      >
+                        BUY NOW
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {/* Metadata */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: '#6c757d', borderTop: '1px solid #e9ecef', paddingTop: '16px' }}>

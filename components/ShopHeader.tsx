@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
 import { useCategories } from '@/lib/hooks';
 import { useAuth } from '@/lib/AuthContext';
-import { fetchApi, getValidImageUrl } from '@/lib/medusa';
+import { fetchApi, getValidImageUrl, isProjectProduct } from '@/lib/medusa';
 import Link from 'next/link';
 
 function formatPrice(amount: number, currencyCode: string = 'inr') {
@@ -586,7 +586,11 @@ function ShopHeaderContent() {
                         {highlightMatch(p.title, query)}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
-                        {priceVal > 0 ? (
+                        {isProjectProduct(p) ? (
+                          <span style={{ fontSize: '13px', fontWeight: '700', color: '#c85a17' }}>
+                            Get a Quote
+                          </span>
+                        ) : priceVal > 0 ? (
                           <span style={{ fontSize: '13px', fontWeight: '700', color: '#136c39' }}>
                             {originalPriceVal > 0 && (
                               <del style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginRight: '6px' }}>

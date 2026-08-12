@@ -460,7 +460,7 @@ export async function getProducts(
     q.set('offset', apiOffset)
     q.set('limit', apiLimit)
     if (params?.order && !isSearching) q.set('order', params.order)
-    q.set('fields', params?.fields || '*variants.prices,*variants.calculated_price,*categories')
+    q.set('fields', params?.fields || '*variants.prices,*variants.calculated_price,*categories,*categories.parent_category')
     
     const res = await fetchApi<{ products: MedusaProduct[]; count: number }>(
       `/store/products?${q.toString()}`,
@@ -501,10 +501,10 @@ export async function getProducts(
 export async function getProduct(handleOrId: string): Promise<MedusaProduct> {
   try {
     if (handleOrId.startsWith('prod_')) {
-      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices,*variants.calculated_price,*categories`)
+      const res = await fetchApi<{ product: MedusaProduct }>(`/store/products/${handleOrId}?fields=*variants.prices,*variants.calculated_price,*categories,*categories.parent_category`)
       return res.product
     } else {
-      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices,*variants.calculated_price,*categories`)
+      const res = await fetchApi<{ products: MedusaProduct[] }>(`/store/products?handle=${handleOrId}&fields=*variants.prices,*variants.calculated_price,*categories,*categories.parent_category`)
       if (!res.products || res.products.length === 0) {
         const found = FALLBACK_PRODUCTS.find(p => p.handle === handleOrId)
         if (found) return found
@@ -683,4 +683,65 @@ export interface MedusaOrder {
 export async function getOrder(orderId: string): Promise<MedusaOrder> {
   const res = await fetchApi<{ order: MedusaOrder }>(`/store/orders/${orderId}?fields=*payment_collections.payments`)
   return res.order
+}
+
+export function isProjectProduct(product: MedusaProduct | null | undefined): boolean {
+  if (!product) return false;
+  const projectParentId = process.env.NEXT_PUBLIC_PROJECT_PARENT_CATEGORY_ID;
+  if (!projectParentId) {
+    console.error("CRITICAL ERROR: NEXT_PUBLIC_PROJECT_PARENT_CATEGORY_ID environment variable is missing!");
+    return false;
+  }
+
+  const checkCategory = (cat: any): boolean => {
+    if (!cat) return false;
+    if (cat.id === projectParentId) return true;
+    if (cat.parent_category_id === projectParentId) return true;
+    if (cat.parent_category && checkCategory(cat.parent_category)) return true;
+    return false;
+  };
+
+  return !!product.categories?.some(checkCategory);
+}
+
+export function getStorefrontUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_STOREFRONT_URL;
+  if (envUrl) return envUrl;
+  
+  if (process.env.NODE_ENV === 'production') {
+    console.error("CRITICAL ERROR: NEXT_PUBLIC_STOREFRONT_URL is missing in production!");
+    return "https://www.oceanstudentprojects.com";
+  }
+  
+  return typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+}
+
+export function getWhatsAppOrderUrl(
+  product: MedusaProduct,
+  selectedVariant: MedusaProductVariant | null,
+  whatsappNumber: string
+): string {
+  const projectParentId = process.env.NEXT_PUBLIC_PROJECT_PARENT_CATEGORY_ID;
+  const catName = product.categories?.find((c: any) => c.parent_category_id === projectParentId)?.name 
+    || product.categories?.[0]?.name 
+    || 'Project';
+  
+  const sku = selectedVariant?.sku || product.variants?.[0]?.sku || '';
+  const skuLine = sku ? `Product ID/SKU: ${sku}` : `Product ID/SKU: ${product.id}`;
+  
+  const baseUrl = getStorefrontUrl();
+  const productSlug = product.handle || product.id;
+  const liveUrl = `${baseUrl}/product/${productSlug}`;
+
+  const message = `Hello, I am interested in this project.
+
+Project: ${product.title}
+Category: ${catName}
+${skuLine}
+
+Product Link: ${liveUrl}
+
+I would like to know the price and details.`;
+
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
