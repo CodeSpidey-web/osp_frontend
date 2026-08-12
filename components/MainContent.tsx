@@ -64,6 +64,7 @@ interface MainContentProps {
   initialCategoryImages?: Record<string, string>;
   initialLatestProducts?: MedusaProduct[];
   initialPopularCategories?: any[];
+  initialExploreProjects?: any[];
 }
 
 export default function MainContent({
@@ -72,6 +73,7 @@ export default function MainContent({
   initialCategoryImages = {},
   initialLatestProducts = [],
   initialPopularCategories = [],
+  initialExploreProjects = [],
 }: MainContentProps) {
   const { addToCart } = useCart();
   const [products, setProducts] = useState<MedusaProduct[]>(initialProducts);
@@ -79,11 +81,13 @@ export default function MainContent({
   const [categoryImages, setCategoryImages] = useState<Record<string, string>>(initialCategoryImages);
   const [latestProducts, setLatestProducts] = useState<MedusaProduct[]>(initialLatestProducts);
   const [popularCategories, setPopularCategories] = useState<any[]>(initialPopularCategories);
+  const [exploreProjects, setExploreProjects] = useState<any[]>(initialExploreProjects);
   const [loading, setLoading] = useState(initialProducts.length === 0);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
 
   const popularCategoriesScrollRef = useRef<HTMLDivElement>(null);
+  const exploreProjectsScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollPopularCategories = (direction: "left" | "right") => {
     if (popularCategoriesScrollRef.current) {
@@ -111,7 +115,34 @@ export default function MainContent({
     }
   };
 
+  const scrollExploreProjects = (direction: "left" | "right") => {
+    if (exploreProjectsScrollRef.current) {
+      const { scrollLeft, clientWidth, scrollWidth } = exploreProjectsScrollRef.current;
+      const computedStyle = window.getComputedStyle(exploreProjectsScrollRef.current);
+      const gap = parseFloat(computedStyle.gap) || 0;
+      const scrollAmount = clientWidth > 0 ? clientWidth + gap : 300;
+      
+      let scrollTo = 0;
+      if (direction === "left") {
+        if (scrollLeft <= 10) {
+          scrollTo = scrollWidth - clientWidth;
+        } else {
+          scrollTo = scrollLeft - scrollAmount;
+        }
+      } else {
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollTo = 0;
+        } else {
+          scrollTo = scrollLeft + scrollAmount;
+        }
+      }
+      
+      exploreProjectsScrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
   const isHoveredRef = useRef(false);
+  const isExploreHoveredRef = useRef(false);
 
   useEffect(() => {
     const container = popularCategoriesScrollRef.current;
@@ -142,16 +173,45 @@ export default function MainContent({
   }, [popularCategories]);
 
   useEffect(() => {
+    const container = exploreProjectsScrollRef.current;
+    if (!container) return;
+
+    const intervalId = setInterval(() => {
+      if (isExploreHoveredRef.current) return;
+
+      const { scrollLeft, clientWidth, scrollWidth } = container;
+      const computedStyle = window.getComputedStyle(container);
+      const gap = parseFloat(computedStyle.gap) || 0;
+      
+      const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
+      const itemWidth = firstItem ? firstItem.offsetWidth : 150;
+      const scrollAmount = itemWidth + gap;
+
+      let scrollTo = 0;
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        scrollTo = 0;
+      } else {
+        scrollTo = scrollLeft + scrollAmount;
+      }
+      
+      container.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [exploreProjects]);
+
+  useEffect(() => {
     if (initialProducts.length > 0) {
       return;
     }
     async function fetchData() {
       try {
-        const [productsData, categoriesData, latestProductsData, popularCategoriesData] = await Promise.all([
+        const [productsData, categoriesData, latestProductsData, popularCategoriesData, exploreProjectsData] = await Promise.all([
           getProducts({ limit: 24 }),
           getCategories(),
           fetchApi<{ products: MedusaProduct[] }>("/store/latest-products").catch(() => ({ products: [] })),
           fetchApi<{ popular_categories: any[] }>("/store/popular-categories").catch(() => ({ popular_categories: [] })),
+          fetchApi<{ explore_projects: any[] }>("/store/explore-projects").catch(() => ({ explore_projects: [] })),
         ]);
         const allProducts = productsData.products || [];
         const shuffled = [...allProducts];
@@ -162,6 +222,7 @@ export default function MainContent({
         setProducts(shuffled);
         setLatestProducts(latestProductsData.products || []);
         setPopularCategories(popularCategoriesData.popular_categories || []);
+        setExploreProjects(exploreProjectsData.explore_projects || []);
         const cats = categoriesData || [];
         setCategories(cats);
 
@@ -1121,29 +1182,78 @@ export default function MainContent({
         </div>
       )}
 
-      {/* Three Promo Banners Section */}
-      <div className="osp-promo-banners-section py-4" style={{ backgroundColor: "#f8fafc" }}>
-        <div className="container">
-          <div className="row g-2 g-md-3">
-            <div className="col-4">
-              <a href="/contact" className="osp-promo-banner-link" style={{ display: 'block', transition: 'transform 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                <img 
-                  src="/assets/images/catagory-img/Untitled design.svg" 
-                  alt="Project Enquiry Banner" 
-                  className="img-fluid rounded-3"
-                  style={{ width: '100%', height: 'auto', objectFit: 'cover', display: 'block', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}
-                />
-              </a>
-            </div>
-            <div className="col-4">
-              {/* Second banner (will be sent later) */}
-            </div>
-            <div className="col-4">
-              {/* Third banner (will be sent later) */}
+      {/* Explore Our Projects Slider */}
+      {(() => {
+        const displayExplore = exploreProjects.length > 0 ? exploreProjects : [];
+        return displayExplore.length > 0 && (
+          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
+            <div className="container">
+              <div className="row">
+                <div className="col-lg-12 mb--24">
+                  <div className="rbt-component-section-title text-center border-0 p-0">
+                    <div>
+                      <span className="osp-brand-chip">EXPLORE OUR PROJECTS</span>
+                    </div>
+                    <h2 className="rbt-title mt--4">
+                      Explore Our <span className="rbt-bold--text text-success">Projects</span>
+                    </h2>
+                  </div>
+                </div>
+              </div>
+
+              <div className="osp-popular-categories-bar-wrapper">
+                <button
+                  type="button"
+                  className="osp-scroll-btn osp-scroll-btn-left"
+                  onClick={() => scrollExploreProjects('left')}
+                  aria-label="Scroll left"
+                >
+                  <i className="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div
+                  className="osp-scroll-wrapper"
+                  onMouseEnter={() => { isExploreHoveredRef.current = true; }}
+                  onMouseLeave={() => { isExploreHoveredRef.current = false; }}
+                  onTouchStart={() => { isExploreHoveredRef.current = true; }}
+                  onTouchEnd={() => {
+                    setTimeout(() => { isExploreHoveredRef.current = false; }, 1000);
+                  }}
+                >
+                  <div className="osp-scroll-container" ref={exploreProjectsScrollRef}>
+                    {displayExplore.map((cat, i) => {
+                      const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+
+                      return (
+                        <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
+                          <div className="osp-cat-img-box">
+                            <img
+                              src={imgUrl}
+                              alt={cat.name}
+                              loading="lazy"
+                            />
+                          </div>
+                          <span className="osp-cat-name">{cat.name}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="osp-scroll-btn osp-scroll-btn-right"
+                  onClick={() => scrollExploreProjects('right')}
+                  aria-label="Scroll right"
+                >
+                  <i className="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Popular Products Area */}
       <div className="rbt-component-area rbt-products-area rbt-bg-color-white rbt-section-gapTop reveal">

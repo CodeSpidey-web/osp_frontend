@@ -7,18 +7,21 @@ export default async function Home() {
   let initialCategories: any[] = [];
   let initialLatestProducts: any[] = [];
   let initialPopularCategories: any[] = [];
+  let initialExploreProjects: any[] = [];
   const initialCategoryImages: Record<string, string> = {};
 
   try {
-    const [productsData, categoriesData, latestProductsData, popularCategoriesData] = await Promise.all([
+    const [productsData, categoriesData, latestProductsData, popularCategoriesData, exploreProjectsData] = await Promise.all([
       getProducts({ limit: 24 }),
       getCategories(),
       fetchApi<{ products: any[] }>("/store/latest-products").catch(() => ({ products: [] })),
       fetchApi<{ popular_categories: any[] }>("/store/popular-categories").catch(() => ({ popular_categories: [] })),
+      fetchApi<{ explore_projects: any[] }>("/store/explore-projects").catch(() => ({ explore_projects: [] })),
     ]);
     initialProducts = productsData?.products || [];
     initialLatestProducts = latestProductsData?.products || [];
     initialPopularCategories = popularCategoriesData?.popular_categories || [];
+    initialExploreProjects = exploreProjectsData?.explore_projects || [];
     
     // Shuffle the products on the server side to maintain the current logic
     initialProducts = [...initialProducts];
@@ -119,6 +122,7 @@ export default async function Home() {
           initialCategoryImages={initialCategoryImages}
           initialLatestProducts={initialLatestProducts}
           initialPopularCategories={initialPopularCategories}
+          initialExploreProjects={initialExploreProjects}
         />
       </main>
     </HomeLayout>
