@@ -58,6 +58,187 @@ function getParentCategoryName(productCategories: any[], allCategories: MedusaCa
   return productCategories[0]?.name || "Electronic Components";
 }
 
+interface UseInfiniteCarouselOptions {
+  itemCount: number;
+  autoplayInterval?: number;
+}
+
+function useInfiniteCarousel({ itemCount, autoplayInterval = 3000 }: UseInfiniteCarouselOptions) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollTargetRef = useRef<number | null>(null);
+  const isHoveredRef = useRef(false);
+  const isTransitioningRef = useRef(false);
+
+  // Helper to calculate N-item set width from DOM
+  const getSetWidth = () => {
+    const container = scrollRef.current;
+    if (!container || container.children.length < itemCount || itemCount === 0) return 0;
+    const parentRect = container.getBoundingClientRect();
+    const targetChild = container.children[itemCount] as HTMLElement;
+    if (!targetChild) return 0;
+    const childRect = targetChild.getBoundingClientRect();
+    return childRect.left - parentRect.left + container.scrollLeft;
+  };
+
+  // Perform instant boundary reset if needed
+  const checkAndResetBoundary = () => {
+    const container = scrollRef.current;
+    if (!container || itemCount === 0) return;
+    const setWidth = getSetWidth();
+    if (setWidth === 0) return;
+
+    const { scrollLeft } = container;
+    
+    if (scrollLeft >= setWidth * 2) {
+      container.style.scrollBehavior = 'auto';
+      const newScroll = scrollLeft - setWidth;
+      container.scrollLeft = newScroll;
+      scrollTargetRef.current = newScroll;
+      void container.offsetHeight; // force reflow
+      container.style.scrollBehavior = 'smooth';
+    } else if (scrollLeft < setWidth) {
+      container.style.scrollBehavior = 'auto';
+      const newScroll = scrollLeft + setWidth;
+      container.scrollLeft = newScroll;
+      scrollTargetRef.current = newScroll;
+      void container.offsetHeight; // force reflow
+      container.style.scrollBehavior = 'smooth';
+    }
+  };
+
+  // Handle scrollend event
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let fallbackTimeout: NodeJS.Timeout;
+    const handleScrollEnd = () => {
+      isTransitioningRef.current = false;
+      checkAndResetBoundary();
+    };
+
+    const onScroll = () => {
+      clearTimeout(fallbackTimeout);
+      fallbackTimeout = setTimeout(handleScrollEnd, 100);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    container.addEventListener('scrollend', handleScrollEnd, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', onScroll);
+      container.removeEventListener('scrollend', handleScrollEnd);
+      clearTimeout(fallbackTimeout);
+    };
+  }, [itemCount]);
+
+  // Initialize scroll position to start of second set
+  const initializeScrollPosition = () => {
+    const container = scrollRef.current;
+    if (!container || itemCount === 0) return;
+
+    requestAnimationFrame(() => {
+      const setWidth = getSetWidth();
+      if (setWidth > 0) {
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = setWidth;
+        scrollTargetRef.current = setWidth;
+        void container.offsetHeight; // force reflow
+        container.style.scrollBehavior = 'smooth';
+      }
+    });
+  };
+
+  // Run initialization when itemCount changes
+  useEffect(() => {
+    initializeScrollPosition();
+  }, [itemCount]);
+
+  // Programmatic scroll (Next / Previous buttons)
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollRef.current;
+    if (!container || itemCount === 0) return;
+
+    const setWidth = getSetWidth();
+    if (setWidth === 0) return;
+
+    if (scrollTargetRef.current === null) {
+      scrollTargetRef.current = container.scrollLeft;
+    }
+
+    const currentScroll = container.scrollLeft;
+    if (currentScroll >= setWidth * 2 || currentScroll < setWidth) {
+      checkAndResetBoundary();
+    }
+
+    const computedStyle = window.getComputedStyle(container);
+    const gap = parseFloat(computedStyle.gap) || 0;
+    const clientWidth = container.clientWidth;
+    const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
+    const itemWidth = firstItem ? firstItem.offsetWidth : 150;
+    const scrollAmount = itemWidth + gap;
+
+    let target = scrollTargetRef.current;
+    if (direction === 'left') {
+      target -= scrollAmount;
+    } else {
+      target += scrollAmount;
+    }
+
+    const maxScroll = container.scrollWidth - clientWidth;
+    target = Math.max(0, Math.min(target, maxScroll));
+
+    scrollTargetRef.current = target;
+    isTransitioningRef.current = true;
+    container.scrollTo({ left: target, behavior: 'smooth' });
+  };
+
+  // Autoplay interval
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || itemCount === 0) return;
+
+    const intervalId = setInterval(() => {
+      if (isHoveredRef.current || isTransitioningRef.current) return;
+
+      const setWidth = getSetWidth();
+      if (setWidth === 0) return;
+
+      if (scrollTargetRef.current === null) {
+        scrollTargetRef.current = container.scrollLeft;
+      }
+
+      const currentScroll = container.scrollLeft;
+      if (currentScroll >= setWidth * 2 || currentScroll < setWidth) {
+        checkAndResetBoundary();
+      }
+
+      const computedStyle = window.getComputedStyle(container);
+      const gap = parseFloat(computedStyle.gap) || 0;
+      const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
+      const itemWidth = firstItem ? firstItem.offsetWidth : 150;
+      const scrollAmount = itemWidth + gap;
+
+      let target = scrollTargetRef.current + scrollAmount;
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      target = Math.max(0, Math.min(target, maxScroll));
+
+      scrollTargetRef.current = target;
+      isTransitioningRef.current = true;
+      container.scrollTo({ left: target, behavior: 'smooth' });
+    }, autoplayInterval);
+
+    return () => clearInterval(intervalId);
+  }, [itemCount, autoplayInterval]);
+
+  return {
+    scrollRef,
+    isHoveredRef,
+    scroll,
+    initializeScrollPosition
+  };
+}
+
 interface MainContentProps {
   initialProducts?: MedusaProduct[];
   initialCategories?: MedusaCategory[];
@@ -86,119 +267,28 @@ export default function MainContent({
   const [addingId, setAddingId] = useState<string | null>(null);
   const [inventoryMap, setInventoryMap] = useState<Record<string, number>>({});
 
-  const popularCategoriesScrollRef = useRef<HTMLDivElement>(null);
-  const exploreProjectsScrollRef = useRef<HTMLDivElement>(null);
+  const displayCategories = popularCategories.length > 0 ? popularCategories : categories.filter(
+    cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
+  );
+  const displayExplore = exploreProjects.length > 0 ? exploreProjects : [];
 
-  const scrollPopularCategories = (direction: "left" | "right") => {
-    if (popularCategoriesScrollRef.current) {
-      const { scrollLeft, clientWidth, scrollWidth } = popularCategoriesScrollRef.current;
-      const computedStyle = window.getComputedStyle(popularCategoriesScrollRef.current);
-      const gap = parseFloat(computedStyle.gap) || 0;
-      const scrollAmount = clientWidth > 0 ? clientWidth + gap : 300;
-      
-      let scrollTo = 0;
-      if (direction === "left") {
-        if (scrollLeft <= 10) {
-          scrollTo = scrollWidth - clientWidth;
-        } else {
-          scrollTo = scrollLeft - scrollAmount;
-        }
-      } else {
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          scrollTo = 0;
-        } else {
-          scrollTo = scrollLeft + scrollAmount;
-        }
-      }
-      
-      popularCategoriesScrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }
-  };
+  const {
+    scrollRef: popularCategoriesScrollRef,
+    isHoveredRef: isPopularHoveredRef,
+    scroll: scrollPopularCategories
+  } = useInfiniteCarousel({
+    itemCount: displayCategories.length,
+    autoplayInterval: 3000
+  });
 
-  const scrollExploreProjects = (direction: "left" | "right") => {
-    if (exploreProjectsScrollRef.current) {
-      const { scrollLeft, clientWidth, scrollWidth } = exploreProjectsScrollRef.current;
-      const computedStyle = window.getComputedStyle(exploreProjectsScrollRef.current);
-      const gap = parseFloat(computedStyle.gap) || 0;
-      const scrollAmount = clientWidth > 0 ? clientWidth + gap : 300;
-      
-      let scrollTo = 0;
-      if (direction === "left") {
-        if (scrollLeft <= 10) {
-          scrollTo = scrollWidth - clientWidth;
-        } else {
-          scrollTo = scrollLeft - scrollAmount;
-        }
-      } else {
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          scrollTo = 0;
-        } else {
-          scrollTo = scrollLeft + scrollAmount;
-        }
-      }
-      
-      exploreProjectsScrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }
-  };
-
-  const isHoveredRef = useRef(false);
-  const isExploreHoveredRef = useRef(false);
-
-  useEffect(() => {
-    const container = popularCategoriesScrollRef.current;
-    if (!container) return;
-
-    const intervalId = setInterval(() => {
-      if (isHoveredRef.current) return;
-
-      const { scrollLeft, clientWidth, scrollWidth } = container;
-      const computedStyle = window.getComputedStyle(container);
-      const gap = parseFloat(computedStyle.gap) || 0;
-      
-      const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
-      const itemWidth = firstItem ? firstItem.offsetWidth : 150;
-      const scrollAmount = itemWidth + gap;
-
-      let scrollTo = 0;
-      if (scrollLeft + clientWidth >= scrollWidth - 10) {
-        scrollTo = 0;
-      } else {
-        scrollTo = scrollLeft + scrollAmount;
-      }
-      
-      container.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }, 3000);
-
-    return () => clearInterval(intervalId);
-  }, [popularCategories]);
-
-  useEffect(() => {
-    const container = exploreProjectsScrollRef.current;
-    if (!container) return;
-
-    const intervalId = setInterval(() => {
-      if (isExploreHoveredRef.current) return;
-
-      const { scrollLeft, clientWidth, scrollWidth } = container;
-      const computedStyle = window.getComputedStyle(container);
-      const gap = parseFloat(computedStyle.gap) || 0;
-      
-      const firstItem = container.querySelector('.osp-cat-item') as HTMLElement;
-      const itemWidth = firstItem ? firstItem.offsetWidth : 150;
-      const scrollAmount = itemWidth + gap;
-
-      let scrollTo = 0;
-      if (scrollLeft + clientWidth >= scrollWidth - 10) {
-        scrollTo = 0;
-      } else {
-        scrollTo = scrollLeft + scrollAmount;
-      }
-      
-      container.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }, 3000);
-
-    return () => clearInterval(intervalId);
-  }, [exploreProjects]);
+  const {
+    scrollRef: exploreProjectsScrollRef,
+    isHoveredRef: isExploreHoveredRef,
+    scroll: scrollExploreProjects
+  } = useInfiniteCarousel({
+    itemCount: displayExplore.length,
+    autoplayInterval: 3000
+  });
 
   useEffect(() => {
     if (initialProducts.length > 0) {
@@ -666,8 +756,9 @@ export default function MainContent({
                 .osp-scroll-wrapper {
                   margin: 0 70px;
                   overflow: hidden;
-                  height: 320px;
-                  margin-top: -200px;
+                  height: 420px;
+                  margin-top: -300px;
+                  padding-top: 80px;
                   flex: 1;
                   min-width: 0;
                 }
@@ -677,7 +768,6 @@ export default function MainContent({
                   gap: 32px;
                   overflow-x: auto;
                   overflow-y: visible;
-                  scroll-behavior: smooth;
                   width: 100%;
                   height: 100%;
                   scrollbar-width: none;
@@ -698,7 +788,7 @@ export default function MainContent({
                   flex: 0 0 calc((100% - 96px) / 4);
                   width: calc((100% - 96px) / 4);
                   min-width: 0;
-                  height: 280px;
+                  height: 320px;
                   text-decoration: none !important;
                   position: relative;
                   scroll-snap-align: start;
@@ -707,8 +797,9 @@ export default function MainContent({
                 @media (max-width: 991px) {
                   .osp-scroll-wrapper {
                     margin: 0 48px;
-                    height: 220px;
-                    margin-top: -135px;
+                    height: 300px;
+                    margin-top: -210px;
+                    padding-top: 60px;
                   }
                   .osp-scroll-container {
                     gap: 24px;
@@ -717,19 +808,18 @@ export default function MainContent({
                     flex: 0 0 calc((100% - 48px) / 3);
                     width: calc((100% - 48px) / 3);
                     min-width: 0;
-                    height: 190px;
+                    height: 220px;
                   }
-                }
-
-                @media (max-width: 767px) {
+                  @media (max-width: 767px) {
                   .osp-popular-categories-bar-wrapper {
                     height: 50px;
                     margin-top: 130px;
                   }
                   .osp-scroll-wrapper {
                     margin: 0 40px;
-                    height: 200px;
-                    margin-top: -150px;
+                    height: 255px;
+                    margin-top: -195px;
+                    padding-top: 45px;
                   }
                   .osp-scroll-container {
                     gap: 16px;
@@ -741,24 +831,27 @@ export default function MainContent({
                     height: 100%;
                   }
                   .osp-cat-img-box {
-                    width: 100px;
-                    height: 100px;
+                    width: 100%;
+                    max-width: 135px;
+                    height: auto;
+                    aspect-ratio: 1 / 1;
                   }
                   .osp-cat-img-box::after {
-                    width: 80px;
-                    height: 18px;
+                    width: 110px;
+                    height: 20px;
                     bottom: 2px;
                   }
                   .osp-cat-img-box::before {
-                    width: 90px;
-                    height: 20px;
+                    width: 120px;
+                    height: 22px;
                     bottom: -3px;
                   }
                 }
+                }
 
                 .osp-cat-img-box {
-                  width: 200px;
-                  height: 200px;
+                  width: 210px;
+                  height: 210px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -769,8 +862,23 @@ export default function MainContent({
 
                 @media (max-width: 991px) {
                   .osp-cat-img-box {
+                    width: 145px;
+                    height: 145px;
+                  }
+                  .osp-cat-img-box::after {
+                    width: 125px;
+                    height: 22px;
+                  }
+                  .osp-cat-img-box::before {
                     width: 140px;
-                    height: 140px;
+                    height: 24px;
+                  }
+                  @media (max-width: 767px) {
+                  .osp-cat-img-box {
+                    width: 100%;
+                    max-width: 135px;
+                    height: auto;
+                    aspect-ratio: 1 / 1;
                   }
                   .osp-cat-img-box::after {
                     width: 110px;
@@ -781,35 +889,28 @@ export default function MainContent({
                     height: 22px;
                   }
                 }
-
-                @media (max-width: 767px) {
-                  .osp-cat-img-box {
-                    width: 100%;
-                    max-width: 110px;
-                    height: auto;
-                    aspect-ratio: 1 / 1;
-                  }
-                  .osp-cat-img-box::after {
-                    width: 90px;
-                    height: 16px;
-                  }
-                  .osp-cat-img-box::before {
-                    width: 100px;
-                    height: 18px;
-                  }
                 }
 
                 .osp-cat-img-box img {
-                  max-width: 95%;
-                  max-height: 95%;
+                  max-width: 100%;
+                  max-height: 100%;
                   object-fit: contain;
-                  transform: scale(1.1);
+                  transform: scale(1.0);
                   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                   mix-blend-mode: multiply;
                 }
 
                 .osp-cat-item:hover .osp-cat-img-box img {
-                  transform: translateY(-30px) scale(1.2);
+                  transform: translateY(-15px) scale(1.1);
+                }
+
+                @media (max-width: 767px) {
+                  .osp-cat-img-box img {
+                    transform: scale(1.1);
+                  }
+                  .osp-cat-item:hover .osp-cat-img-box img {
+                    transform: translateY(-10px) scale(1.15);
+                  }
                 }
 
                 /* Glowing pedestal ring underneath the image inside the img box */
@@ -819,7 +920,7 @@ export default function MainContent({
                   bottom: 4px;
                   left: 50%;
                   transform: translateX(-50%) scale(0.6);
-                  width: 160px;
+                  width: 170px;
                   height: 28px;
                   border: 1.5px solid #22c55e;
                   border-radius: 50%;
@@ -835,7 +936,7 @@ export default function MainContent({
                   bottom: -6px;
                   left: 50%;
                   transform: translateX(-50%) scale(0.6);
-                  width: 180px;
+                  width: 190px;
                   height: 32px;
                   border: 1px solid #4ade80;
                   border-radius: 50%;
@@ -1011,19 +1112,22 @@ export default function MainContent({
 
                 <div
                   className="osp-scroll-wrapper"
-                  onMouseEnter={() => { isHoveredRef.current = true; }}
-                  onMouseLeave={() => { isHoveredRef.current = false; }}
-                  onTouchStart={() => { isHoveredRef.current = true; }}
+                  onMouseEnter={() => { isPopularHoveredRef.current = true; }}
+                  onMouseLeave={() => { isPopularHoveredRef.current = false; }}
+                  onTouchStart={() => { isPopularHoveredRef.current = true; }}
                   onTouchEnd={() => {
-                    setTimeout(() => { isHoveredRef.current = false; }, 1000);
+                    setTimeout(() => { isPopularHoveredRef.current = false; }, 1000);
                   }}
                 >
                   <div className="osp-scroll-container" ref={popularCategoriesScrollRef}>
-                    {displayCategories.map((cat, i) => {
+                    {[...displayCategories, ...displayCategories, ...displayCategories].map((cat, i) => {
                       const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+                      const originalCount = displayCategories.length;
+                      const setIndex = Math.floor(i / originalCount);
+                      const uniqueKey = `${cat.id}-clone-${setIndex}-${i}`;
 
                       return (
-                        <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
+                        <a key={uniqueKey} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
                           <div className="osp-cat-img-box">
                             <img
                               src={imgUrl}
@@ -1240,11 +1344,14 @@ export default function MainContent({
                   }}
                 >
                   <div className="osp-scroll-container" ref={exploreProjectsScrollRef}>
-                    {displayExplore.map((cat, i) => {
+                    {[...displayExplore, ...displayExplore, ...displayExplore].map((cat, i) => {
                       const imgUrl = getValidImageUrl(cat.image_url) || categoryImages[cat.id] || `/assets/images/catagory-img/cat-bg-electro-c-0${(i % 6) + 1}.webp`;
+                      const originalCount = displayExplore.length;
+                      const setIndex = Math.floor(i / originalCount);
+                      const uniqueKey = `${cat.id}-clone-${setIndex}-${i}`;
 
                       return (
-                        <a key={cat.id} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
+                        <a key={uniqueKey} href={`/shop?category_id=${cat.id}`} className="osp-cat-item">
                           <div className="osp-cat-img-box">
                             <img
                               src={imgUrl}
