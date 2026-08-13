@@ -716,7 +716,7 @@ export default function MainContent({
           cat => !cat.parent_category_id && cat.name?.toLowerCase() !== 'uncategorized'
         );
         return displayCategories.length > 0 && (
-          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
+          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal" style={{ paddingTop: '60px' }}>
             <div className="container">
               <div className="row">
                 <div className="col-lg-12 mb--24">
@@ -739,7 +739,7 @@ export default function MainContent({
                   background-color: #136c39;
                   border-radius: 9999px;
                   height: 120px;
-                  margin-top: 180px;
+                  margin-top: 220px;
                   display: flex;
                   align-items: center;
                   box-shadow: 0 10px 25px -5px rgba(19, 108, 57, 0.3);
@@ -749,15 +749,15 @@ export default function MainContent({
                   .osp-popular-categories-bar-wrapper {
                     border-radius: 24px;
                     height: 100px;
-                    margin-top: 130px;
+                    margin-top: 160px;
                   }
                 }
 
                 .osp-scroll-wrapper {
                   margin: 0 70px;
                   overflow: hidden;
-                  height: 420px;
-                  margin-top: -300px;
+                  height: 475px;
+                  margin-top: -355px;
                   padding-top: 80px;
                   flex: 1;
                   min-width: 0;
@@ -788,7 +788,7 @@ export default function MainContent({
                   flex: 0 0 calc((100% - 96px) / 4);
                   width: calc((100% - 96px) / 4);
                   min-width: 0;
-                  height: 320px;
+                  height: 350px;
                   text-decoration: none !important;
                   position: relative;
                   scroll-snap-align: start;
@@ -797,8 +797,8 @@ export default function MainContent({
                 @media (max-width: 991px) {
                   .osp-scroll-wrapper {
                     margin: 0 48px;
-                    height: 300px;
-                    margin-top: -210px;
+                    height: 350px;
+                    margin-top: -250px;
                     padding-top: 60px;
                   }
                   .osp-scroll-container {
@@ -808,34 +808,34 @@ export default function MainContent({
                     flex: 0 0 calc((100% - 48px) / 3);
                     width: calc((100% - 48px) / 3);
                     min-width: 0;
-                    height: 220px;
+                    height: 240px;
                   }
                   @media (max-width: 767px) {
-                  .osp-popular-categories-bar-wrapper {
-                    height: 50px;
-                    margin-top: 130px;
+                    .osp-popular-categories-bar-wrapper {
+                      height: 50px;
+                      margin-top: 160px;
+                    }
+                    .osp-scroll-wrapper {
+                      margin: 0 40px;
+                      height: 280px;
+                      margin-top: -210px;
+                      padding-top: 45px;
+                    }
+                    .osp-scroll-container {
+                      gap: 16px;
+                    }
+                    .osp-cat-item {
+                      flex: 0 0 calc((100% - 16px) / 2);
+                      width: calc((100% - 16px) / 2);
+                      min-width: 0;
+                      height: 100%;
+                    }
                   }
-                  .osp-scroll-wrapper {
-                    margin: 0 40px;
-                    height: 255px;
-                    margin-top: -195px;
-                    padding-top: 45px;
-                  }
-                  .osp-scroll-container {
-                    gap: 16px;
-                  }
-                  .osp-cat-item {
-                    flex: 0 0 calc((100% - 16px) / 2);
-                    width: calc((100% - 16px) / 2);
-                    min-width: 0;
-                    height: 100%;
-                  }
-                }
                 }
 
                 .osp-cat-img-box {
-                  width: 210px;
-                  height: 210px;
+                  width: 245px;
+                  height: 245px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -844,33 +844,34 @@ export default function MainContent({
                   background-color: #ffffff;
                   border: 2.5px solid #136c39;
                   border-radius: 16px;
-                  padding: 12px;
-                  box-shadow: 0 0 15px rgba(19, 108, 57, 0.4), inset 0 0 8px rgba(19, 108, 57, 0.1);
+                  padding: 4px;
+                  box-shadow: 0 4px 15px rgba(19, 108, 57, 0.25), 0 0 10px rgba(19, 108, 57, 0.15);
+                  overflow: hidden;
                   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 }
 
                 .osp-cat-item:hover .osp-cat-img-box {
-                  box-shadow: 0 0 25px rgba(19, 108, 57, 0.7), inset 0 0 12px rgba(19, 108, 57, 0.15);
+                  box-shadow: 0 8px 24px rgba(19, 108, 57, 0.45), 0 0 15px rgba(19, 108, 57, 0.25);
                   border-color: #22c55e;
                 }
 
                 @media (max-width: 991px) {
                   .osp-cat-img-box {
-                    width: 145px;
-                    height: 145px;
+                    width: 170px;
+                    height: 170px;
                     border-radius: 14px;
-                    padding: 10px;
+                    padding: 3px;
                   }
                 }
 
                 @media (max-width: 767px) {
                   .osp-cat-img-box {
                     width: 100%;
-                    max-width: 135px;
+                    max-width: 145px;
                     height: auto;
                     aspect-ratio: 1 / 1;
                     border-radius: 12px;
-                    padding: 8px;
+                    padding: 2px;
                   }
                 }
 
@@ -880,25 +881,31 @@ export default function MainContent({
                   max-width: 100%;
                   max-height: 100%;
                   object-fit: contain;
+                  border-radius: 14px;
                   transform: scale(1.0);
                   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                   mix-blend-mode: multiply;
                 }
 
                 .osp-cat-item:hover .osp-cat-img-box img {
-                  transform: translateY(-10px) scale(1.06);
+                  transform: scale(1.1);
+                }
+
+                @media (max-width: 991px) {
+                  .osp-cat-img-box img {
+                    border-radius: 12px;
+                  }
+                  .osp-cat-item:hover .osp-cat-img-box img {
+                    transform: scale(1.08);
+                  }
                 }
 
                 @media (max-width: 767px) {
                   .osp-cat-img-box img {
-                    width: 100%;
-                    height: 100%;
-                    max-width: 100%;
-                    max-height: 100%;
-                    transform: scale(1.0);
+                    border-radius: 10px;
                   }
                   .osp-cat-item:hover .osp-cat-img-box img {
-                    transform: translateY(-6px) scale(1.04);
+                    transform: scale(1.08);
                   }
                 }
 
@@ -1259,7 +1266,7 @@ export default function MainContent({
       {(() => {
         const displayExplore = exploreProjects.length > 0 ? exploreProjects : [];
         return displayExplore.length > 0 && (
-          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal">
+          <div className="rbt-component-area rbt-catagories-area rbt-section-gapTop rbt-bg-color-gray-light pb--30 reveal" style={{ paddingTop: '60px' }}>
             <div className="container">
               <div className="row">
                 <div className="col-lg-12 mb--24">
