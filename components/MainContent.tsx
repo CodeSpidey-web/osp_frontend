@@ -88,7 +88,7 @@ function useInfiniteCarousel({ itemCount, autoplayInterval = 3000 }: UseInfinite
     if (setWidth === 0) return;
 
     const { scrollLeft } = container;
-    
+
     if (scrollLeft >= setWidth * 2) {
       container.style.scrollBehavior = 'auto';
       const newScroll = scrollLeft - setWidth;
@@ -1315,7 +1315,7 @@ export default function MainContent({
                 <div className="col-lg-12 mb--24">
                   <div className="rbt-component-section-title text-center border-0 p-0">
                     <div>
-                      <span className="osp-brand-chip">EXPLORE OUR PROJECTS</span>
+                      <span className="osp-brand-chip">PROJECT COLLECTIONS</span>
                     </div>
                     <h2 className="rbt-title mt--4">
                       Explore Our <span className="rbt-bold--text text-success">Projects</span>
