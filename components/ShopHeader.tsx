@@ -790,6 +790,51 @@ function ShopHeaderContent() {
                 transform: translate3d(-50%, 0, 0);
               }
             }
+
+            /* Premium highlighted green search bar styling */
+            .premium-nav-search-bar {
+              background: #f0fdf4 !important;
+              border: 1.5px solid #136c39 !important;
+              box-shadow: 0 2px 8px rgba(19, 108, 57, 0.08) !important;
+              transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+            .premium-nav-search-bar:hover {
+              border-color: #22c55e !important;
+              box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15) !important;
+            }
+            .premium-nav-search-bar:focus-within {
+              background: #ffffff !important;
+              border-color: #22c55e !important;
+              box-shadow: 0 8px 24px rgba(34, 197, 94, 0.18), 0 2px 8px rgba(34, 197, 94, 0.08) !important;
+            }
+            .premium-nav-search-bar input {
+              color: #111111 !important;
+            }
+            
+            /* Premium highlighted green quick-access buttons */
+            .rbt-round-btn.rbt-bg-static-gray {
+              background-color: rgba(19, 108, 57, 0.08) !important;
+              border: 1.5px solid rgba(19, 108, 57, 0.25) !important;
+              color: #136c39 !important;
+              transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            }
+            .rbt-round-btn.rbt-bg-static-gray i {
+              color: #136c39 !important;
+              transition: all 0.3s ease !important;
+            }
+            .rbt-access-box:hover .rbt-round-btn.rbt-bg-static-gray,
+            .rbt-access-box-wrapper:hover .rbt-round-btn.rbt-bg-static-gray,
+            .rbt-cart-sidenav-activation:hover .rbt-round-btn.rbt-bg-static-gray {
+              background-color: #136c39 !important;
+              border-color: #22c55e !important;
+              box-shadow: 0 0 14px rgba(34, 197, 94, 0.5) !important;
+              transform: scale(1.08) !important;
+            }
+            .rbt-access-box:hover .rbt-round-btn.rbt-bg-static-gray i,
+            .rbt-access-box-wrapper:hover .rbt-round-btn.rbt-bg-static-gray i,
+            .rbt-cart-sidenav-activation:hover .rbt-round-btn.rbt-bg-static-gray i {
+              color: #ffffff !important;
+            }
           ` }} />
 
     <div className="rbt-header-wrapper rbt-header-wrapper-one header-space-between rbt-bg-color-white header-not-transparent plr--0 position-relative z-5">

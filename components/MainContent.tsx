@@ -1322,7 +1322,6 @@ export default function MainContent({
                     })}
                   </div>
                 </div>
-
                 <button
                   type="button"
                   className="osp-scroll-btn osp-scroll-btn-right"
