@@ -812,21 +812,21 @@ export default function MainContent({
                   }
                   @media (max-width: 767px) {
                     .osp-popular-categories-bar-wrapper {
-                      height: 50px;
-                      margin-top: 160px;
+                      height: 60px;
+                      margin-top: 135px;
                     }
                     .osp-scroll-wrapper {
-                      margin: 0 40px;
-                      height: 280px;
-                      margin-top: -210px;
+                      margin: 0 20px;
+                      height: 275px;
+                      margin-top: -225px;
                       padding-top: 45px;
                     }
                     .osp-scroll-container {
-                      gap: 16px;
+                      gap: 12px;
                     }
                     .osp-cat-item {
-                      flex: 0 0 calc((100% - 16px) / 2);
-                      width: calc((100% - 16px) / 2);
+                      flex: 0 0 calc((100% - 12px) / 2);
+                      width: calc((100% - 12px) / 2);
                       min-width: 0;
                       height: 100%;
                     }
@@ -867,11 +867,11 @@ export default function MainContent({
                 @media (max-width: 767px) {
                   .osp-cat-img-box {
                     width: 100%;
-                    max-width: 145px;
+                    max-width: 100%;
                     height: auto;
                     aspect-ratio: 1 / 1;
                     border-radius: 12px;
-                    padding: 2px;
+                    padding: 3px;
                   }
                 }
 
@@ -976,10 +976,10 @@ export default function MainContent({
                     font-size: 12px;
                   }
                   .osp-scroll-btn-left {
-                    left: 10px;
+                    left: 4px;
                   }
                   .osp-scroll-btn-right {
-                    right: 10px;
+                    right: 4px;
                   }
                   .osp-cat-name {
                     font-size: 13px;
