@@ -818,7 +818,7 @@ export default function MainContent({
                     .osp-scroll-wrapper {
                       margin: 0 20px;
                       height: 275px;
-                      margin-top: -210px;
+                      margin-top: -225px;
                       padding-top: 45px;
                     }
                     .osp-scroll-container {
