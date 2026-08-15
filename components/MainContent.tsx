@@ -738,8 +738,8 @@ export default function MainContent({
                   position: relative;
                   background-color: #136c39;
                   border-radius: 9999px;
-                  height: 120px;
-                  margin-top: 220px;
+                  height: 60px;
+                  margin-top: 280px;
                   display: flex;
                   align-items: center;
                   box-shadow: 0 10px 25px -5px rgba(19, 108, 57, 0.3);
@@ -748,8 +748,8 @@ export default function MainContent({
                 @media (max-width: 991px) {
                   .osp-popular-categories-bar-wrapper {
                     border-radius: 24px;
-                    height: 100px;
-                    margin-top: 160px;
+                    height: 60px;
+                    margin-top: 195px;
                   }
                 }
 
@@ -757,7 +757,7 @@ export default function MainContent({
                   margin: 0 70px;
                   overflow: hidden;
                   height: 475px;
-                  margin-top: -355px;
+                  margin-top: -345px;
                   padding-top: 80px;
                   flex: 1;
                   min-width: 0;
@@ -798,7 +798,7 @@ export default function MainContent({
                   .osp-scroll-wrapper {
                     margin: 0 48px;
                     height: 350px;
-                    margin-top: -250px;
+                    margin-top: -230px;
                     padding-top: 60px;
                   }
                   .osp-scroll-container {
@@ -813,12 +813,12 @@ export default function MainContent({
                   @media (max-width: 767px) {
                     .osp-popular-categories-bar-wrapper {
                       height: 60px;
-                      margin-top: 135px;
+                      margin-top: 155px;
                     }
                     .osp-scroll-wrapper {
                       margin: 0 20px;
                       height: 275px;
-                      margin-top: -225px;
+                      margin-top: -210px;
                       padding-top: 45px;
                     }
                     .osp-scroll-container {
@@ -861,6 +861,9 @@ export default function MainContent({
                     height: 170px;
                     border-radius: 14px;
                     padding: 3px;
+                  }
+                  .osp-cat-name {
+                    font-size: 14px;
                   }
                 }
 
@@ -913,15 +916,21 @@ export default function MainContent({
                   color: #ffffff;
                   font-size: 16px;
                   font-weight: 700;
-                  margin-bottom: 24px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
+                  margin-bottom: 0px;
+                  white-space: normal;
+                  overflow: visible;
+                  text-overflow: clip;
+                  line-height: 1.2;
                   width: 100%;
                   text-align: center;
                   z-index: 5;
                   position: relative;
                   transition: color 0.2s ease;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  min-height: 40px;
+                  padding: 0 8px;
                 }
 
                 .osp-cat-item:hover .osp-cat-name {
@@ -936,20 +945,19 @@ export default function MainContent({
                   height: 44px;
                   border-radius: 50%;
                   background-color: #ffffff;
-                  border: none;
+                  border: 1px solid rgba(19, 108, 57, 0.18);
                   display: flex;
                   align-items: center;
                   justify-content: center;
                   cursor: pointer;
-                  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
                   z-index: 10;
-                  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                  transition: all 0.2s ease;
                 }
 
                 .osp-scroll-btn:hover {
-                  transform: translateY(-50%) scale(1.1);
-                  box-shadow: 0 6px 14px rgba(0,0,0,0.22);
-                  background-color: #f8fafc;
+                  transform: translateY(-50%) scale(1.06);
+                  border-color: #136c39;
+                  background-color: #f0fdf4;
                 }
 
                 .osp-scroll-btn-left {
@@ -968,31 +976,29 @@ export default function MainContent({
 
                 @media (max-width: 767px) {
                   .osp-scroll-btn {
-                    width: 32px;
-                    height: 32px;
+                    width: 24px;
+                    height: 24px;
+                    background: none !important;
+                    border: none !important;
+                    box-shadow: none !important;
                     top: 50%;
                   }
+                  .osp-scroll-btn:hover {
+                    transform: translateY(-50%) scale(1.15);
+                  }
                   .osp-scroll-btn i {
-                    font-size: 12px;
+                    font-size: 16px;
+                    color: #ffffff !important;
                   }
                   .osp-scroll-btn-left {
-                    left: 4px;
+                    left: 6px;
                   }
                   .osp-scroll-btn-right {
-                    right: 4px;
+                    right: 6px;
                   }
                   .osp-cat-name {
                     font-size: 13px;
-                    font-weight: 700;
-                    margin-bottom: 5px;
-                    white-space: normal;
-                    overflow: visible;
-                    text-overflow: clip;
-                    line-height: 1.2;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 40px;
+                    padding: 0 4px;
                   }
                 }
 
